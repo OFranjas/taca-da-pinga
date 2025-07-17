@@ -1,0 +1,96 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+/* Search */
+.searchWrapper {
+  position: relative;
+  width: 100%;
+}
+.searchInput {
+    box-sizing: border-box;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+}
+.searchInput:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+}
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  max-height: 10rem;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+.suggestion {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.suggestion:hover {
+  background: var(--accent-hover);
+}
+
+/* Amount picker */
+.amountPicker {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: max-content;
+}
+.minusBtn,
+.plusBtn {
+  background: var(--accent-green);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.minusBtn:hover,
+.plusBtn:hover {
+  background: #0e9e63;
+}
+.amountInput {
+  width: 3rem;
+  padding: 0.5rem;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  outline: none;
+}
+
+/* Add button */
+.addButton {
+  padding: 0.75rem;
+  background: var(--accent-green);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.addButton:hover {
+  background: #0e9e63;
+  transform: translateY(-1px);
+}

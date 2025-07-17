@@ -1,0 +1,77 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+/* Creation row */
+.top {
+  display: flex;
+  gap: 0.5rem;
+}
+.input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.createBtn {
+  background: var(--accent-green);
+  color: #fff;
+  border: none;
+  padding: 0 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.createBtn:hover {
+  background: #0e9e63;
+}
+
+/* Filter */
+.filterWrapper {
+  margin-top: 0.5rem;
+}
+
+/* List */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s;
+}
+.item:last-child {
+  border-bottom: none;
+}
+.item:hover {
+  background: var(--accent-hover);
+}
+.teamName {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.deleteBtn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.deleteBtn:hover {
+  background: #dc2626;
+}

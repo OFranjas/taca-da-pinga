@@ -1,10 +1,9 @@
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-}
+/* Reúne estilos para ambos os painéis */
 .card {
-  background: #ffffff;
-  padding: 2rem;
+  max-width: 600px;
+  margin: 1rem auto;
+  background: var(--bg-card);
+  padding: 1.5rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
@@ -17,46 +16,107 @@
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
 }
 .logoutBtn {
   background: #ef4444;
   color: #fff;
   padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+}
+.tabBar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.tab, .activeTab {
+  flex: 1;
+  padding: 0.5rem;
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
 }
-.formGroup {
+.tab {
+  background: #e5e7eb;
+}
+.activeTab {
+  background: var(--accent-green);
+  color: #fff;
+}
+
+/* AddPingasPanel.module.css */
+.panel {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-bottom: 1rem;
 }
-.input, .select {
-  padding: 0.75rem;
+.search {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+}
+.suggestions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 8rem;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+}
+.suggestion {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.suggestion:hover {
+  background: var(--accent-hover);
+}
+.form {
+  display: flex;
+  gap: 0.5rem;
+}
+.input {
+  flex: 1;
+  padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
 }
 .button {
-  padding: 0.75rem;
-  background: #10b981;
+  padding: 0.5rem 1rem;
+  background: var(--accent-green);
   color: #fff;
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
-  font-weight: 600;
 }
-.error {
-  color: #dc2626;
-  margin-bottom: 0.5rem;
+
+/* ManageTeamsPanel.module.css */
+.top {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 .list {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  max-height: 12rem;
+  overflow-y: auto;
 }
 .item {
-  padding: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
   border-bottom: 1px solid #e5e7eb;
+  align-items: center;
+}
+.deleteBtn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
 }

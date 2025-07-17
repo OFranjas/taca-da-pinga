@@ -10,6 +10,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
-    <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+    <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
   </React.StrictMode>
 );
