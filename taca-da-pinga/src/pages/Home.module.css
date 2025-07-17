@@ -1,35 +1,75 @@
-/* Home.module.css */
+/* Hero section */
 .hero {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 2rem 1rem;
-  min-height: 80vh;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  min-height: calc(100vh - 64px); /* subtrai altura do header */
+  background: var(--bg-page);
 }
+
+/* Logo */
+.logo {
+  width: clamp(80px, 20vw, 150px);
+  height: auto;
+  margin-bottom: 1rem;
+  transition: transform 0.2s;
+}
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* Title */
 .title {
   font-size: clamp(2rem, 8vw, 4rem);
+  color: var(--text-primary);
+  font-weight: 800;
   margin-bottom: 2rem;
-  color: #1f2937;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.1);
 }
+
+/* Buttons */
 .buttonGroup {
   display: grid;
   gap: 1rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
+
 .button {
   padding: 1rem 0;
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
-  border-radius: .5rem;
   color: #fff;
-  transition: transform .2s, opacity .2s;
+  background: var(--accent-green);
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: transform 0.2s, opacity 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
 .button:hover {
-  opacity: .9;
-  transform: translateY(-2px);
+  opacity: 0.9;
+  transform: translateY(-3px);
+}
+
+.leader {
+  background: var(--accent-green);
+}
+
+.admin {
+  background: #3b82f6; /* mantém azul para diferenciar */
+}
+
+/* Mobile tweak */
+@media (max-width: 480px) {
+  .title {
+    font-size: clamp(1.5rem, 10vw, 3rem);
+  }
+  .logo {
+    width: clamp(60px, 25vw, 120px);
+  }
 }
