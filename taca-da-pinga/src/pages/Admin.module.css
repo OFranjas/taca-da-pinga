@@ -120,3 +120,40 @@
   cursor: pointer;
   font-size: 0.875rem;
 }
+
+
+/* Login form styling */
+.loginForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 1rem;
+}
+.loginForm .input {
+  flex: 1 1 200px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.loginForm .input:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+}
+.loginBtn {
+  background: var(--accent-green);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.loginBtn:hover {
+  background: #0e9e63;
+  transform: translateY(-1px);
+}

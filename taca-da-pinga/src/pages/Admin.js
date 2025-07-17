@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import AddPingasPanel from '../components/AddPingasPanel';
-import ManageTeamsPanel from '../components/ManageTeamsPanel';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import styles from './Admin.module.css';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import Header from "../components/Header";
+import AddPingasPanel from "../components/AddPingasPanel";
+import ManageTeamsPanel from "../components/ManageTeamsPanel";
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import styles from "./Admin.module.css";
+import { toast } from "react-toastify";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
-  const [section, setSection] = useState('add');
+  const [section, setSection] = useState("add");
 
   // Login form state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(u => setUser(u));
+    const unsub = auth.onAuthStateChanged((u) => setUser(u));
     return unsub;
   }, []);
 
@@ -24,7 +24,7 @@ export default function Admin() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success('Logged in successfully');
+      toast.success("Logged in successfully");
     } catch (e) {
       toast.error(e.message);
     }
@@ -33,7 +33,7 @@ export default function Admin() {
   // Logout handler
   const logout = async () => {
     await signOut(auth);
-    toast.info('Logged out');
+    toast.info("Logged out");
   };
 
   if (!user) {
@@ -42,23 +42,33 @@ export default function Admin() {
         <Header />
         <div className={styles.card}>
           <h2 className={styles.title}>Admin Login</h2>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className={styles.input}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className={styles.input}
-          />
-          <button onClick={login} className={styles.button}>
-            Login
-          </button>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              login();
+            }}
+            className={styles.loginForm}
+          >
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={styles.input}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.input}
+              required
+            />
+            <button type="submit" className={styles.loginBtn}>
+              Login
+            </button>
+          </form>
         </div>
       </>
     );
@@ -76,20 +86,20 @@ export default function Admin() {
         </div>
         <div className={styles.tabBar}>
           <button
-            className={section === 'add' ? styles.activeTab : styles.tab}
-            onClick={() => setSection('add')}
+            className={section === "add" ? styles.activeTab : styles.tab}
+            onClick={() => setSection("add")}
           >
             Add Pingas
           </button>
           <button
-            className={section === 'manage' ? styles.activeTab : styles.tab}
-            onClick={() => setSection('manage')}
+            className={section === "manage" ? styles.activeTab : styles.tab}
+            onClick={() => setSection("manage")}
           >
             Manage Teams
           </button>
         </div>
 
-        {section === 'add' ? <AddPingasPanel /> : <ManageTeamsPanel />}
+        {section === "add" ? <AddPingasPanel /> : <ManageTeamsPanel />}
       </div>
     </>
   );
