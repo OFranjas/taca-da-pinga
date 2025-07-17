@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+}
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 2rem;
+}
+.buttonGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+.button {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.leader {
+  background-color: #10b981;
+}
+.admin {
+  background-color: #3b82f6;
+}
+.config {
+  background-color: #8b5cf6;
+}
+.button:hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,24 @@
+.card {
+  padding: 1rem;
+  margin: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+}
+.info {
+  display: flex;
+  flex-direction: column;
+}
+.name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+.pingas {
+  font-size: 1rem;
+  color: #374151;
+}
