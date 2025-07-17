@@ -13,7 +13,7 @@ import {
   where,
   getDocs
 } from 'firebase/firestore';
-import Layout from '../components/Layout';
+import Header from '../components/Header';
 import TeamCard from '../components/TeamCard';
 import styles from './Admin.module.css';
 import { toast } from 'react-toastify';
@@ -93,7 +93,8 @@ export default function Admin() {
 
   if (!user) {
     return (
-      <Layout showBack>
+      <>
+        <Header />
         <div className={styles.card}>
           <h2 className={styles.title}>Admin Login</h2>
           <input
@@ -114,12 +115,13 @@ export default function Admin() {
             Login
           </button>
         </div>
-      </Layout>
+      </>
     );
   }
 
   return (
-    <Layout showBack>
+    <>
+      <Header />
       <div className={styles.card}>
         <div className={styles.header}>
           <h2 className={styles.title}>Admin Panel</h2>
@@ -185,6 +187,6 @@ export default function Admin() {
           ))}
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

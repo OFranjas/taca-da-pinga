@@ -1,17 +1,27 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
-import styles from './Home.module.css';
+// src/pages/Home.js
+import React from "react";
+import { Link } from "react-router-dom";
+import styles from "./Home.module.css";
+import Header from "../components/Header";
+
 export default function Home() {
   return (
-    <Layout>
-      <div className={styles.container}>
-        <h2 className={styles.title}>Taça da Pinga</h2>
+    <>
+      <Header/>
+      <section className={styles.hero}>
+        <h1 className={styles.title}>Taça da Pinga</h1>
         <div className={styles.buttonGroup}>
-          <Link to="/leaderboard" className={`${styles.button} ${styles.leader}`}>Leaderboard</Link>
-          <Link to="/admin" className={`${styles.button} ${styles.admin}`}>Admin Panel</Link>
+          <Link
+            to="/leaderboard"
+            className={`${styles.button} ${styles.leader}`}
+          >
+            Leaderboard
+          </Link>
+          <Link to="/admin" className={`${styles.button} ${styles.admin}`}>
+            Admin Panel
+          </Link>
         </div>
-      </div>
-    </Layout>
+      </section>
+    </>
   );
 }

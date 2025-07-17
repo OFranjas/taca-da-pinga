@@ -1,0 +1,16 @@
+:root {
+  /* Paleta de Cores */
+  --bg-page: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --accent-green: #10b981;
+  --accent-hover: rgba(16,185,129,0.1);
+}
+
+/* Importa depois dos @tailwind ou no topo se não usares Tailwind */
+body {
+  background: var(--bg-page);
+  margin: 0;
+  font-family: sans-serif;
+}

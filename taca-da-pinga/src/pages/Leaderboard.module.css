@@ -1,11 +1,113 @@
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1.5rem;
+/* src/pages/Leaderboard.module.css */
+.page {
+  /* Remove background aqui, o body já tem a cor */
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
 }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+/* Header full-width */
+.header {
+  width: 100%;
+  background: var(--bg-page);
+  padding: 1rem 0;
+  text-align: center;
+}
+.title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* Podium full-width section */
+.podium {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
+  padding: 1rem 0;
+  background: var(--bg-page);
+}
+
+/* Cartões responsivos: encolhem até um mínimo */
+.card {
+  background: var(--bg-card);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  text-align: center;
+  flex: 1 1 120px;      /* ENCOLHE até 120px */
+  max-width: 30%;       /* No desktop, no máximo 30% cada */
+  min-width: 100px;     /* No mobile, mínimo 100px */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Ordenação no flex: primeiro no centro */
+.first { order: 2; }
+.second { order: 1; }
+.third { order: 3; }
+
+.rank {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+.name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  margin-top: 0.5rem;
+}
+
+/* Lista de baixo */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-card);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s;
+}
+.listItem:last-child {
+  border-bottom: none;
+}
+.listItem:hover {
+  background: var(--accent-hover);
+}
+.position,
+.listName,
+.listScore {
+  color: var(--text-secondary);
+}
+.position { width: 2rem; font-weight: 600; }
+.listName { flex: 1; font-weight: 600; }
+.listScore { width: 3rem; text-align: right; font-weight: 700; }
+
+/* Adapt for small screens */
+@media (max-width: 640px) {
+  .podium {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    max-width: 80%;
+  }
 }

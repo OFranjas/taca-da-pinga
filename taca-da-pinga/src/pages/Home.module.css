@@ -1,38 +1,35 @@
-.container {
+/* Home.module.css */
+.hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 70vh;
+  align-items: center;
+  padding: 2rem 1rem;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
 }
 .title {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #111827;
+  font-size: clamp(2rem, 8vw, 4rem);
   margin-bottom: 2rem;
+  color: #1f2937;
 }
 .buttonGroup {
-  display: flex;
-  gap: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 800px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 .button {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
+  padding: 1rem 0;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #ffffff;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-}
-.leader {
-  background-color: #10b981;
-}
-.admin {
-  background-color: #3b82f6;
-}
-.config {
-  background-color: #8b5cf6;
+  text-align: center;
+  border-radius: .5rem;
+  color: #fff;
+  transition: transform .2s, opacity .2s;
 }
 .button:hover {
-  opacity: 0.9;
+  opacity: .9;
+  transform: translateY(-2px);
 }
