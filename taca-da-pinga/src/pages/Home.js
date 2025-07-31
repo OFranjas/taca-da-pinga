@@ -20,7 +20,7 @@ export default function Home() {
               Ver leaderboard
             </Link>
             <Link to="/admin" className={`${styles.button} ${styles.admin}`}>
-              Admin panel
+              Painel Admin
             </Link>
           </div>
         </section>

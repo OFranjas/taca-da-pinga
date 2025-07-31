@@ -31,7 +31,7 @@ export default function Leaderboard() {
         <div className={styles.pageHeader}>
           <h1 className={styles.title}>Leaderboard</h1>
           <div className={styles.totals}>
-            <span className={styles.totalLabel}>Total drinks</span>
+            <span className={styles.totalLabel}>Total</span>
             <span className={styles.totalValue}>{total}</span>
           </div>
         </div>

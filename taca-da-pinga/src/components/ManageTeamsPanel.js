@@ -31,17 +31,17 @@ export default function ManageTeamsPanel() {
   const createTeam = async () => {
     const nameTrim = newName.trim();
     if (!nameTrim) {
-      toast.error("Name cannot be empty");
+      toast.error("Nome não pode estar vazio");
       return;
     }
     const q = query(collection(db, "teams"), where("name", "==", nameTrim));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      toast.error("Team exists");
+      toast.error("Equipa já existe");
       return;
     }
     await addDoc(collection(db, "teams"), { name: nameTrim, pingas: 0 });
-    toast.success("Team created");
+    toast.success("Equipa criada");
     setNewName("");
   };
 
@@ -60,19 +60,19 @@ export default function ManageTeamsPanel() {
       <div className={styles.top}>
         <input
           type="text"
-          placeholder="New team name..."
+          placeholder="Nova equipa..."
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           className={styles.input}
         />
         <button onClick={createTeam} className={styles.createBtn}>
-          Create
+          Criar
         </button>
       </div>
       <div className={styles.filterWrapper}>
         <input
           type="text"
-          placeholder="Filter teams..."
+          placeholder="Filtrar equipas..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className={styles.input}
@@ -93,7 +93,7 @@ export default function ManageTeamsPanel() {
                 className={styles.deleteBtn}
                 aria-label={`Delete ${team.name}`}
               >
-                Delete
+                Eliminar
               </button>
             </div>
           </li>
@@ -102,8 +102,8 @@ export default function ManageTeamsPanel() {
 
       <ConfirmModal
         isOpen={!!toDelete}
-        title="Delete Team?"
-        message={`Are you sure you want to delete "${toDelete?.name}"?`}
+        title="Eliminar Equipa?"
+        message={`Tem a certeza de que deseja eliminar "${toDelete?.name}"?`}
         onCancel={() => setToDelete(null)}
         onConfirm={confirmDelete}
       />

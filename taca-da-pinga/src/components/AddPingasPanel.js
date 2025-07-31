@@ -53,14 +53,14 @@ export default function AddPingasPanel() {
   // Add pingas
   const handleAdd = async () => {
     if (!selectedTeam || amount < 1) {
-      toast.error("Select a team and a valid amount");
+      toast.error("Seleciona uma equipa e define um valor válido");
       return;
     }
     try {
       await updateDoc(doc(db, "teams", selectedTeam.id), {
         pingas: increment(amount),
       });
-      toast.success(`Added ${amount} to ${selectedTeam.name}`);
+      toast.success(`Adicionados ${amount} a ${selectedTeam.name}`);
       setSearch("");
       setSelectedTeam(null);
       setAmount(1);
@@ -86,7 +86,7 @@ export default function AddPingasPanel() {
         <div className={styles.searchWrapper} ref={wrapperRef}>
           <input
             type="text"
-            placeholder="Search team..."
+            placeholder="Procurar equipa..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -116,12 +116,12 @@ export default function AddPingasPanel() {
           className={styles.amountPicker}
           tabIndex={0}
           onKeyDown={handleAmountKey}
-          aria-label="Amount"
+          aria-label="Quantidade"
         >
           <button
             className={styles.minusBtn}
             onClick={() => setAmount((a) => Math.max(1, a - 1))}
-            aria-label="Decrease"
+            aria-label="Diminuir"
           >
             –
           </button>
@@ -135,7 +135,7 @@ export default function AddPingasPanel() {
           <button
             className={styles.plusBtn}
             onClick={() => setAmount((a) => a + 1)}
-            aria-label="Increase"
+            aria-label="Aumentar"
           >
             +
           </button>

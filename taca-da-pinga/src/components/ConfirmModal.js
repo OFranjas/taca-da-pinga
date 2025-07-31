@@ -23,10 +23,10 @@ export default function ConfirmModal({
         <p className={styles.message}>{message}</p>
         <div className={styles.buttons}>
           <button className={styles.cancelBtn} onClick={onCancel}>
-            Cancel
+            Cancelar
           </button>
           <button className={styles.confirmBtn} onClick={onConfirm}>
-            Confirm
+            Confirmar
           </button>
         </div>
       </div>
