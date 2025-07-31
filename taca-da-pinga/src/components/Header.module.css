@@ -1,29 +1,93 @@
+:root {
+  --card-border: #e5e7eb;
+}
+
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 40;
   background: var(--bg-card);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: saturate(140%) blur(4px);
 }
 
-.logoWrapper {
-  width: 48px; /* Match or slightly bigger than logo width */
+/* Agrupa brand + nav e centraliza */
+.centerWrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 16px;
   display: flex;
+  justify-content: center; /* <- centra tudo */
   align-items: center;
-  justify-content: center;
+  gap: 16px;
+  width: 100%;
 }
 
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
 .logo {
-  height: 40px;
-  width: 40px;
+  height: 36px;
+  width: 36px;
   object-fit: contain;
 }
-
-.title {
-  flex: 1;
-  text-align: center;
-  font-size: clamp(1.25rem, 4vw, 2rem);
+.brandText {
+  font-weight: 900;
   color: var(--text-primary);
-  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
+/* Nav */
+.nav {
+  display: inline-flex;
+  gap: 8px;
+}
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  border: 1px solid transparent;
+}
+.navLink:hover {
+  transform: translateY(-1px);
+}
+
+.active {
+  background: var(--accent-green);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+.outline {
+  border: 1px solid #c9d2e6;
+  color: #1f2a44;
+  background: #edf2ff;
+}
+.outline:hover {
+  background: #e2e9ff;
+}
+.activeOutline {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+@media (max-width: 640px) {
+  .brandText {
+    display: none;
+  }
+  .navLink {
+    height: 34px;
+    padding: 0 12px;
+  }
 }

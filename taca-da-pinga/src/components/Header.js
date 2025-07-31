@@ -1,28 +1,40 @@
-// src/components/Header.js
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import styles from './Header.module.css';
-import logo from '../assets/logo.png';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import styles from "./Header.module.css";
+import logo from "../assets/logo.png";
 
 export default function Header() {
   const { pathname } = useLocation();
-  const showHome = pathname !== '/';
+  const isActive = (to) => pathname.startsWith(to);
 
-  // The ghost element ensures symmetry
   return (
     <header className={styles.header}>
-      <div className={styles.logoWrapper}>
-        {showHome ? (
-          <Link to="/" className={styles.logoLink}>
-            <img src={logo} alt="Logo Taça da Pinga" className={styles.logo} />
-          </Link>
-        ) : (
+      <div className={styles.centerWrap}>
+        <Link to="/" className={styles.brand}>
           <img src={logo} alt="Logo Taça da Pinga" className={styles.logo} />
-        )}
+          <span className={styles.brandText}>Taça da Pinga</span>
+        </Link>
+        <nav className={styles.nav} aria-label="Main">
+          <Link
+            to="/leaderboard"
+            className={`${styles.navLink} ${
+              isActive("/leaderboard") ? styles.active : ""
+            }`}
+            aria-current={isActive("/leaderboard") ? "page" : undefined}
+          >
+            Leaderboard
+          </Link>
+          <Link
+            to="/admin"
+            className={`${styles.navLink} ${styles.outline} ${
+              isActive("/admin") ? styles.activeOutline : ""
+            }`}
+            aria-current={isActive("/admin") ? "page" : undefined}
+          >
+            Admin
+          </Link>
+        </nav>
       </div>
-      <h1 className={styles.title}>Taça da Pinga</h1>
-      {/* Ghost div with same width as logo to center the title */}
-      <div className={styles.logoWrapper} aria-hidden="true"></div>
     </header>
   );
 }
