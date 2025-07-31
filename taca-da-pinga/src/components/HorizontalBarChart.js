@@ -21,6 +21,7 @@ const OTHER_COLOR = "#E0E0E0";
 const MARGIN_PC = { top: 16, right: 60, bottom: 16, left: 200 };
 const MARGIN_MOBILE = { top: 16, right: 60, bottom: 16, left: 110 };
 
+
 // Hook: detect mobile viewport
 function useIsMobile(breakpoint = MOBILE_BREAKPOINT) {
   const [isMobile, setIsMobile] = useState(
@@ -90,6 +91,15 @@ const BeerLabel = ({ x, y, width, value, barSize, isMobile }) => {
   const fontSize = isMobile ? 16 : 22;
   const iconSize = fontSize * 0.95;
   const cy = y + barSize / 2;
+
+  // Render the number and the icon as siblings using a <g> group
+  // Calculate the width of the text dynamically so the icon sits right next to it
+
+  // SVG: measure text width using the 'ref' trick
+  const numberStr = String(value);
+  // Approximate per-digit width (varies by font, but 0.6 * fontSize works well for monospace or regular numbers)
+  const textWidth = numberStr.length * fontSize * 0.6;
+
   return (
     <g>
       <text
@@ -104,7 +114,7 @@ const BeerLabel = ({ x, y, width, value, barSize, isMobile }) => {
       </text>
       <image
         href={BeerIcon}
-        x={x + width + 8 + fontSize + 4}
+        x={x + width + 8 + textWidth + 2}  // 6px gap between number and icon
         y={cy - iconSize / 2}
         width={iconSize}
         height={iconSize}
@@ -112,14 +122,7 @@ const BeerLabel = ({ x, y, width, value, barSize, isMobile }) => {
     </g>
   );
 };
-BeerLabel.propTypes = {
-  x: PropTypes.number,
-  y: PropTypes.number,
-  width: PropTypes.number,
-  value: PropTypes.number,
-  barSize: PropTypes.number,
-  isMobile: PropTypes.bool,
-};
+
 
 // Main component
 function HorizontalBarChart({ data, highlight }) {
