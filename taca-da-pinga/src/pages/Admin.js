@@ -11,7 +11,6 @@ export default function Admin() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("add");
 
-  // Login form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,7 +19,6 @@ export default function Admin() {
     return unsub;
   }, []);
 
-  // Login handler
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -30,7 +28,6 @@ export default function Admin() {
     }
   };
 
-  // Logout handler
   const logout = async () => {
     await signOut(auth);
     toast.info("Logged out");
@@ -79,23 +76,31 @@ export default function Admin() {
       <Header />
       <div className={styles.card}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Admin Panel</h2>
+          <h2 className={styles.title}>Painel Admin</h2>
           <button onClick={logout} className={styles.logoutBtn}>
             Logout
           </button>
         </div>
-        <div className={styles.tabBar}>
+        <div
+          className={styles.tabBar}
+          role="tablist"
+          aria-label="Admin sections"
+        >
           <button
+            role="tab"
+            aria-selected={section === "add"}
             className={section === "add" ? styles.activeTab : styles.tab}
             onClick={() => setSection("add")}
           >
-            Add Pingas
+            Adicionar Pingas
           </button>
           <button
+            role="tab"
+            aria-selected={section === "manage"}
             className={section === "manage" ? styles.activeTab : styles.tab}
             onClick={() => setSection("manage")}
           >
-            Manage Teams
+            Gerir Equipas
           </button>
         </div>
 

@@ -19,6 +19,7 @@ export default function ManageTeamsPanel() {
   const [teams, setTeams] = useState([]);
   const [newName, setNewName] = useState("");
   const [filter, setFilter] = useState("");
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     const q = query(collection(db, "teams"), orderBy("name"));
@@ -44,8 +45,6 @@ export default function ManageTeamsPanel() {
     setNewName("");
   };
 
-  const [toDelete, setToDelete] = useState(null);
-
   const confirmDelete = async () => {
     await deleteDoc(doc(db, "teams", toDelete.id));
     toast.info(`"${toDelete.name}" deleted`);
@@ -70,7 +69,6 @@ export default function ManageTeamsPanel() {
           Create
         </button>
       </div>
-
       <div className={styles.filterWrapper}>
         <input
           type="text"
@@ -84,15 +82,20 @@ export default function ManageTeamsPanel() {
       <ul className={styles.list}>
         {visible.map((team) => (
           <li key={team.id} className={styles.item}>
-            <span className={styles.teamName}>
-              {team.name} ({team.pingas})
-            </span>
-            <button
-              onClick={() => setToDelete(team)}
-              className={styles.deleteBtn}
-            >
-              Delete
-            </button>
+            <div className={styles.left}>
+              <span className={styles.dot} aria-hidden />
+              <span className={styles.teamName}>{team.name}</span>
+            </div>
+            <div className={styles.right}>
+              <span className={styles.countPill}>{team.pingas}</span>
+              <button
+                onClick={() => setToDelete(team)}
+                className={styles.deleteBtn}
+                aria-label={`Delete ${team.name}`}
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>

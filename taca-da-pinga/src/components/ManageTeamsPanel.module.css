@@ -1,10 +1,13 @@
-/* ManageTeamsPanel.module.css */
+:root {
+  --card-border: #e5e7eb;
+  --shadow: 0 2px 10px rgba(17, 24, 39, 0.08);
+}
 
 .panel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem 0;
+  padding: 0.25rem 0;
 }
 
 /* Creation row */
@@ -16,25 +19,33 @@
   flex: 1;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 1rem;
+  background: var(--bg-card);
 }
+.input:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
 .createBtn {
   background: var(--accent-green);
   color: #fff;
   border: none;
   padding: 0 1rem;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 800;
+  transition: background 0.2s, transform 0.2s;
 }
 .createBtn:hover {
   background: #0e9e63;
+  transform: translateY(-1px);
 }
 
 /* Filter */
 .filterWrapper {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 /* List */
@@ -42,15 +53,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 12rem;
+  max-height: 16rem;
   overflow-y: auto;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
 }
 .item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
+  gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e5e7eb;
   transition: background 0.2s;
@@ -61,19 +75,53 @@
 .item:hover {
   background: var(--accent-hover);
 }
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: #d1d5db;
+}
 .teamName {
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.countPill {
+  background: #eef2f7;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  min-width: 28px;
+  text-align: center;
 }
 .deleteBtn {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.375rem;
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 .deleteBtn:hover {
-  background: #dc2626;
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-1px);
 }

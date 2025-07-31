@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { db } from '../firebase';
+import React, { useState, useEffect, useRef } from "react";
+import { db } from "../firebase";
 import {
   collection,
   query,
@@ -7,14 +7,14 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  increment
-} from 'firebase/firestore';
-import { toast } from 'react-toastify';
-import styles from './AddPingasPanel.module.css';
+  increment,
+} from "firebase/firestore";
+import { toast } from "react-toastify";
+import styles from "./AddPingasPanel.module.css";
 
 export default function AddPingasPanel() {
   const [teams, setTeams] = useState([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [amount, setAmount] = useState(1);
@@ -22,9 +22,9 @@ export default function AddPingasPanel() {
 
   // Load teams
   useEffect(() => {
-    const q = query(collection(db, 'teams'), orderBy('name'));
-    return onSnapshot(q, snap => {
-      setTeams(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const q = query(collection(db, "teams"), orderBy("name"));
+    return onSnapshot(q, (snap) => {
+      setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
   }, []);
 
@@ -35,35 +35,33 @@ export default function AddPingasPanel() {
       return;
     }
     setFiltered(
-      teams.filter(t =>
-        t.name.toLowerCase().includes(search.toLowerCase())
-      )
+      teams.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
     );
   }, [search, teams, selectedTeam]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
-    const handleClick = e => {
+    const handleClick = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setFiltered([]);
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   // Add pingas
   const handleAdd = async () => {
     if (!selectedTeam || amount < 1) {
-      toast.error('Select a team and a valid amount');
+      toast.error("Select a team and a valid amount");
       return;
     }
     try {
-      await updateDoc(doc(db, 'teams', selectedTeam.id), {
-        pingas: increment(amount)
+      await updateDoc(doc(db, "teams", selectedTeam.id), {
+        pingas: increment(amount),
       });
       toast.success(`Added ${amount} to ${selectedTeam.name}`);
-      setSearch('');
+      setSearch("");
       setSelectedTeam(null);
       setAmount(1);
     } catch (e) {
@@ -72,75 +70,80 @@ export default function AddPingasPanel() {
   };
 
   // Handle amount input + arrow keys
-  const handleAmountChange = e => {
+  const handleAmountChange = (e) => {
     const v = parseInt(e.target.value, 10);
     setAmount(isNaN(v) || v < 1 ? 1 : v);
   };
-  const handleAmountKey = e => {
-    if (e.key === 'ArrowUp') setAmount(a => a + 1);
-    if (e.key === 'ArrowDown') setAmount(a => Math.max(1, a - 1));
+  const handleAmountKey = (e) => {
+    if (e.key === "ArrowUp") setAmount((a) => a + 1);
+    if (e.key === "ArrowDown") setAmount((a) => Math.max(1, a - 1));
+    if (e.key === "Enter") handleAdd();
   };
 
   return (
     <div className={styles.panel}>
-      <div className={styles.searchWrapper} ref={wrapperRef}>
-        <input
-          type="text"
-          placeholder="Search team..."
-          value={search}
-          onChange={e => {
-            setSearch(e.target.value);
-            setSelectedTeam(null);
-          }}
-          className={styles.searchInput}
-        />
-        {filtered.length > 0 && (
-          <div className={styles.suggestions}>
-            {filtered.slice(0, 5).map(t => (
-              <div
-                key={t.id}
-                className={styles.suggestion}
-                onClick={() => {
-                  setSelectedTeam(t);
-                  setSearch(t.name);
-                  setFiltered([]);
-                }}
-              >
-                {t.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div
-        className={styles.amountPicker}
-        tabIndex={0}
-        onKeyDown={handleAmountKey}
-      >
-        <button
-          className={styles.minusBtn}
-          onClick={() => setAmount(a => Math.max(1, a - 1))}
+      <div className={styles.searchRow}>
+        <div className={styles.searchWrapper} ref={wrapperRef}>
+          <input
+            type="text"
+            placeholder="Search team..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setSelectedTeam(null);
+            }}
+            className={styles.searchInput}
+          />
+          {filtered.length > 0 && (
+            <div className={styles.suggestions}>
+              {filtered.slice(0, 6).map((t) => (
+                <div
+                  key={t.id}
+                  className={styles.suggestion}
+                  onClick={() => {
+                    setSelectedTeam(t);
+                    setSearch(t.name);
+                    setFiltered([]);
+                  }}
+                >
+                  {t.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div
+          className={styles.amountPicker}
+          tabIndex={0}
+          onKeyDown={handleAmountKey}
+          aria-label="Amount"
         >
-          –
-        </button>
-        <input
-          type="number"
-          min="1"
-          value={amount}
-          onChange={handleAmountChange}
-          className={styles.amountInput}
-        />
-        <button
-          className={styles.plusBtn}
-          onClick={() => setAmount(a => a + 1)}
-        >
-          +
-        </button>
+          <button
+            className={styles.minusBtn}
+            onClick={() => setAmount((a) => Math.max(1, a - 1))}
+            aria-label="Decrease"
+          >
+            –
+          </button>
+          <input
+            type="number"
+            min="1"
+            value={amount}
+            onChange={handleAmountChange}
+            className={styles.amountInput}
+          />
+          <button
+            className={styles.plusBtn}
+            onClick={() => setAmount((a) => a + 1)}
+            aria-label="Increase"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       <button onClick={handleAdd} className={styles.addButton}>
-        Add Pingas
+        Adicionar Pingas
       </button>
     </div>
   );

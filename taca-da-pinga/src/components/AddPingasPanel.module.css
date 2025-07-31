@@ -1,11 +1,21 @@
-/* AddPingasPanel.module.css */
+:root {
+  --card-border: #e5e7eb;
+  --shadow: 0 2px 10px rgba(17, 24, 39, 0.08);
+}
 
 .panel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  padding: 1rem 0;
+  padding: 0.25rem 0;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: start;
 }
 
 /* Search */
@@ -14,34 +24,35 @@
   width: 100%;
 }
 .searchInput {
-    box-sizing: border-box;
+  box-sizing: border-box;
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 1rem;
   outline: none;
+  background: var(--bg-card);
 }
 .searchInput:focus {
   border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 .suggestions {
   position: absolute;
-  top: 100%;
+  top: calc(100% - 2px);
   left: 0;
   right: 0;
   background: var(--bg-card);
   border: 1px solid #d1d5db;
   border-top: none;
-  border-radius: 0 0 0.5rem 0.5rem;
+  border-radius: 0 0 10px 10px;
   max-height: 10rem;
   overflow-y: auto;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow);
   z-index: 10;
 }
 .suggestion {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 0.9rem;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -54,16 +65,17 @@
   display: inline-flex;
   align-items: center;
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   overflow: hidden;
   width: max-content;
+  background: var(--bg-card);
 }
 .minusBtn,
 .plusBtn {
   background: var(--accent-green);
   color: #fff;
   border: none;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.85rem;
   font-size: 1.25rem;
   cursor: pointer;
   transition: background 0.2s;
@@ -73,22 +85,24 @@
   background: #0e9e63;
 }
 .amountInput {
-  width: 3rem;
-  padding: 0.5rem;
+  width: 3.25rem;
+  padding: 0.55rem;
   border: none;
   text-align: center;
   font-size: 1rem;
   outline: none;
+  background: transparent;
 }
 
 /* Add button */
 .addButton {
-  padding: 0.75rem;
+  padding: 0.9rem;
   background: var(--accent-green);
   color: #fff;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 1rem;
+  font-weight: 800;
   cursor: pointer;
   transition: background 0.2s, transform 0.2s;
 }
