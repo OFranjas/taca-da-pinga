@@ -1,12 +1,17 @@
-/* Header.module.css */
-
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 1rem 2rem;
   background: var(--bg-card);
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.logoWrapper {
+  width: 48px; /* Match or slightly bigger than logo width */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {
@@ -15,36 +20,10 @@
   object-fit: contain;
 }
 
-.placeholderLogo {
-  height: 40px;
-  width: 40px;
-  background: var(--accent-green);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: bold;
-}
-
 .title {
   flex: 1;
   text-align: center;
   font-size: clamp(1.25rem, 4vw, 2rem);
   color: var(--text-primary);
   margin: 0;
-}
-
-.homeBtn {
-  padding: 0.5rem 1rem;
-  background: var(--accent-green);
-  color: #fff;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.homeBtn:hover {
-  background: #0e9e63;
 }

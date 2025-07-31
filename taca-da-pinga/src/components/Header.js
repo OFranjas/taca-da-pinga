@@ -8,17 +8,21 @@ export default function Header() {
   const { pathname } = useLocation();
   const showHome = pathname !== '/';
 
+  // The ghost element ensures symmetry
   return (
     <header className={styles.header}>
-      {showHome ? (
-        <Link to="/" className={styles.logoLink}>
+      <div className={styles.logoWrapper}>
+        {showHome ? (
+          <Link to="/" className={styles.logoLink}>
+            <img src={logo} alt="Logo Taça da Pinga" className={styles.logo} />
+          </Link>
+        ) : (
           <img src={logo} alt="Logo Taça da Pinga" className={styles.logo} />
-        </Link>
-      ) : (
-        <img src={logo} alt="Logo Taça da Pinga" className={styles.logo} />
-      )}
+        )}
+      </div>
       <h1 className={styles.title}>Taça da Pinga</h1>
-      {/* Removed separate Home button, logo now acts as Home link */}
+      {/* Ghost div with same width as logo to center the title */}
+      <div className={styles.logoWrapper} aria-hidden="true"></div>
     </header>
   );
 }
