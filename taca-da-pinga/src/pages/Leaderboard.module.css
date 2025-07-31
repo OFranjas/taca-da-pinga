@@ -1,187 +1,25 @@
-/* src/pages/Leaderboard.module.css */
-
-.page {
-  /* Remove background aqui, o body já tem a cor */
-  max-width: 1000px;
+.wrapper {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1rem 2rem;  /* alinha com o Header */
+  background: var(--bg-page);
+  min-height: calc(100vh - 64px);
+  box-sizing: border-box;
 }
 
-/* Header */
-.header {
-  width: 100%;
-  background: var(--bg-page);
-  padding: 1rem 0;
-  text-align: center;
-}
 .title {
-  font-size: clamp(2rem, 6vw, 3rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
   color: var(--text-primary);
-}
-
-/* Podium */
-.podium {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem 0;
-  background: var(--bg-page);
-}
-
-/* Card base */
-.card {
-  background: var(--bg-card);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 1rem;
   text-align: center;
-  flex: 1 1 200px; /* grow, shrink, base 200px */
-  max-width: 30%; /* desktop: 3 per row */
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
-/* Podium ordering */
-.first {
-  order: 2;
-}
-.second {
-  order: 1;
-}
-.third {
-  order: 3;
-}
-
-/* Card content */
-.rank {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-.name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.score {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--accent-green);
-  margin-top: 0.5rem;
-}
-
-/* Remaining list */
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background: var(--bg-card);
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-.listItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  transition: background 0.2s;
-}
-.listItem:last-child {
-  border-bottom: none;
-}
-.listItem:hover {
-  background: var(--accent-hover);
-}
-
-.position {
-  width: 2rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-.listName {
-  flex: 1;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-.listScore {
-  width: 3rem;
-  text-align: right;
-  font-weight: 700;
-  color: var(--accent-green);
-}
-
-/* —— Mobile & small tablets —— */
-@media (max-width: 768px) {
-  .card {
-    max-width: 45%; /* two per row */
-    flex: 1 1 45%;
+@media (max-width: 600px) {
+  .wrapper {
+    padding: 1rem 1rem;
   }
-  .first {
-    order: 1;
-  }
-  .second {
-    order: 2;
-  }
-  .third {
-    order: 3;
-  }
-}
-
-@media (max-width: 480px) {
-  .podium {
-    flex-direction: column;
-    align-items: center;
-  }
-  .card {
-    flex: none;
-    padding: 1.25rem; /* a bit more breathing room */
-  }
-
-  /* make first card prominent */
-  .first {
-    max-width: 90%;
-    width: 90%;
-  }
-
-  /* second & third slightly narrower */
-  .second,
-  .third {
-    max-width: 70%;
-    width: 70%;
-  }
-
-  .rank {
-    font-size: 1.5rem;
-  }
-  .name {
-    font-size: 1.125rem;
-  }
-  .score {
-    font-size: 1.75rem;
-  }
-
-  /* retweak list text for small screens */
-  .listItem {
-    padding: 1rem;
-  }
-  .listItem:hover {
-    background: var(--accent-hover);
-  }
-  .position {
-    width: 2.5rem;
-    font-size: 1rem;
-  }
-  .listName {
-    font-size: 1rem;
-  }
-  .listScore {
-    font-size: 1.125rem;
+  .title {
+    margin-bottom: 1rem;
   }
 }
