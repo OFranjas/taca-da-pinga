@@ -11,12 +11,17 @@
   padding: 2.5rem 1rem 3.5rem;
   min-height: calc(100vh - 64px);
   background: var(--bg-page);
-  overflow: hidden;
+  overflow: hidden; /* already there, keep it */
+  max-width: 100%; /* ensure it never exceeds viewport */
 }
+
 .hero::before {
   content: "";
   position: absolute;
-  inset: -20%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; /* keep within hero bounds */
   pointer-events: none;
   background: radial-gradient(
       600px 400px at 50% -10%,
@@ -35,6 +40,7 @@
     );
   filter: blur(1px);
   z-index: 0;
+  overflow: hidden; /* belt-and-braces */
 }
 
 /* Card central */

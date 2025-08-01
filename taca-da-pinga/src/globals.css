@@ -5,7 +5,7 @@
   --text-primary: #111827;
   --text-secondary: #374151;
   --accent-green: #10b981;
-  --accent-hover: rgba(16,185,129,0.1);
+  --accent-hover: rgba(16, 185, 129, 0.1);
 }
 
 /* Importa depois dos @tailwind ou no topo se não usares Tailwind */
@@ -13,4 +13,30 @@ body {
   background: var(--bg-page);
   margin: 0;
   font-family: sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevent page-wide horizontal scroll */
+  width: 100%;
+}
+*,
+*::before,
+::after {
+  box-sizing: border-box; /* safer sizing */
+}
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
