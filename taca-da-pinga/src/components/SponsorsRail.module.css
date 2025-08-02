@@ -1,0 +1,59 @@
+.rail {
+  position: sticky;
+  top: 72px;
+  align-self: start;
+  width: 100%;
+  max-width: 220px; /* matches the rail column */
+  padding: 0;
+}
+
+.stack {
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: 14px;
+}
+
+.slot {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 3px 10px rgba(17, 24, 39, 0.1);
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  aspect-ratio: 2.6 / 1; /* wide tile so logos are visually larger */
+}
+
+/* Tablet: one full-width row (4 items) above the table */
+@media (max-width: 1024px) {
+  .rail {
+    position: static;
+    max-width: none;
+  }
+  .stack {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .slot {
+    padding: 10px;
+  }
+}
+
+/* Mobile: 2 x 2 grid with bigger tiles */
+@media (max-width: 640px) {
+  .stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .slot {
+    padding: 12px;
+  }
+  .logo {
+    aspect-ratio: 2.2 / 1;
+  }
+}
