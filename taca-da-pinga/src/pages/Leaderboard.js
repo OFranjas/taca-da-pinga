@@ -13,6 +13,10 @@ import s3 from "../assets/s3.png";
 import s4 from "../assets/s4.png";
 import s5 from "../assets/s5.png";
 import s6 from "../assets/s6.png";
+import s7 from "../assets/s7.jpeg";
+import s8 from "../assets/s8.jpeg";
+import s9 from "../assets/s9.jpeg";
+import s10 from "../assets/s10.jpeg";
 
 export default function Leaderboard() {
   const [teams, setTeams] = useState([]);
@@ -28,8 +32,8 @@ export default function Leaderboard() {
     });
   }, []);
 
-  const left = [s1, s3, s5];
-  const right = [s2, s4, s6];
+  const left = [s1, s3, s5, s7, s9];
+  const right = [s2, s4, s6, s8, s10];
 
   return (
     <>
