@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import Header from "../components/Header";
@@ -11,6 +11,8 @@ import s1 from "../assets/s1.png";
 import s2 from "../assets/s2.jpeg";
 import s3 from "../assets/s3.png";
 import s4 from "../assets/s4.png";
+import s5 from "../assets/s5.png";
+import s6 from "../assets/s6.png";
 
 export default function Leaderboard() {
   const [teams, setTeams] = useState([]);
@@ -26,13 +28,8 @@ export default function Leaderboard() {
     });
   }, []);
 
-  const total = useMemo(
-    () => teams.reduce((sum, t) => sum + (Number(t.pingas) || 0), 0),
-    [teams]
-  );
-
-  const left = [s1, s3];
-  const right = [s2, s4];
+  const left = [s1, s3, s5];
+  const right = [s2, s4, s6];
 
   return (
     <>
@@ -42,10 +39,6 @@ export default function Leaderboard() {
         <div className={styles.wrapper}>
           <div className={styles.pageHeader}>
             <h1 className={styles.title}>Leaderboard</h1>
-            <div className={styles.totals}>
-              <span className={styles.totalLabel}>Total</span>
-              <span className={styles.totalValue}>{total}</span>
-            </div>
           </div>
 
           <LeaderboardBars teams={teams} />

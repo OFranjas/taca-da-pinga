@@ -80,25 +80,6 @@
   color: var(--text-primary);
 }
 
-.totals {
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.totalLabel {
-  font-size: 0.85rem;
-  letter-spacing: 0.35px;
-  text-transform: uppercase;
-}
-
-.totalValue {
-  color: var(--text-primary);
-  font-weight: 800;
-  font-size: 1.2rem;
-}
-
 .list {
   margin-top: 1rem;
   display: grid;
@@ -181,15 +162,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 0.98rem;
-}
-
-.count {
-  color: var(--text-secondary);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.9rem;
-  display: inline-flex;
-  align-items: center;
 }
 
 /* bar track and bar: less rounded */

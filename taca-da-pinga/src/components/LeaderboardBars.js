@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import styles from "../pages/Leaderboard.module.css";
-import Beer from "../assets/beer.svg";
 
 // Medal colors + greens for 4th/5th
 const BAR_COLORS = [
@@ -61,15 +60,6 @@ export default function LeaderboardBars({ teams }) {
               <div className={styles.rowHeader}>
                 <div className={styles.teamName} title={t.name}>
                   {t.name}
-                </div>
-                <div className={styles.count}>
-                  {value}
-                  <img
-                    src={Beer}
-                    alt=""
-                    aria-hidden
-                    style={{ width: 16, height: 16, marginLeft: 6 }}
-                  />
                 </div>
               </div>
 
