@@ -6,6 +6,7 @@
 ![Firebase Hosting](https://img.shields.io/badge/Hosted%20on-Firebase%20Hosting-orange?style=for-the-badge&logo=firebase)
 
 ![Made with Love](https://img.shields.io/badge/Made%20with-%F0%9F%8D%BA%20and%20%F0%9F%92%9C-ff69b4?style=for-the-badge)
+
 [![License: MIT](https://cdn.prod.website-files.com/5e0f1144930a8bc8aace526c/65dd9eb5aaca434fac4f1c34_License-MIT-blue.svg)](/LICENSE)
 
 
@@ -14,7 +15,7 @@ Participants can see the leaderboard in real-time, and admins can add points (*p
 
 Originally developed in a couple of days as a request for a friend, this project also served as a hands-on opportunity to practice **React** development, **Firebase** integration, and responsive UI design.
 
-**Live Demo:** [https://taca-da-pinga.web.app/](https://taca-da-pinga.web.app/)
+**Live Demo:** [Check here](https://taca-da-pinga.web.app/)
 
 ---
 
