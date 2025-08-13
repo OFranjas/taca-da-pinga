@@ -15,7 +15,8 @@ Participants can see the leaderboard in real-time, and admins can add points (*p
 
 Originally developed in a couple of days as a request for a friend, this project also served as a hands-on opportunity to practice **React** development, **Firebase** integration, and responsive UI design.
 
-🚀 **[Click here to view the live demo](https://taca-da-pinga.web.app/)** 🚀
+🚀 <a href="https://taca-da-pinga.web.app/" target="_blank"><strong>Click here to view the live demo</strong></a> 🚀
+
 
 > Test admin credentials:
 > - Email: testing@tests.com
