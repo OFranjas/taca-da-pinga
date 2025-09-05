@@ -119,6 +119,44 @@ npm start
 
 Runs the app in development mode at http://localhost:3000
 
+#### Scripts
+
+```
+npm prepare
+```
+
+Sets up Husky git hooks for pre-commit linting and formatting.
+
+```
+npm lint
+```
+
+Runs ESLint to check for code style issues.
+
+```
+npm lint:fix
+```
+
+Runs ESLint and automatically fixes issues where possible.
+
+```
+npm test
+```
+
+Runs the test suite (Jest).
+
+```
+npm typecheck
+```
+
+Runs TypeScript type checking.
+
+```
+npm format
+```
+
+Formats the codebase using Prettier.
+
 #### Build
 
 ```

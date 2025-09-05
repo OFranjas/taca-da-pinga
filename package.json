@@ -24,7 +24,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "typecheck": "echo \"(no TS yet)\" && exit 0"
+    "typecheck": "echo \"(no TS yet)\" && exit 0",
+    "prepare": "husky install"
   },
   "engines": {
     "node": ">=18 <20"
