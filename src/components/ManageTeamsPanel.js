@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  where,
-  getDocs,
-  addDoc,
-  doc,
-  deleteDoc,
-} from 'firebase/firestore';
+import { observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam } from '../services/teams';
 import { toast } from 'react-toastify';
 import styles from './ManageTeamsPanel.module.css';
 import ConfirmModal from './ConfirmModal';
@@ -21,12 +10,7 @@ export default function ManageTeamsPanel() {
   const [filter, setFilter] = useState('');
   const [toDelete, setToDelete] = useState(null);
 
-  useEffect(() => {
-    const q = query(collection(db, 'teams'), orderBy('name'));
-    return onSnapshot(q, (snap) => {
-      setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-  }, []);
+  useEffect(() => observeTeamsOrderedByName(setTeams), []);
 
   const createTeam = async () => {
     const nameTrim = newName.trim();
@@ -34,19 +18,21 @@ export default function ManageTeamsPanel() {
       toast.error('Nome não pode estar vazio');
       return;
     }
-    const q = query(collection(db, 'teams'), where('name', '==', nameTrim));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      toast.error('Equipa já existe');
-      return;
+    try {
+      await createTeamIfNotExists(nameTrim);
+    } catch (e) {
+      if (e?.code === 'already-exists') {
+        toast.error('Equipa já existe');
+        return;
+      }
+      throw e;
     }
-    await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0 });
     toast.success('Equipa criada');
     setNewName('');
   };
 
   const confirmDelete = async () => {
-    await deleteDoc(doc(db, 'teams', toDelete.id));
+    await deleteTeam(toDelete.id);
     toast.info(`"${toDelete.name}" deleted`);
     setToDelete(null);
   };

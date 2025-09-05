@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { observeLeaderboard } from '../services/leaderboard';
 import Header from '../components/Header';
 import LeaderboardBars from '../components/LeaderboardBars';
 import SponsorsRail from '../components/SponsorsRail';
@@ -23,12 +22,7 @@ import s12 from '../assets/s12.png';
 export default function Leaderboard() {
   const [teams, setTeams] = useState([]);
 
-  useEffect(() => {
-    const q = query(collection(db, 'teams'), orderBy('pingas', 'desc'), orderBy('name'));
-    return onSnapshot(q, (snap) => {
-      setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-  }, []);
+  useEffect(() => observeLeaderboard(setTeams), []);
 
   const left = [s1, s3, s5, s7, s10, s11];
   const right = [s2, s4, s6, s8, s9, s12];
