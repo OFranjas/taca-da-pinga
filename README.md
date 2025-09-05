@@ -119,44 +119,6 @@ npm start
 
 Runs the app in development mode at http://localhost:3000
 
-#### Scripts
-
-```
-npm prepare
-```
-
-Sets up Husky git hooks for pre-commit linting and formatting.
-
-```
-npm lint
-```
-
-Runs ESLint to check for code style issues.
-
-```
-npm lint:fix
-```
-
-Runs ESLint and automatically fixes issues where possible.
-
-```
-npm test
-```
-
-Runs the test suite (Jest).
-
-```
-npm typecheck
-```
-
-Runs TypeScript type checking.
-
-```
-npm format
-```
-
-Formats the codebase using Prettier.
-
 #### Build
 
 ```
@@ -170,6 +132,16 @@ Builds the app for production to the `build` folder.
 - `production` → production-ready, protected branch
 - `develop` → integration branch (feature PRs go here)
 - `feature/*` → short-lived branches for new work
+
+See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
+
+## Runbook
+
+- Local dev: [docs/DEV.md](docs/DEV.md)
+- Config/env: [docs/CONFIG.md](docs/CONFIG.md)
+- Testing: [docs/TESTING.md](docs/TESTING.md)
+- Release: [docs/RELEASE.md](docs/RELEASE.md)
+- Security: [docs/SECURITY.md](docs/SECURITY.md)
 
 ## 📄 License
 
