@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { db } from "../firebase";
+import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
 import {
   collection,
   query,
@@ -10,19 +10,19 @@ import {
   addDoc,
   doc,
   deleteDoc,
-} from "firebase/firestore";
-import { toast } from "react-toastify";
-import styles from "./ManageTeamsPanel.module.css";
-import ConfirmModal from "./ConfirmModal";
+} from 'firebase/firestore';
+import { toast } from 'react-toastify';
+import styles from './ManageTeamsPanel.module.css';
+import ConfirmModal from './ConfirmModal';
 
 export default function ManageTeamsPanel() {
   const [teams, setTeams] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [filter, setFilter] = useState("");
+  const [newName, setNewName] = useState('');
+  const [filter, setFilter] = useState('');
   const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
-    const q = query(collection(db, "teams"), orderBy("name"));
+    const q = query(collection(db, 'teams'), orderBy('name'));
     return onSnapshot(q, (snap) => {
       setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
@@ -31,29 +31,27 @@ export default function ManageTeamsPanel() {
   const createTeam = async () => {
     const nameTrim = newName.trim();
     if (!nameTrim) {
-      toast.error("Nome não pode estar vazio");
+      toast.error('Nome não pode estar vazio');
       return;
     }
-    const q = query(collection(db, "teams"), where("name", "==", nameTrim));
+    const q = query(collection(db, 'teams'), where('name', '==', nameTrim));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      toast.error("Equipa já existe");
+      toast.error('Equipa já existe');
       return;
     }
-    await addDoc(collection(db, "teams"), { name: nameTrim, pingas: 0 });
-    toast.success("Equipa criada");
-    setNewName("");
+    await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0 });
+    toast.success('Equipa criada');
+    setNewName('');
   };
 
   const confirmDelete = async () => {
-    await deleteDoc(doc(db, "teams", toDelete.id));
+    await deleteDoc(doc(db, 'teams', toDelete.id));
     toast.info(`"${toDelete.name}" deleted`);
     setToDelete(null);
   };
 
-  const visible = teams.filter((t) =>
-    t.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const visible = teams.filter((t) => t.name.toLowerCase().includes(filter.toLowerCase()));
 
   return (
     <div className={styles.panel}>

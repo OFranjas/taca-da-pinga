@@ -1,7 +1,7 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import styles from "./Header.module.css";
-import logo from "../assets/logo.png";
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import styles from './Header.module.css';
+import logo from '../assets/logo.png';
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -17,19 +17,17 @@ export default function Header() {
         <nav className={styles.nav} aria-label="Main">
           <Link
             to="/leaderboard"
-            className={`${styles.navLink} ${
-              isActive("/leaderboard") ? styles.active : ""
-            }`}
-            aria-current={isActive("/leaderboard") ? "page" : undefined}
+            className={`${styles.navLink} ${isActive('/leaderboard') ? styles.active : ''}`}
+            aria-current={isActive('/leaderboard') ? 'page' : undefined}
           >
             Leaderboard
           </Link>
           <Link
             to="/admin"
             className={`${styles.navLink} ${styles.outline} ${
-              isActive("/admin") ? styles.activeOutline : ""
+              isActive('/admin') ? styles.activeOutline : ''
             }`}
-            aria-current={isActive("/admin") ? "page" : undefined}
+            aria-current={isActive('/admin') ? 'page' : undefined}
           >
             Admin
           </Link>

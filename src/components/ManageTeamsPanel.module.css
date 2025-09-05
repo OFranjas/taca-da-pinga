@@ -36,7 +36,9 @@
   border-radius: 10px;
   cursor: pointer;
   font-weight: 800;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .createBtn:hover {
   background: #0e9e63;
@@ -118,7 +120,10 @@
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.2s, color 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
 }
 .deleteBtn:hover {
   background: #ef4444;

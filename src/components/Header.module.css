@@ -55,7 +55,11 @@
   color: var(--text-primary);
   text-decoration: none;
   border-radius: 10px;
-  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   border: 1px solid transparent;
 }
 .navLink:hover {

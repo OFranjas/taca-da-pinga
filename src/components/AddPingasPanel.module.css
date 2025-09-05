@@ -104,7 +104,9 @@
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .addButton:hover {
   background: #0e9e63;

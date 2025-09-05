@@ -16,28 +16,17 @@
 }
 
 .hero::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0; /* keep within hero bounds */
   pointer-events: none;
-  background: radial-gradient(
-      600px 400px at 50% -10%,
-      rgba(52, 168, 83, 0.18),
-      transparent 60%
-    ),
-    radial-gradient(
-      400px 260px at 85% 30%,
-      rgba(242, 201, 76, 0.18),
-      transparent 55%
-    ),
-    radial-gradient(
-      400px 260px at 10% 70%,
-      rgba(61, 110, 234, 0.15),
-      transparent 55%
-    );
+  background:
+    radial-gradient(600px 400px at 50% -10%, rgba(52, 168, 83, 0.18), transparent 60%),
+    radial-gradient(400px 260px at 85% 30%, rgba(242, 201, 76, 0.18), transparent 55%),
+    radial-gradient(400px 260px at 10% 70%, rgba(61, 110, 234, 0.15), transparent 55%);
   filter: blur(1px);
   z-index: 0;
   overflow: hidden; /* belt-and-braces */
@@ -47,10 +36,7 @@
 .panel {
   position: relative;
   z-index: 1;
-  width: min(
-    780px,
-    100% - 32px
-  ); /* sempre cabe no viewport com margem lateral */
+  width: min(780px, 100% - 32px); /* sempre cabe no viewport com margem lateral */
   margin: 0 auto;
   background: var(--bg-card);
   border: 1px solid var(--card-border);
@@ -103,7 +89,10 @@ min-width: 0; / evita “estouro” horizontal */
   color: #fff;
   border-radius: 12px;
   text-decoration: none;
-  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 }
 
 .leader {
