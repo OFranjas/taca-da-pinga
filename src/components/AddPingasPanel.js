@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { db } from '../firebase';
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-  updateDoc,
-  increment,
-} from 'firebase/firestore';
+import { observeTeamsOrderedByName } from '../services/teams';
+import { addPinga } from '../services/leaderboard';
 import { toast } from 'react-toastify';
 import styles from './AddPingasPanel.module.css';
 
@@ -21,12 +13,7 @@ export default function AddPingasPanel() {
   const wrapperRef = useRef(null);
 
   // Load teams
-  useEffect(() => {
-    const q = query(collection(db, 'teams'), orderBy('name'));
-    return onSnapshot(q, (snap) => {
-      setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    });
-  }, []);
+  useEffect(() => observeTeamsOrderedByName(setTeams), []);
 
   // Filter suggestions
   useEffect(() => {
@@ -55,9 +42,7 @@ export default function AddPingasPanel() {
       return;
     }
     try {
-      await updateDoc(doc(db, 'teams', selectedTeam.id), {
-        pingas: increment(amount),
-      });
+      await addPinga(selectedTeam.id, amount);
       toast.success(`Adicionados ${amount} a ${selectedTeam.name}`);
       setSearch('');
       setSelectedTeam(null);
