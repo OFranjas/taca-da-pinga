@@ -2,14 +2,53 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Leaderboard is public read
-    match /teams/{teamId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Optionally protect other collections fully
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Leaderboard (teams) — public READ, admin WRITE with invariants
+    match /teams/{teamId} {
+      allow read: if true;
+
+      // Create/update/delete only by admins
+      allow create: if isAdmin() &&
+        // New documents must start with non-negative total
+        (!('pingas' in request.resource.data) || request.resource.data.pingas >= 0);
+
+      allow update: if isAdmin() && (
+        // If pingas is not being changed, allow (for name-only etc.)
+        !(request.resource.data.diff(resource.data).changedKeys().hasAny(['pingas'])) ||
+        // If pingas changes, enforce bounds and positivity, and types
+        (
+          (request.resource.data.pingas is int) &&
+          (resource.data.pingas is int) &&
+          request.resource.data.pingas >= 0 &&
+          request.resource.data.pingas > resource.data.pingas &&
+          (request.resource.data.pingas - resource.data.pingas) >= 1 &&
+          (request.resource.data.pingas - resource.data.pingas) <= 5
+        )
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // Events — public READ, admin WRITE
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // App config — admin WRITE (reads restricted by default)
+    match /app_config/{docId} {
+      allow write: if isAdmin();
+      allow read: if false;
+    }
+
+    // Everything else denied
     match /{document=**} {
       allow read, write: if false;
     }
