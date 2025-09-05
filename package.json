@@ -22,8 +22,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false",
     "test:rules": "npm --prefix rules-tests install --no-audit --no-fund && npm --prefix rules-tests run test",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint --cache --max-warnings=0 \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --cache --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "format": "prettier --write .",
     "typecheck": "echo \"(no TS yet)\" && exit 0",
     "prepare": "husky install"
@@ -42,6 +42,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "webpack-dev-server": "^4.15.2"
   },
   "devDependencies": {
     "eslint": "^8.57.1",

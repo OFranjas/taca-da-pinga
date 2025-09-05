@@ -14,16 +14,20 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && request.auth.token.admin == true;
     }
-    match /leaderboard/{teamId} {
-      allow read: if true;
-      allow write: if isAdmin();
+    // Leaderboard teams
+    match /teams/{teamId} {
+      allow read: if true;                      // public reads
+      allow write: if isAdmin();                // admin-only writes
     }
+    // Audit events
     match /events/{eventId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read: if true;                      // public reads
+      allow write: if isAdmin();                // admin-only writes
     }
+    // App config (reads restricted by default)
     match /app_config/{docId} {
-      allow read, write: if isAdmin();
+      allow write: if isAdmin();
+      allow read: if false;                     // not publicly readable
     }
   }
 }
@@ -31,10 +35,9 @@ service cloud.firestore {
 
 ## Invariants
 
-- Only admins can mutate.
-
-- “Add pinga” increments are positive and bounded.
-
+- Only admins can mutate (`teams`, `events`, `app_config`).
+- Public can read `teams` and `events`; `app_config` is not publicly readable.
+- “Add pinga” increments are positive and bounded (delta ∈ [1..5]).
 - Totals never negative.
 
 ## Logging & Audit

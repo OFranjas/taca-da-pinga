@@ -8,6 +8,7 @@ Purpose: This file briefs AI coding agents (e.g., Codex) on how to work in this 
 - Core rule: UI components MUST NOT call Firestore directly. All I/O goes through the `src/services/` layer.
 - Hosting: Firebase Hosting.
 - Node: 18.x.
+- Services: `src/services/leaderboard.js` (getLeaderboard, observeLeaderboard, addPinga, listEvents), `src/services/teams.js` (observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam).
 
 ## Branching & PR Rules
 
@@ -105,6 +106,8 @@ src/
 - “Add pinga” increments must be positive and bounded (e.g., 1..5).
 
 - Update or add Firestore rules only with emulator tests in the same PR.
+
+- App invariants are enforced both at service layer (validation) and Firestore rules (authoritative); verify via `npm run test:rules`.
 
 ## Secrets & Config
 

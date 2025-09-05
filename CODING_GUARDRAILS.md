@@ -24,6 +24,30 @@ lib/
 - Rules: Firestore emulator tests for read/write invariants.
 - E2E: Playwright smoke (view leaderboard; admin adds pinga; event recorded).
 
+## Services Layer Enforcement
+
+- UI layers (components/pages) must not import `firebase/firestore` directly.
+  - Quick check:
+
+    ```bash
+    git grep "from 'firebase/firestore'" src/components src/pages
+    # → should return 0 results
+    ```
+
+- All data access lives in `src/services/`.
+  - `src/services/leaderboard.js`
+    - `getLeaderboard(): Promise<Array<{id:string,name:string,pingas:number}>>`
+    - `observeLeaderboard(callback: (teams: Team[]) => void): () => void`
+    - `addPinga(teamId: string, delta: number, actorUid?: string): Promise<void>`
+    - `listEvents(limit?: number): Promise<Event[]>`
+
+  - `src/services/teams.js`
+    - `observeTeamsOrderedByName(callback: (teams: Team[]) => void): () => void`
+    - `createTeamIfNotExists(name: string): Promise<void>`
+    - `deleteTeam(teamId: string): Promise<void>`
+
+- Unit tests for services live under `src/services/__tests__/`.
+
 ## Performance & DX
 
 - Memoize heavy lists; consider react-window for large leaderboards.
