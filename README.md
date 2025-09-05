@@ -17,11 +17,6 @@ Originally developed in a couple of days as a request for a friend, this project
 
 🚀 <a href="https://taca-da-pinga.web.app/" target="_blank"><strong>Click here to view the live demo</strong></a> 🚀
 
-
-> Test admin credentials:
-> - Email: testing@tests.com
-> - Password: testing
-
 ---
 
 ## ✨ Features
@@ -112,9 +107,6 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 ```
 # Clone the repository
 git clone https://github.com/OFranjas/taca-da-pinga.git
-
-# Navigate into the project
-cd taca-da-pinga/taca-da-pinga
 
 # Install dependencies
 npm install

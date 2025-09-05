@@ -1,0 +1,30 @@
+# deps & builds
+node_modules/
+build/
+dist/
+.cache/
+.tmp/
+
+# env
+.env
+.env.*.local
+.env.local
+
+# firebase local state
+.firebase/
+
+# tests/coverage
+coverage/
+.nyc_output/
+
+# editor/OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# logs
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
