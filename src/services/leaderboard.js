@@ -33,8 +33,6 @@ export async function addPinga(teamId, delta, actorUid) {
   if (!Number.isInteger(n) || n < 1 || n > 5) {
     throw new Error('Delta must be an integer between 1 and 5');
   }
-  // Log the actor performing the action for audit purposes
-  console.log(`[addPinga] actorUid=${actorUid} added ${n} pingas to teamId=${teamId}`);
   const ref = doc(db, 'teams', teamId);
   await updateDoc(ref, { pingas: increment(n) });
 }
