@@ -53,47 +53,6 @@ Originally developed in a couple of days as a request for a friend, this project
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Frontend:** React, CSS Modules
-- **Backend:** Firebase (Firestore, Authentication)
-- **Hosting:** Firebase Hosting
-- **Other Tools:** Recharts (for the leaderboard bars)
-
----
-
-## 📂 Project Structure
-
-```
-.
-├──📁 public/ # Static assets
-├──📁 src/ # Main source code
-│ ├──📁 assets/ # Images, SVGs
-│ ├──📁 components/ # Reusable UI components
-│ ├──📁 pages/ # Page-level components
-│ ├──📄 firebase.js # Firebase configuration (uses .env variables)
-│ └──📄 globals.css # Global styles
-├──📄 .env.example # Example environment variables
-└──📄 package.json # Dependencies & scripts
-```
-
----
-
-## ⚙️ Environment Variables
-
-Before running the project locally, create a `.env` file in the root directory based on [.env.example](.env.example) and fill in your Firebase configuration details.:
-
-```env
-REACT_APP_FIREBASE_API_KEY=your_api_key
-REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
-REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-REACT_APP_FIREBASE_APP_ID=your_app_id
-```
-
----
-
 ## 🚀 Getting Started
 
 #### Prerequisites
@@ -119,44 +78,6 @@ npm start
 
 Runs the app in development mode at http://localhost:3000
 
-#### Scripts
-
-```
-npm prepare
-```
-
-Sets up Husky git hooks for pre-commit linting and formatting.
-
-```
-npm lint
-```
-
-Runs ESLint to check for code style issues.
-
-```
-npm lint:fix
-```
-
-Runs ESLint and automatically fixes issues where possible.
-
-```
-npm test
-```
-
-Runs the test suite (Jest).
-
-```
-npm typecheck
-```
-
-Runs TypeScript type checking.
-
-```
-npm format
-```
-
-Formats the codebase using Prettier.
-
 #### Build
 
 ```
@@ -167,9 +88,27 @@ Builds the app for production to the `build` folder.
 
 ## 🔀 Branching Model
 
-- `production` → production-ready, protected branch
-- `develop` → integration branch (feature PRs go here)
-- `feature/*` → short-lived branches for new work
+- `feature/*` → short-lived feature branches, branched from `develop`
+- `develop` → integration branch (feature PRs merge here)
+- `production` → production-ready branch (protected)
+
+### PR Rules
+
+- Into `develop`: CI must be green.
+- Into `production`: CI must be green **and** at least 1 approval from code owner.
+- Required CI check name: **CI / Lint / Typecheck / Test / Build**
+
+See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
+
+---
+
+## Runbook
+
+- Local dev: [docs/DEV.md](docs/DEV.md)
+- Config/env: [docs/CONFIG.md](docs/CONFIG.md)
+- Testing: [docs/TESTING.md](docs/TESTING.md)
+- Release: [docs/RELEASE.md](docs/RELEASE.md)
+- Security: [docs/SECURITY.md](docs/SECURITY.md)
 
 ## 📄 License
 
