@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [production, develop]
+  pull_request:
+    branches: [production, develop]
+  workflow_dispatch:
+
+jobs:
+  quality:
+    name: Lint / Typecheck / Test / Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
+
+      - name: Unit tests
+        run: npm test --if-present -- --ci --reporter=default --coverage
+
+      - name: Build
+        run: npm run build --if-present
