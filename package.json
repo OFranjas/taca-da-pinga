@@ -44,7 +44,7 @@
     ]
   },
   "overrides": {
-    "webpack-dev-server": "^5.2.2"
+    "webpack-dev-server": "^4.15.2"
   },
   "devDependencies": {
     "eslint": "^8.57.1",
