@@ -1,13 +1,9 @@
-import React from "react";
-import styles from "./SponsorsRail.module.css";
-export default function SponsorsRail({ images = [], side = "left" }) {
+import React from 'react';
+import styles from './SponsorsRail.module.css';
+export default function SponsorsRail({ images = [], side = 'left' }) {
   if (!images?.length) return null;
   return (
-    <aside
-      className={`${styles.rail} ${
-        side === "right" ? styles.right : styles.left
-      }`}
-    >
+    <aside className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}>
       <div className={styles.stack}>
         {images.map((src, i) => (
           <div key={i} className={styles.slot}>

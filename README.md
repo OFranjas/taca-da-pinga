@@ -7,11 +7,11 @@
 
 ![Made with Love](https://img.shields.io/badge/Made%20with-%F0%9F%8D%BA%20and%20%F0%9F%92%9C-ff69b4?style=for-the-badge)
 
+![CI](https://github.com/OFranjas/taca-da-pinga/actions/workflows/ci.yml/badge.svg)
 [![License: MIT](https://cdn.prod.website-files.com/5e0f1144930a8bc8aace526c/65dd9eb5aaca434fac4f1c34_License-MIT-blue.svg)](/LICENSE)
 
-
 A small web application built with **React** and **Firebase** to manage a fun "beer points" leaderboard for a local football tournament.  
-Participants can see the leaderboard in real-time, and admins can add points (*pingas*) from a protected admin panel.
+Participants can see the leaderboard in real-time, and admins can add points (_pingas_) from a protected admin panel.
 
 Originally developed in a couple of days as a request for a friend, this project also served as a hands-on opportunity to practice **React** development, **Firebase** integration, and responsive UI design.
 
@@ -65,7 +65,7 @@ Originally developed in a couple of days as a request for a friend, this project
 ## 📂 Project Structure
 
 ```
-taca-da-pinga/
+.
 ├──📁 public/ # Static assets
 ├──📁 src/ # Main source code
 │ ├──📁 assets/ # Images, SVGs
@@ -81,7 +81,7 @@ taca-da-pinga/
 
 ## ⚙️ Environment Variables
 
-Before running the project locally, create a `.env` file in the root directory based on [.env.example](./taca-da-pinga/.env.example) and fill in your Firebase configuration details.:
+Before running the project locally, create a `.env` file in the root directory based on [.env.example](.env.example) and fill in your Firebase configuration details.:
 
 ```env
 REACT_APP_FIREBASE_API_KEY=your_api_key
@@ -94,13 +94,12 @@ REACT_APP_FIREBASE_APP_ID=your_app_id
 
 ---
 
-
 ## 🚀 Getting Started
 
 #### Prerequisites
 
-- Node.js v22+
-- npm or yarn
+- Node.js v18+
+- npm (comes with Node)
 
 #### Installation
 
@@ -118,8 +117,45 @@ npm install
 npm start
 ```
 
-Runs the app in development mode.
-Open http://localhost:3000 to view it in your browser.
+Runs the app in development mode at http://localhost:3000
+
+#### Scripts
+
+```
+npm prepare
+```
+
+Sets up Husky git hooks for pre-commit linting and formatting.
+
+```
+npm lint
+```
+
+Runs ESLint to check for code style issues.
+
+```
+npm lint:fix
+```
+
+Runs ESLint and automatically fixes issues where possible.
+
+```
+npm test
+```
+
+Runs the test suite (Jest).
+
+```
+npm typecheck
+```
+
+Runs TypeScript type checking.
+
+```
+npm format
+```
+
+Formats the codebase using Prettier.
 
 #### Build
 
@@ -128,6 +164,12 @@ npm run build
 ```
 
 Builds the app for production to the `build` folder.
+
+## 🔀 Branching Model
+
+- `production` → production-ready, protected branch
+- `develop` → integration branch (feature PRs go here)
+- `feature/*` → short-lived branches for new work
 
 ## 📄 License
 

@@ -1,13 +1,17 @@
 ## What
-- 
+
+-
 
 ## Why
-- 
+
+-
 
 ## How
-- 
+
+-
 
 ## Checks
+
 - [ ] Lint
 - [ ] Typecheck
 - [ ] Tests passing

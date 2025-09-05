@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import styles from "../pages/Leaderboard.module.css";
+import React, { useEffect, useMemo, useRef } from 'react';
+import styles from '../pages/Leaderboard.module.css';
 
 // Medal colors + greens for 4th/5th
 const BAR_COLORS = [
-  "#F2C94C", // 1 - gold
-  "#C0C0C0", // 2 - silver
-  "#CD7F32", // 3 - bronze
-  "#34A853", // 4 - green
-  "#2E7D32", // 5 - dark green
+  '#F2C94C', // 1 - gold
+  '#C0C0C0', // 2 - silver
+  '#CD7F32', // 3 - bronze
+  '#34A853', // 4 - green
+  '#2E7D32', // 5 - dark green
 ];
 // Darker neutral for remaining teams
-const REST_COLOR = "#9CA3AF";
+const REST_COLOR = '#9CA3AF';
 
 // Scaling: baseline keeps tiny bars visible, gamma (<1) emphasizes small values
 const BASELINE_PCT = 5;
@@ -20,7 +20,7 @@ const medalClass = (i) => {
   if (i === 0) return styles.rankGold;
   if (i === 1) return styles.rankSilver;
   if (i === 2) return styles.rankBronze;
-  return "";
+  return '';
 };
 
 function widthPctFor(value, max) {
@@ -31,10 +31,7 @@ function widthPctFor(value, max) {
 }
 
 export default function LeaderboardBars({ teams }) {
-  const max = useMemo(
-    () => Math.max(1, ...teams.map((t) => Number(t.pingas) || 0)),
-    [teams]
-  );
+  const max = useMemo(() => Math.max(1, ...teams.map((t) => Number(t.pingas) || 0)), [teams]);
 
   const barRefs = useRef([]);
 
@@ -42,7 +39,7 @@ export default function LeaderboardBars({ teams }) {
     barRefs.current.forEach((el, i) => {
       if (!el) return;
       const value = Number(teams[i]?.pingas) || 0;
-      el.style.width = widthPctFor(value, max) + "%";
+      el.style.width = widthPctFor(value, max) + '%';
     });
   }, [teams, max]);
 

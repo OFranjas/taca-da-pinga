@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import AddPingasPanel from "../components/AddPingasPanel";
-import ManageTeamsPanel from "../components/ManageTeamsPanel";
-import { auth } from "../firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import styles from "./Admin.module.css";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import Header from '../components/Header';
+import AddPingasPanel from '../components/AddPingasPanel';
+import ManageTeamsPanel from '../components/ManageTeamsPanel';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import styles from './Admin.module.css';
+import { toast } from 'react-toastify';
 
 export default function Admin() {
   const [user, setUser] = useState(null);
-  const [section, setSection] = useState("add");
+  const [section, setSection] = useState('add');
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUser(u));
@@ -22,7 +22,7 @@ export default function Admin() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Logged in successfully");
+      toast.success('Logged in successfully');
     } catch (e) {
       toast.error(e.message);
     }
@@ -30,7 +30,7 @@ export default function Admin() {
 
   const logout = async () => {
     await signOut(auth);
-    toast.info("Logged out");
+    toast.info('Logged out');
   };
 
   if (!user) {
@@ -81,30 +81,26 @@ export default function Admin() {
             Logout
           </button>
         </div>
-        <div
-          className={styles.tabBar}
-          role="tablist"
-          aria-label="Admin sections"
-        >
+        <div className={styles.tabBar} role="tablist" aria-label="Admin sections">
           <button
             role="tab"
-            aria-selected={section === "add"}
-            className={section === "add" ? styles.activeTab : styles.tab}
-            onClick={() => setSection("add")}
+            aria-selected={section === 'add'}
+            className={section === 'add' ? styles.activeTab : styles.tab}
+            onClick={() => setSection('add')}
           >
             Adicionar Pingas
           </button>
           <button
             role="tab"
-            aria-selected={section === "manage"}
-            className={section === "manage" ? styles.activeTab : styles.tab}
-            onClick={() => setSection("manage")}
+            aria-selected={section === 'manage'}
+            className={section === 'manage' ? styles.activeTab : styles.tab}
+            onClick={() => setSection('manage')}
           >
             Gerir Equipas
           </button>
         </div>
 
-        {section === "add" ? <AddPingasPanel /> : <ManageTeamsPanel />}
+        {section === 'add' ? <AddPingasPanel /> : <ManageTeamsPanel />}
       </div>
     </>
   );

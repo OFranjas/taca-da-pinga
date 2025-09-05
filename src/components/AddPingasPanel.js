@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { db } from "../firebase";
+import React, { useState, useEffect, useRef } from 'react';
+import { db } from '../firebase';
 import {
   collection,
   query,
@@ -8,13 +8,13 @@ import {
   doc,
   updateDoc,
   increment,
-} from "firebase/firestore";
-import { toast } from "react-toastify";
-import styles from "./AddPingasPanel.module.css";
+} from 'firebase/firestore';
+import { toast } from 'react-toastify';
+import styles from './AddPingasPanel.module.css';
 
 export default function AddPingasPanel() {
   const [teams, setTeams] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [filtered, setFiltered] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [amount, setAmount] = useState(1);
@@ -22,7 +22,7 @@ export default function AddPingasPanel() {
 
   // Load teams
   useEffect(() => {
-    const q = query(collection(db, "teams"), orderBy("name"));
+    const q = query(collection(db, 'teams'), orderBy('name'));
     return onSnapshot(q, (snap) => {
       setTeams(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
@@ -34,9 +34,7 @@ export default function AddPingasPanel() {
       setFiltered([]);
       return;
     }
-    setFiltered(
-      teams.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
-    );
+    setFiltered(teams.filter((t) => t.name.toLowerCase().includes(search.toLowerCase())));
   }, [search, teams, selectedTeam]);
 
   // Close suggestions when clicking outside
@@ -46,22 +44,22 @@ export default function AddPingasPanel() {
         setFiltered([]);
       }
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   // Add pingas
   const handleAdd = async () => {
     if (!selectedTeam || amount < 1) {
-      toast.error("Seleciona uma equipa e define um valor válido");
+      toast.error('Seleciona uma equipa e define um valor válido');
       return;
     }
     try {
-      await updateDoc(doc(db, "teams", selectedTeam.id), {
+      await updateDoc(doc(db, 'teams', selectedTeam.id), {
         pingas: increment(amount),
       });
       toast.success(`Adicionados ${amount} a ${selectedTeam.name}`);
-      setSearch("");
+      setSearch('');
       setSelectedTeam(null);
       setAmount(1);
     } catch (e) {
@@ -75,9 +73,9 @@ export default function AddPingasPanel() {
     setAmount(isNaN(v) || v < 1 ? 1 : v);
   };
   const handleAmountKey = (e) => {
-    if (e.key === "ArrowUp") setAmount((a) => a + 1);
-    if (e.key === "ArrowDown") setAmount((a) => Math.max(1, a - 1));
-    if (e.key === "Enter") handleAdd();
+    if (e.key === 'ArrowUp') setAmount((a) => a + 1);
+    if (e.key === 'ArrowDown') setAmount((a) => Math.max(1, a - 1));
+    if (e.key === 'Enter') handleAdd();
   };
 
   return (
