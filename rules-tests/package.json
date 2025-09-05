@@ -1,0 +1,13 @@
+{
+  "name": "taca-da-pinga-rules-tests",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "NODE_NO_WARNINGS=1 jest -c jest.config.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.0.0",
+    "jest": "^29.7.0"
+  }
+}
