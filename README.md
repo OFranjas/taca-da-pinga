@@ -129,11 +129,19 @@ Builds the app for production to the `build` folder.
 
 ## 🔀 Branching Model
 
-- `production` → production-ready, protected branch
-- `develop` → integration branch (feature PRs go here)
-- `feature/*` → short-lived branches for new work
+- `feature/*` → short-lived feature branches, branched from `develop`
+- `develop` → integration branch (feature PRs merge here)
+- `production` → production-ready branch (protected)
+
+### PR Rules
+
+- Into `develop`: CI must be green.
+- Into `production`: CI must be green **and** at least 1 approval from code owner.
+- Required CI check name: **CI / Lint / Typecheck / Test / Build**
 
 See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
+
+---
 
 ## Runbook
 
