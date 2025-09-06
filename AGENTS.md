@@ -28,11 +28,12 @@ When implementing a task:
 2. **Install & validate**
 
    ```bash
-   npm ci
-   npm run lint
-   npm run typecheck || echo "no TS yet"
-   npm run test
-   npm run build
+   corepack enable
+   yarn install
+   yarn lint
+   yarn typecheck || echo "no TS yet"
+   yarn test
+   yarn build
    ```
 
 3. **Use the services layer for data access**
@@ -63,30 +64,30 @@ When implementing a task:
 
 ## Setup Commands
 
-- Install deps: npm ci
+- Install deps: corepack enable && yarn install
 
-- Start dev server: npm run dev → http://localhost:5173 (Vite)
+- Start dev server: yarn dev → http://localhost:5173 (Vite)
 
-- Preview prod build: npm run preview
+- Preview prod build: yarn preview
 
 - Start emulators: firebase emulators:start --only firestore,auth
 
 ## Test Commands
 
-- Lint: npm run lint
+- Lint: yarn lint
 
-- Typecheck: npm run typecheck (noop acceptable until TS lands)
+- Typecheck: yarn typecheck (noop acceptable until TS lands)
 
-- Unit/Component: npm run test
-- Unit/Component (CI): npm run test:ci
+- Unit/Component: yarn test
+- Unit/Component (CI): yarn test:ci
 
-- Rules (emulator): npm run test:rules
+- Rules (emulator): yarn test:rules
 
-- E2E (Playwright): npm run e2e
+- E2E (Playwright): yarn e2e
 
 ## Build Command
 
-- npm run build
+- yarn build
 
 File/Folder Map
 
@@ -110,7 +111,7 @@ src/
 
 - Update or add Firestore rules only with emulator tests in the same PR.
 
-- App invariants are enforced both at service layer (validation) and Firestore rules (authoritative); verify via `npm run test:rules`.
+- App invariants are enforced both at service layer (validation) and Firestore rules (authoritative); verify via `yarn test:rules`.
 
 ## Secrets & Config
 

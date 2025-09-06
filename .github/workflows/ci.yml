@@ -20,19 +20,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.19.0'
-          cache: 'npm'
+          # Don't use setup-node's Yarn cache because it invokes Yarn 1
+          # which conflicts with Corepack-managed Yarn 4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
 
       - name: Install
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Lint
-        run: npm run lint --if-present
+        run: yarn lint
 
       - name: Typecheck
-        run: npm run typecheck --if-present || true
+        run: yarn typecheck || true
 
       - name: Unit tests
-        run: npm run test:ci --if-present
+        run: yarn test:ci
 
       - name: Cache Firebase emulators
         uses: actions/cache@v4
@@ -41,7 +56,7 @@ jobs:
           key: ${{ runner.os }}-firebase-emulators
 
       - name: Rules tests (Firestore emulator)
-        run: npm run test:rules
+        run: yarn test:rules
 
       - name: Build
-        run: npm run build --if-present
+        run: yarn build

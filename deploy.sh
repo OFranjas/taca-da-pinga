@@ -4,7 +4,7 @@
 set -e
 
 echo "🛠️ Building app (Vite)..."
-npm run build
+yarn build
 
 echo "🚀 Deploying to Firebase Hosting (dist)..."
 firebase deploy --only hosting
