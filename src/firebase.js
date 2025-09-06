@@ -6,14 +6,14 @@ const env = (key, fallback) => {
   // Prefer Vite envs, fallback to CRA envs for transition compatibility
   const viteKey = `VITE_${key}`;
   const craKey = `REACT_APP_${key}`;
-  const viteVal =
-    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[viteKey]) ||
-    undefined;
   const proc =
     typeof globalThis !== 'undefined' && typeof globalThis.process !== 'undefined'
       ? globalThis.process
       : undefined;
-  const craVal = (proc && proc.env && proc.env[craKey]) || undefined;
+  const viteVal =
+    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[viteKey]) ||
+    (proc && proc.env && proc.env[viteKey]);
+  const craVal = proc && proc.env && proc.env[craKey];
   return viteVal ?? craVal ?? fallback;
 };
 
