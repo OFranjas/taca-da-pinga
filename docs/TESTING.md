@@ -10,10 +10,10 @@
 ## Commands
 
 ```bash
-npm run test                     # unit + component (Vitest)
-npm run test:ci                  # CI mode with coverage
-npm run test:rules               # Firestore security rules (emulator)
-npm run e2e                      # end-to-end (Playwright)
+yarn test                        # unit + component (Vitest)
+yarn test:ci                     # CI mode with coverage
+yarn test:rules                  # Firestore security rules (emulator)
+yarn e2e                         # end-to-end (Playwright)
 
 Ensure Firestore emulator is running for rules tests:
 
@@ -56,4 +56,4 @@ git grep "from 'firebase/firestore'" src/components src/pages
   - Totals going negative.
   - Public READ of `app_config`.
 
-Rules tests live under `rules-tests/` and run via `npm run test:rules`.
+Rules tests live under `rules-tests/` and run via `yarn test:rules`.

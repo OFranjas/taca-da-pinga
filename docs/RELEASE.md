@@ -9,7 +9,7 @@
 
 ```bash
 firebase use <prod-project-id>
-npm run build
+yarn build
 firebase deploy --only hosting,firestore:rules,firestore:indexes
 ```
 

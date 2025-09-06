@@ -22,7 +22,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
-    "test:rules": "npm --prefix rules-tests install --no-audit --no-fund && firebase emulators:exec --only firestore \"npm --prefix rules-tests run test\"",
+    "test:rules": "yarn --cwd rules-tests install --immutable && firebase emulators:exec --only firestore \"yarn --cwd rules-tests test\"",
     "lint": "eslint --cache --max-warnings=0 \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --cache --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "format": "prettier --write .",
@@ -32,7 +32,7 @@
   "engines": {
     "node": ">=22.19.0 <23"
   },
-  "packageManager": "npm@10",
+  "packageManager": "yarn@4.3.1",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -61,11 +61,11 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "firebase-tools": "^14.15.2",
     "globals": "^15.13.0",
-    "jsdom": "^24.1.0",
     "husky": "^9.1.7",
-    "vitest": "^3.0.4",
+    "jsdom": "^24.1.0",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.0.4"
   }
 }

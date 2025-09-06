@@ -20,19 +20,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.19.0'
-          cache: 'npm'
+          cache: 'yarn'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
 
       - name: Install
-        run: npm ci
+        run: yarn install --immutable
 
       - name: Lint
-        run: npm run lint --if-present
+        run: yarn lint --if-present
 
       - name: Typecheck
-        run: npm run typecheck --if-present || true
+        run: yarn typecheck --if-present || true
 
       - name: Unit tests
-        run: npm run test:ci --if-present
+        run: yarn test:ci --if-present
 
       - name: Cache Firebase emulators
         uses: actions/cache@v4
@@ -41,7 +47,7 @@ jobs:
           key: ${{ runner.os }}-firebase-emulators
 
       - name: Rules tests (Firestore emulator)
-        run: npm run test:rules
+        run: yarn test:rules
 
       - name: Build
-        run: npm run build --if-present
+        run: yarn build --if-present

@@ -58,7 +58,7 @@ Originally developed in a couple of days as a request for a friend, this project
 #### Prerequisites
 
 - Node.js v22.19.0 (see `.nvmrc`)
-- npm (comes with Node)
+- Corepack (bundled with Node 22; run `corepack enable`)
 
 #### Installation
 
@@ -66,14 +66,15 @@ Originally developed in a couple of days as a request for a friend, this project
 # Clone the repository
 git clone https://github.com/OFranjas/taca-da-pinga.git
 
-# Install dependencies
-npm install
+# Enable Corepack and install deps
+corepack enable
+yarn install
 ```
 
 #### Development
 
 ```
-npm run dev
+yarn dev
 ```
 
 Runs the app in development mode (Vite) at http://localhost:5173 with HMR.
@@ -81,17 +82,17 @@ Runs the app in development mode (Vite) at http://localhost:5173 with HMR.
 #### Build
 
 ```
-npm run build
+yarn build
 ```
 
-Builds the app for production to the `dist` folder (Vite). Use `npm run preview` to locally preview the production build.
+Builds the app for production to the `dist` folder (Vite). Use `yarn preview` to locally preview the production build.
 
 #### Testing
 
 ```
-npm run test       # unit + component (Vitest)
-npm run test:ci    # CI mode with coverage
-npm run test:rules # Firestore security rules (emulator)
+yarn test        # unit + component (Vitest)
+yarn test:ci     # CI mode with coverage
+npm run test:rules  # Firestore security rules (emulator)
 ```
 
 ## 🔀 Branching Model
@@ -112,7 +113,7 @@ See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
 
 ## Firestore Emulator
 
-Security rules tests run against the Firestore emulator. The `npm run test:rules` script automatically downloads and starts the emulator before executing the tests.
+Security rules tests run against the Firestore emulator. The `yarn test:rules` script automatically downloads and starts the emulator before executing the tests.
 
 If you prefer to keep the emulator running for multiple test iterations, start it manually in another terminal:
 
@@ -123,7 +124,7 @@ firebase emulators:start --only firestore
 Then run the tests separately:
 
 ```
-npm --prefix rules-tests run test
+yarn --cwd rules-tests test
 ```
 
 ## Runbook
