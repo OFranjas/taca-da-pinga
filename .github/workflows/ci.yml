@@ -20,7 +20,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.19.0'
-          cache: 'yarn'
+          # Don't use setup-node's Yarn cache because it invokes Yarn 1
+          # which conflicts with Corepack-managed Yarn 4
 
       - name: Enable Corepack
         run: corepack enable
