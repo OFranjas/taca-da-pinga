@@ -10,7 +10,8 @@
 ## Commands
 
 ```bash
-npm test -- --watch=false        # unit + component (Jest)
+npm run test                     # unit + component (Vitest)
+npm run test:ci                  # CI mode with coverage
 npm run test:rules               # Firestore security rules (emulator)
 npm run e2e                      # end-to-end (Playwright)
 
@@ -35,11 +36,12 @@ git grep "from 'firebase/firestore'" src/components src/pages
 # should return no matches
 ```
 
-## Jest Configuration
+## Vitest Configuration
 
-- We use Jest (temporary until Vitest migration).
-- Config lives at `jest.config.js` with `jsdom` environment and `babel-jest` transform.
-- CSS Modules are mapped via `identity-obj-proxy`; assets use a file stub.
+- Tests run with Vitest configured in `vite.config.js` under the `test` block.
+- Environment: `jsdom`, globals enabled, CSS handling on.
+- Setup file: `src/test/setup.ts` (adds `@testing-library/jest-dom/vitest`).
+- Coverage: V8 provider with `text` and `lcov` reporters.
 
 ## Firestore Rule Invariants
 

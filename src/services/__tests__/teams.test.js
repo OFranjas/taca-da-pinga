@@ -1,16 +1,16 @@
-jest.mock('../../firebase', () => ({ db: {} }));
+vi.mock('../../firebase', () => ({ db: {} }));
 
-const mockCollection = jest.fn();
-const mockQuery = jest.fn();
-const mockOrderBy = jest.fn((field, dir) => ({ field, dir }));
-const mockOnSnapshot = jest.fn();
-const mockWhere = jest.fn();
-const mockGetDocs = jest.fn();
-const mockAddDoc = jest.fn();
-const mockDoc = jest.fn((db, col, id) => ({ col, id }));
-const mockDeleteDoc = jest.fn();
+const mockCollection = vi.fn();
+const mockQuery = vi.fn();
+const mockOrderBy = vi.fn((field, dir) => ({ field, dir }));
+const mockOnSnapshot = vi.fn();
+const mockWhere = vi.fn();
+const mockGetDocs = vi.fn();
+const mockAddDoc = vi.fn();
+const mockDoc = vi.fn((db, col, id) => ({ col, id }));
+const mockDeleteDoc = vi.fn();
 
-jest.mock('firebase/firestore', () => ({
+vi.mock('firebase/firestore', () => ({
   collection: (...args) => mockCollection(...args),
   query: (...args) => mockQuery(...args),
   orderBy: (...args) => mockOrderBy(...args),
@@ -24,7 +24,7 @@ jest.mock('firebase/firestore', () => ({
 
 describe('services/teams', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('observeTeamsOrderedByName passes mapped teams', async () => {
@@ -34,7 +34,7 @@ describe('services/teams', () => {
       internalCb = cb;
       return () => 'unsub';
     });
-    const cb = jest.fn();
+    const cb = vi.fn();
     const unsub = observeTeamsOrderedByName(cb);
     expect(typeof unsub).toBe('function');
     internalCb({ docs: [{ id: '1', data: () => ({ name: 'N', pingas: 0 }) }] });
