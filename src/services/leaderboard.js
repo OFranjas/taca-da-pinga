@@ -27,7 +27,7 @@ export function observeLeaderboard(callback) {
   });
 }
 
-export async function addPinga(teamId, delta, actorUid) {
+export async function addPinga(teamId, delta, _actorUid) {
   // Enforce service-level guardrails; rules will enforce too.
   const n = Number(delta);
   if (!Number.isInteger(n) || n < 1 || n > 5) {

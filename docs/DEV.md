@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node 18+
+- Node 22.19.0 (use `.nvmrc`)
 - Firebase CLI: `npm i -g firebase-tools`
 - Java 11+ (emulators)
 
@@ -13,11 +13,11 @@ npm ci
 cp .env.example .env   # populate dev values
 ```
 
-## Run the App
+## Run the App (Vite)
 
 ```bash
-npm start
-# http://localhost:3000
+npm run dev
+# http://localhost:5173
 ```
 
 ## Emulators
@@ -38,4 +38,4 @@ Dev test user (local only): testing@tests.com / testing
 
 - Rules tests: npm run test:rules
 
-- Build: npm run build
+- Build: npm run build (outputs to dist/). Use `npm run preview` to preview the production build.

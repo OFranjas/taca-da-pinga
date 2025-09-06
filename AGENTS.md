@@ -7,7 +7,7 @@ Purpose: This file briefs AI coding agents (e.g., Codex) on how to work in this 
 - Stack: React (Create React App), Firebase (Auth, Firestore), CSS Modules.
 - Core rule: UI components MUST NOT call Firestore directly. All I/O goes through the `src/services/` layer.
 - Hosting: Firebase Hosting.
-- Node: 18.x.
+- Node: 22.19.0.
 - Services: `src/services/leaderboard.js` (getLeaderboard, observeLeaderboard, addPinga, listEvents), `src/services/teams.js` (observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam).
 
 ## Branching & PR Rules
@@ -65,7 +65,9 @@ When implementing a task:
 
 - Install deps: npm ci
 
-- Start dev server: npm start → http://localhost:3000
+- Start dev server: npm run dev → http://localhost:5173 (Vite)
+
+- Preview prod build: npm run preview
 
 - Start emulators: firebase emulators:start --only firestore,auth
 

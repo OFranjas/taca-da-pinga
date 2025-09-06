@@ -2,22 +2,22 @@
 
 ## Environment Variables (dev)
 
-Create `.env` from `.env.example` and fill:
+Create `.env` from `.env.example` and fill (Vite prefixes envs with `VITE_`):
 
 ```
-REACT_APP_FIREBASE_API_KEY=
-REACT_APP_FIREBASE_AUTH_DOMAIN=
-REACT_APP_FIREBASE_PROJECT_ID=
-REACT_APP_FIREBASE_STORAGE_BUCKET=
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=
-REACT_APP_FIREBASE_APP_ID=
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 ```
 
 ## Runtime Config
 
 - Admin allowlist: `app_config/admins` document in Firestore (or custom claim `admin`).
 - Collections:
-  - `leaderboard` (teams): { teamId, name, points, updatedAt }
+  - `teams`: { id, name, pingas }
   - `events` (audit): { ts, actorUid, type, delta, teamId }
 
 ## Environments
