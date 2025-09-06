@@ -3,20 +3,22 @@
 ## Prerequisites
 
 - Node 22.19.0 (use `.nvmrc`)
+- Corepack enabled (`corepack enable`)
 - Firebase CLI: `npm i -g firebase-tools`
 - Java 11+ (emulators)
 
 ## Setup
 
 ```bash
-npm ci
+corepack enable
+yarn install
 cp .env.example .env   # populate dev values
 ```
 
 ## Run the App (Vite)
 
 ```bash
-npm run dev
+yarn dev
 # http://localhost:5173
 ```
 
@@ -30,12 +32,12 @@ Dev test user (local only): testing@tests.com / testing
 
 ## Useful Scripts
 
-- Lint: npm run lint / npm run lint:fix
+- Lint: yarn lint / yarn lint:fix
 
-- Typecheck: npm run typecheck
+- Typecheck: yarn typecheck
 
-- Tests: npm test -- --watch=false
+- Tests: yarn test
 
-- Rules tests: npm run test:rules
+- Rules tests: yarn test:rules
 
-- Build: npm run build (outputs to dist/). Use `npm run preview` to preview the production build.
+- Build: yarn build (outputs to dist/). Use `yarn preview` to preview the production build.
