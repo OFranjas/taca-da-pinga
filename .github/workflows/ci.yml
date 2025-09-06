@@ -29,17 +29,25 @@ jobs:
       - name: Prepare Yarn 4
         run: corepack prepare yarn@4.3.1 --activate
 
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
       - name: Install
         run: yarn install --immutable
 
       - name: Lint
-        run: yarn lint --if-present
+        run: yarn lint
 
       - name: Typecheck
-        run: yarn typecheck --if-present || true
+        run: yarn typecheck || true
 
       - name: Unit tests
-        run: yarn test:ci --if-present
+        run: yarn test:ci
 
       - name: Cache Firebase emulators
         uses: actions/cache@v4
@@ -51,4 +59,4 @@ jobs:
         run: yarn test:rules
 
       - name: Build
-        run: yarn build --if-present
+        run: yarn build
