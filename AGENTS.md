@@ -65,7 +65,9 @@ When implementing a task:
 
 - Install deps: npm ci
 
-- Start dev server: npm start → http://localhost:3000
+- Start dev server: npm run dev → http://localhost:5173
+
+- Preview prod build: npm run preview
 
 - Start emulators: firebase emulators:start --only firestore,auth
 

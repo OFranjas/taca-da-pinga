@@ -73,10 +73,10 @@ npm install
 #### Development
 
 ```
-npm start
+npm run dev
 ```
 
-Runs the app in development mode at http://localhost:3000
+Runs the app in development mode (Vite) at http://localhost:5173 with HMR.
 
 #### Build
 
@@ -84,7 +84,7 @@ Runs the app in development mode at http://localhost:3000
 npm run build
 ```
 
-Builds the app for production to the `build` folder.
+Builds the app for production to the `dist` folder (Vite). Use `npm run preview` to locally preview the production build.
 
 ## 🔀 Branching Model
 

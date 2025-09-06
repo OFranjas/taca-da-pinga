@@ -3,10 +3,10 @@
 # Aborta se der erro
 set -e
 
-echo "🛠️ Building React app..."
+echo "🛠️ Building app (Vite)..."
 npm run build
 
-echo "🚀 Deploying to Firebase Hosting..."
+echo "🚀 Deploying to Firebase Hosting (dist)..."
 firebase deploy --only hosting
 
 echo "✅ Deploy complete!"
