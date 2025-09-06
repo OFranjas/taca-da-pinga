@@ -102,6 +102,22 @@ See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
 
 ---
 
+## Firestore Emulator
+
+Security rules tests run against the Firestore emulator. The `npm run test:rules` script automatically downloads and starts the emulator before executing the tests.
+
+If you prefer to keep the emulator running for multiple test iterations, start it manually in another terminal:
+
+```
+firebase emulators:start --only firestore
+```
+
+Then run the tests separately:
+
+```
+npm --prefix rules-tests run test
+```
+
 ## Runbook
 
 - Local dev: [docs/DEV.md](docs/DEV.md)
