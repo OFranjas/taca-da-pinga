@@ -32,7 +32,7 @@ jobs:
         run: npm run typecheck --if-present || true
 
       - name: Unit tests
-        run: npm test --if-present -- --ci --reporter=default --coverage
+        run: npm run test:ci --if-present
 
       - name: Cache Firebase emulators
         uses: actions/cache@v4

@@ -1,16 +1,16 @@
-jest.mock('../../firebase', () => ({ db: {} }));
+vi.mock('../../firebase', () => ({ db: {} }));
 
-const mockCollection = jest.fn();
-const mockQuery = jest.fn();
-const mockOrderBy = jest.fn((field, dir) => ({ field, dir }));
-const mockGetDocs = jest.fn();
-const mockOnSnapshot = jest.fn();
-const mockDoc = jest.fn((db, col, id) => ({ col, id }));
-const mockUpdateDoc = jest.fn();
-const mockIncrement = jest.fn((n) => ({ __op: 'increment', n }));
-const mockLimit = jest.fn((n) => ({ __op: 'limit', n }));
+const mockCollection = vi.fn();
+const mockQuery = vi.fn();
+const mockOrderBy = vi.fn((field, dir) => ({ field, dir }));
+const mockGetDocs = vi.fn();
+const mockOnSnapshot = vi.fn();
+const mockDoc = vi.fn((db, col, id) => ({ col, id }));
+const mockUpdateDoc = vi.fn();
+const mockIncrement = vi.fn((n) => ({ __op: 'increment', n }));
+const mockLimit = vi.fn((n) => ({ __op: 'limit', n }));
 
-jest.mock('firebase/firestore', () => ({
+vi.mock('firebase/firestore', () => ({
   collection: (...args) => mockCollection(...args),
   query: (...args) => mockQuery(...args),
   orderBy: (...args) => mockOrderBy(...args),
@@ -24,7 +24,7 @@ jest.mock('firebase/firestore', () => ({
 
 describe('services/leaderboard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('getLeaderboard returns mapped teams', async () => {
@@ -52,7 +52,7 @@ describe('services/leaderboard', () => {
       internalCb = cb;
       return () => 'unsub';
     });
-    const cb = jest.fn();
+    const cb = vi.fn();
     const unsub = observeLeaderboard(cb);
     expect(typeof unsub).toBe('function');
 

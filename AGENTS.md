@@ -31,7 +31,7 @@ When implementing a task:
    npm ci
    npm run lint
    npm run typecheck || echo "no TS yet"
-   npm test -- --watch=false
+   npm run test
    npm run build
    ```
 
@@ -44,7 +44,7 @@ When implementing a task:
    - See CODING_GUARDRAILS.md (formatting, testing, file layout, review checklist).
 
 5. **Write tests**
-   - Unit tests for services and hooks (Jest).
+   - Unit tests for services and hooks (Vitest).
 
    - Component tests with React Testing Library.
 
@@ -77,7 +77,8 @@ When implementing a task:
 
 - Typecheck: npm run typecheck (noop acceptable until TS lands)
 
-- Unit/Component: npm test -- --watch=false
+- Unit/Component: npm run test
+- Unit/Component (CI): npm run test:ci
 
 - Rules (emulator): npm run test:rules
 

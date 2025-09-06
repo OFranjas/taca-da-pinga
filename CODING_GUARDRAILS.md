@@ -19,7 +19,7 @@ lib/
 
 ## Testing Requirements
 
-- Services: unit tests (Jest), mock emulator or SDK against emulator.
+- Services: unit tests (Vitest), mock emulator or SDK against emulator.
 - Components: React Testing Library; test behavior, not implementation details.
 - Rules: Firestore emulator tests for read/write invariants.
 - E2E: Playwright smoke (view leaderboard; admin adds pinga; event recorded).

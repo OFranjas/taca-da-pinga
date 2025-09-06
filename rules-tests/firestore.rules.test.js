@@ -1,15 +1,14 @@
-/** @jest-environment node */
-const fs = require('node:fs');
-const path = require('node:path');
-const {
+import fs from 'node:fs';
+import path from 'node:path';
+import {
   initializeTestEnvironment,
   assertSucceeds,
   assertFails,
-} = require('@firebase/rules-unit-testing');
+} from '@firebase/rules-unit-testing';
 
 // Reduce Firestore internal console.warn noise during deny cases
-const firebase = require('firebase/compat/app').default;
-require('firebase/compat/firestore');
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 firebase.firestore.setLogLevel('error');
 
 const PROJECT_ID = process.env.FB_PROJECT_ID || 'taca-da-pinga';

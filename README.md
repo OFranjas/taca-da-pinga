@@ -86,6 +86,14 @@ npm run build
 
 Builds the app for production to the `dist` folder (Vite). Use `npm run preview` to locally preview the production build.
 
+#### Testing
+
+```
+npm run test       # unit + component (Vitest)
+npm run test:ci    # CI mode with coverage
+npm run test:rules # Firestore security rules (emulator)
+```
+
 ## 🔀 Branching Model
 
 - `feature/*` → short-lived feature branches, branched from `develop`
