@@ -29,8 +29,9 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": ">=18 <20"
+    "node": ">=22.19.0 <23"
   },
+  "packageManager": "npm@10",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -42,9 +43,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "overrides": {
-    "webpack-dev-server": "^4.15.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.4",
@@ -62,6 +60,6 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
-    "vite": "^5.4.8"
+    "vite": "^6.3.5"
   }
 }

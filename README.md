@@ -57,7 +57,7 @@ Originally developed in a couple of days as a request for a friend, this project
 
 #### Prerequisites
 
-- Node.js v18+
+- Node.js v22.19.0 (see `.nvmrc`)
 - npm (comes with Node)
 
 #### Installation

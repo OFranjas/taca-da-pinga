@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node 18+
+- Node 22.19.0 (use `.nvmrc`)
 - Firebase CLI: `npm i -g firebase-tools`
 - Java 11+ (emulators)
 

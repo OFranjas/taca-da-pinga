@@ -35,6 +35,12 @@ git grep "from 'firebase/firestore'" src/components src/pages
 # should return no matches
 ```
 
+## Jest Configuration
+
+- We use Jest (temporary until Vitest migration).
+- Config lives at `jest.config.js` with `jsdom` environment and `babel-jest` transform.
+- CSS Modules are mapped via `identity-obj-proxy`; assets use a file stub.
+
 ## Firestore Rule Invariants
 
 - Allowed
