@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import AddPingasPanel from '../components/AddPingasPanel';
 import ManageTeamsPanel from '../components/ManageTeamsPanel';
@@ -10,6 +11,7 @@ import { toast } from 'react-toastify';
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState('add');
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -77,9 +79,18 @@ export default function Admin() {
       <div className={styles.card}>
         <div className={styles.header}>
           <h2 className={styles.title}>Painel Admin</h2>
-          <button onClick={logout} className={styles.logoutBtn}>
-            Logout
-          </button>
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={styles.secondaryAction}
+              onClick={() => navigate('/admin/branding')}
+            >
+              Branding
+            </button>
+            <button onClick={logout} className={styles.logoutBtn}>
+              Logout
+            </button>
+          </div>
         </div>
         <div className={styles.tabBar} role="tablist" aria-label="Admin sections">
           <button

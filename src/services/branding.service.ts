@@ -1,4 +1,4 @@
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { deleteField, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { compressImage } from '../utils/image';
 import { db } from '../firebase';
 
@@ -26,11 +26,15 @@ export async function getBranding(): Promise<BrandingData> {
 interface UpdateBrandingParams {
   mainLogoFile?: File | null;
   iconFile?: File | null;
+  removeMainLogo?: boolean;
+  removeIcon?: boolean;
 }
 
 export async function updateBranding({
   mainLogoFile,
   iconFile,
+  removeMainLogo,
+  removeIcon,
 }: UpdateBrandingParams): Promise<void> {
   const ref = doc(db, BRANDING_COLLECTION, BRANDING_DOC_ID);
   const updates: Record<string, unknown> = {
@@ -39,9 +43,13 @@ export async function updateBranding({
 
   if (mainLogoFile) {
     updates.mainLogoDataUrl = await compressImage(mainLogoFile);
+  } else if (removeMainLogo) {
+    updates.mainLogoDataUrl = deleteField();
   }
   if (iconFile) {
     updates.iconDataUrl = await compressImage(iconFile);
+  } else if (removeIcon) {
+    updates.iconDataUrl = deleteField();
   }
 
   await setDoc(ref, updates, { merge: true });

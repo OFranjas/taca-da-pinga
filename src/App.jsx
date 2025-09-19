@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Home from './pages/Home';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
+import Branding from './pages/Branding';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/branding" element={<Branding />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
