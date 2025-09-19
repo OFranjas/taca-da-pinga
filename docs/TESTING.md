@@ -15,14 +15,15 @@ yarn test:ci                     # CI mode with coverage
 yarn test:rules                  # Firestore security rules (emulator)
 yarn e2e                         # end-to-end (Playwright)
 
-Ensure Firestore emulator is running for rules tests:
-
+# `yarn test:rules` ensures Java is available (JAVA_HOME or Homebrew openjdk)
+# before launching `firebase emulators:exec`.
 ```
 
+When iterating on security rules interactively, run the emulator in a separate
+terminal instead:
+
+```
 firebase emulators:start --only firestore
-
-```
-
 ```
 
 ## Service Unit Tests
@@ -49,11 +50,16 @@ git grep "from 'firebase/firestore'" src/components src/pages
   - Public READ for `teams` (leaderboard) and `events`.
   - Admin WRITE to `teams`, `events`, and `app_config`.
   - Admin increments to `teams.pingas` with delta in [1..5].
+  - Public READ for `branding/current` and `sponsors`; admin writes must keep
+    image data URLs ≤ 180 KB.
 
 - Denied
   - Non-admin writes anywhere.
   - Increments > 5 or any decrement to `teams.pingas`.
   - Totals going negative.
   - Public READ of `app_config`.
+  - Invalid branding payloads (non-image data URLs or oversized assets).
+  - Invalid sponsor payloads (name > 80 chars, non-HTTPS links, bad image data,
+    non-bool `active`, or `order` outside 0–999).
 
 Rules tests live under `rules-tests/` and run via `yarn test:rules`.

@@ -19,6 +19,8 @@ VITE_FIREBASE_APP_ID=
 - Collections:
   - `teams`: { id, name, pingas }
   - `events` (audit): { ts, actorUid, type, delta, teamId }
+  - `branding/current`: { mainLogoDataUrl?, iconDataUrl? } (data URLs, max 180 KB each)
+  - `sponsors/{id}`: { name (≤80 chars), link (empty or https URL), imageDataUrl (≤180 KB data URL), active (bool), order (0-999) }
 
 ## Environments
 

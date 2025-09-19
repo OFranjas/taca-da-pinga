@@ -10,6 +10,18 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.admin == true;
     }
 
+    function isDataUrl(s) {
+      return s is string && s.matches('^data:image/.*');
+    }
+
+    function maxImgLen() {
+      return 180000;
+    }
+
+    function isValidImageDataUrl(dataUrl) {
+      return isDataUrl(dataUrl) && dataUrl.size() <= maxImgLen();
+    }
+
     // Leaderboard (teams) — public READ, admin WRITE with invariants
     match /teams/{teamId} {
       allow read: if true;
@@ -46,6 +58,32 @@ service cloud.firestore {
     match /app_config/{docId} {
       allow write: if isAdmin();
       allow read: if false;
+    }
+
+    // Branding — public READ, admin WRITE with validated data URLs
+    match /branding/current {
+      allow read: if true;
+      allow write: if isAdmin() &&
+        (!('mainLogoDataUrl' in request.resource.data) ||
+          isValidImageDataUrl(request.resource.data.mainLogoDataUrl)) &&
+        (!('iconDataUrl' in request.resource.data) ||
+          isValidImageDataUrl(request.resource.data.iconDataUrl));
+    }
+
+    function isValidSponsorData(data) {
+      return (data.name is string) && (data.name.size() <= 80) &&
+        ('link' in data) && (data.link is string) &&
+          (data.link.size() == 0 || data.link.matches('^https?://.+')) &&
+        ('imageDataUrl' in data) && isValidImageDataUrl(data.imageDataUrl) &&
+        ('active' in data) && (data.active is bool) &&
+        ('order' in data) && (data.order is int) &&
+        data.order >= 0 && data.order <= 999;
+    }
+
+    // Sponsors — public READ, admin WRITE with validated fields
+    match /sponsors/{sponsorId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidSponsorData(request.resource.data);
     }
 
     // Everything else denied

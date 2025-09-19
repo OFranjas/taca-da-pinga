@@ -107,4 +107,95 @@ describe('Firestore security rules', () => {
     const { db: anonDb2 } = makeDb(undefined);
     await assertFails(getDoc(doc(anonDb2, 'app_config/main')));
   });
+
+  describe('branding/current rules', () => {
+    const prefix = 'data:image/png;base64,';
+    const makeImageDataUrl = (payloadLength) => prefix + 'a'.repeat(payloadLength);
+
+    test('allows public reads and admin writes with valid data URLs', async () => {
+      const { db: adminDb } = makeDb({ sub: 'admin2', user_id: 'admin2', admin: true });
+      const validDataUrl = makeImageDataUrl(32);
+      await assertSucceeds(setDoc(doc(adminDb, 'branding/current'), {
+        mainLogoDataUrl: validDataUrl,
+        iconDataUrl: validDataUrl,
+      }));
+
+      const { db: anonDb } = makeDb(undefined);
+      await assertSucceeds(getDoc(doc(anonDb, 'branding/current')));
+
+      const { db: userDb } = makeDb({ sub: 'user2', user_id: 'user2', admin: false });
+      await assertFails(setDoc(doc(userDb, 'branding/current'), {
+        mainLogoDataUrl: validDataUrl,
+      }));
+    });
+
+    test('rejects image data that exceeds MAX_IMG_LEN', async () => {
+      const { db: adminDb } = makeDb({ sub: 'admin3', user_id: 'admin3', admin: true });
+      const maxAllowed = 180000 - prefix.length;
+      const atLimit = makeImageDataUrl(maxAllowed);
+      await assertSucceeds(setDoc(doc(adminDb, 'branding/current'), {
+        mainLogoDataUrl: atLimit,
+        iconDataUrl: atLimit,
+      }));
+
+      const oversize = makeImageDataUrl(maxAllowed + 1);
+      await assertFails(setDoc(doc(adminDb, 'branding/current'), {
+        mainLogoDataUrl: oversize,
+      }));
+    });
+  });
+
+  describe('sponsors rules', () => {
+    const prefix = 'data:image/png;base64,';
+    const validDataUrl = prefix + 'a'.repeat(16);
+
+    const baseSponsor = {
+      name: 'Sponsor Inc',
+      link: 'https://example.com',
+      imageDataUrl: validDataUrl,
+      active: true,
+      order: 1,
+    };
+
+    test('allows public reads and admin writes with valid payloads', async () => {
+      const { db: adminDb } = makeDb({ sub: 'admin4', user_id: 'admin4', admin: true });
+      await assertSucceeds(setDoc(doc(adminDb, 'sponsors/s1'), baseSponsor));
+
+      const { db: anonDb } = makeDb(undefined);
+      await assertSucceeds(getDoc(doc(anonDb, 'sponsors/s1')));
+
+      const { db: userDb } = makeDb({ sub: 'user3', user_id: 'user3', admin: false });
+      await assertFails(setDoc(doc(userDb, 'sponsors/s2'), baseSponsor));
+    });
+
+    test('rejects invalid sponsor payloads', async () => {
+      const { db: adminDb } = makeDb({ sub: 'admin5', user_id: 'admin5', admin: true });
+
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-name'), {
+        ...baseSponsor,
+        name: 'a'.repeat(81),
+      }));
+
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-link'), {
+        ...baseSponsor,
+        link: 'ftp://invalid',
+      }));
+
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-order'), {
+        ...baseSponsor,
+        order: 1000,
+      }));
+
+      const oversizeImage = prefix + 'a'.repeat(180000 - prefix.length + 1);
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-big-image'), {
+        ...baseSponsor,
+        imageDataUrl: oversizeImage,
+      }));
+
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-active'), {
+        ...baseSponsor,
+        active: 'yes please',
+      }));
+    });
+  });
 });
