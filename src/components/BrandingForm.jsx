@@ -40,7 +40,14 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
     []
   );
 
-  const handleFileChange = (file, setter, previewSetter, objectUrlRef, inputRef) => {
+  const handleFileChange = (
+    file,
+    setter,
+    previewSetter,
+    objectUrlRef,
+    inputRef,
+    resetRemoval
+  ) => {
     setter(file || null);
     revokeObjectUrl(objectUrlRef);
     if (file) {
@@ -50,12 +57,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
       const nextUrl = URL.createObjectURL(file);
       objectUrlRef.current = nextUrl;
       previewSetter(nextUrl);
-      if (setter === setMainLogoFile) {
-        setMainRemoved(false);
-      }
-      if (setter === setIconFile) {
-        setIconRemoved(false);
-      }
+      resetRemoval(false);
     } else {
       previewSetter('');
     }
@@ -64,14 +66,26 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
   const mainInputRef = useRef(null);
   const iconInputRef = useRef(null);
 
-  const clearFile = (setter, previewSetter, objectUrlRef, inputRef, markRemoved) => {
+  const resetFileSelection = (setter, previewSetter, objectUrlRef, inputRef) => {
     setter(null);
     previewSetter('');
     revokeObjectUrl(objectUrlRef);
     if (inputRef?.current) {
       inputRef.current.value = '';
     }
-    markRemoved(true);
+  };
+
+  const handleRemoveMainLogo = () => {
+    const removingStoredAsset =
+      !mainLogoFile && Boolean(initialBranding?.mainLogoDataUrl);
+    resetFileSelection(setMainLogoFile, setMainPreview, mainObjectUrlRef, mainInputRef);
+    setMainRemoved(removingStoredAsset);
+  };
+
+  const handleRemoveIcon = () => {
+    const removingStoredAsset = !iconFile && Boolean(initialBranding?.iconDataUrl);
+    resetFileSelection(setIconFile, setIconPreview, iconObjectUrlRef, iconInputRef);
+    setIconRemoved(removingStoredAsset);
   };
 
   const handleSubmit = async (event) => {
@@ -120,15 +134,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <button
                   type="button"
                   className={styles.clearButton}
-                  onClick={() =>
-                    clearFile(
-                      setMainLogoFile,
-                      setMainPreview,
-                      mainObjectUrlRef,
-                      mainInputRef,
-                      setMainRemoved
-                    )
-                  }
+                  onClick={handleRemoveMainLogo}
                 >
                   Remove
                 </button>
@@ -157,7 +163,8 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                     setMainLogoFile,
                     setMainPreview,
                     mainObjectUrlRef,
-                    mainInputRef
+                    mainInputRef,
+                    setMainRemoved
                   )
                 }
               />
@@ -180,15 +187,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <button
                   type="button"
                   className={styles.clearButton}
-                  onClick={() =>
-                    clearFile(
-                      setIconFile,
-                      setIconPreview,
-                      iconObjectUrlRef,
-                      iconInputRef,
-                      setIconRemoved
-                    )
-                  }
+                  onClick={handleRemoveIcon}
                 >
                   Remove
                 </button>
@@ -217,7 +216,8 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                     setIconFile,
                     setIconPreview,
                     iconObjectUrlRef,
-                    iconInputRef
+                    iconInputRef,
+                    setIconRemoved
                   )
                 }
               />

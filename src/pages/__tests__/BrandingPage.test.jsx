@@ -148,4 +148,45 @@ describe('Branding admin page', () => {
       });
     });
   });
+
+  test('clearing a pending main logo upload restores the stored asset', async () => {
+    const user = userEvent.setup ? userEvent.setup() : userEvent;
+    auth.onAuthStateChanged.mockImplementation((cb) => {
+      cb({ uid: 'admin' });
+      return vi.fn();
+    });
+    getBrandingMock.mockResolvedValue({
+      mainLogoDataUrl: 'data:image/png;base64,main',
+      iconDataUrl: 'data:image/png;base64,icon',
+    });
+    updateBrandingMock.mockResolvedValue(undefined);
+
+    renderWithRouter();
+
+    const mainInput = await screen.findByLabelText(/Main logo/i, { selector: 'input' });
+    const pendingFile = new File(['override'], 'override.png', { type: 'image/png' });
+
+    await user.upload(mainInput, pendingFile);
+
+    const [removeMain] = await screen.findAllByRole('button', { name: /Remove/i });
+    await user.click(removeMain);
+
+    await waitFor(() => {
+      expect(screen.getByAltText('Main logo preview')).toHaveAttribute(
+        'src',
+        'data:image/png;base64,main'
+      );
+    });
+
+    await user.click(screen.getByRole('button', { name: /Save branding/i }));
+
+    await waitFor(() => {
+      expect(updateBrandingMock).toHaveBeenCalledWith({
+        mainLogoFile: undefined,
+        iconFile: undefined,
+        removeMainLogo: false,
+        removeIcon: false,
+      });
+    });
+  });
 });
