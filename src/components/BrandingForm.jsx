@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './BrandingForm.module.css';
 
@@ -40,28 +40,52 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
     []
   );
 
-  const handleFileChange = (
-    file,
-    setter,
-    previewSetter,
-    objectUrlRef,
-    inputRef,
-    resetRemoval
-  ) => {
-    setter(file || null);
-    revokeObjectUrl(objectUrlRef);
-    if (file) {
-      if (inputRef?.current) {
-        inputRef.current.value = '';
+  const applyFileSelection = useCallback(
+    (file, setter, previewSetter, objectUrlRef, inputRef, resetRemoval) => {
+      setter(file || null);
+      revokeObjectUrl(objectUrlRef);
+      if (file) {
+        if (inputRef?.current) {
+          inputRef.current.value = '';
+        }
+        const nextUrl = URL.createObjectURL(file);
+        objectUrlRef.current = nextUrl;
+        previewSetter(nextUrl);
+        resetRemoval(false);
+      } else {
+        previewSetter('');
       }
-      const nextUrl = URL.createObjectURL(file);
-      objectUrlRef.current = nextUrl;
-      previewSetter(nextUrl);
-      resetRemoval(false);
-    } else {
-      previewSetter('');
-    }
-  };
+    },
+    []
+  );
+
+  const handleMainLogoChange = useCallback(
+    (event) => {
+      applyFileSelection(
+        event.target.files?.[0] || null,
+        setMainLogoFile,
+        setMainPreview,
+        mainObjectUrlRef,
+        mainInputRef,
+        setMainRemoved
+      );
+    },
+    [applyFileSelection]
+  );
+
+  const handleIconChange = useCallback(
+    (event) => {
+      applyFileSelection(
+        event.target.files?.[0] || null,
+        setIconFile,
+        setIconPreview,
+        iconObjectUrlRef,
+        iconInputRef,
+        setIconRemoved
+      );
+    },
+    [applyFileSelection]
+  );
 
   const mainInputRef = useRef(null);
   const iconInputRef = useRef(null);
@@ -76,8 +100,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
   };
 
   const handleRemoveMainLogo = () => {
-    const removingStoredAsset =
-      !mainLogoFile && Boolean(initialBranding?.mainLogoDataUrl);
+    const removingStoredAsset = !mainLogoFile && Boolean(initialBranding?.mainLogoDataUrl);
     resetFileSelection(setMainLogoFile, setMainPreview, mainObjectUrlRef, mainInputRef);
     setMainRemoved(removingStoredAsset);
   };
@@ -131,11 +154,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <p className={styles.assetHint}>Displayed on scoreboards and landing page</p>
               </div>
               {mainPreview ? (
-                <button
-                  type="button"
-                  className={styles.clearButton}
-                  onClick={handleRemoveMainLogo}
-                >
+                <button type="button" className={styles.clearButton} onClick={handleRemoveMainLogo}>
                   Remove
                 </button>
               ) : null}
@@ -157,16 +176,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 type="file"
                 accept="image/*"
                 className={styles.fileInput}
-                onChange={(e) =>
-                  handleFileChange(
-                    e.target.files?.[0] || null,
-                    setMainLogoFile,
-                    setMainPreview,
-                    mainObjectUrlRef,
-                    mainInputRef,
-                    setMainRemoved
-                  )
-                }
+                onChange={handleMainLogoChange}
               />
               <label htmlFor="mainLogo" className={styles.uploadButton}>
                 Choose image
@@ -184,11 +194,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <p className={styles.assetHint}>Used for favicons &amp; mobile shortcuts</p>
               </div>
               {iconPreview ? (
-                <button
-                  type="button"
-                  className={styles.clearButton}
-                  onClick={handleRemoveIcon}
-                >
+                <button type="button" className={styles.clearButton} onClick={handleRemoveIcon}>
                   Remove
                 </button>
               ) : null}
@@ -210,16 +216,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 type="file"
                 accept="image/*"
                 className={styles.fileInput}
-                onChange={(e) =>
-                  handleFileChange(
-                    e.target.files?.[0] || null,
-                    setIconFile,
-                    setIconPreview,
-                    iconObjectUrlRef,
-                    iconInputRef,
-                    setIconRemoved
-                  )
-                }
+                onChange={handleIconChange}
               />
               <label htmlFor="icon" className={styles.uploadButton}>
                 Choose image
