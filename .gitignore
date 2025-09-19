@@ -60,11 +60,3 @@ package-lock.json
 # non-root yarn.lock
 tools/yarn.lock
 test-rules/yarn.lock
-
-# Yarn install artifacts
-.yarn/
-**/.yarn/
-.yarn/**/*
-**/.yarn/**/*
-.yarn/install-state.gz
-**/.yarn/install-state.gz

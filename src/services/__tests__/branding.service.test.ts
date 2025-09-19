@@ -4,12 +4,14 @@ const mockDoc = vi.fn(() => ({}));
 const mockGetDoc = vi.fn();
 const mockSetDoc = vi.fn();
 const mockServerTimestamp = vi.fn(() => 'server-ts');
+const mockDeleteField = vi.fn(() => 'delete-field');
 
 vi.mock('firebase/firestore', () => ({
   doc: (...args: unknown[]) => mockDoc(...args),
   getDoc: (...args: unknown[]) => mockGetDoc(...args),
   setDoc: (...args: unknown[]) => mockSetDoc(...args),
   serverTimestamp: () => mockServerTimestamp(),
+  deleteField: () => mockDeleteField(),
 }));
 
 const compressImage = vi.fn();
@@ -67,5 +69,21 @@ describe('branding.service', () => {
     await updateBranding({});
     expect(compressImage).not.toHaveBeenCalled();
     expect(mockSetDoc).toHaveBeenCalledWith({}, { updatedAt: 'server-ts' }, { merge: true });
+  });
+
+  test('updateBranding removes assets when flagged', async () => {
+    const { updateBranding } = await import('../branding.service');
+    await updateBranding({ removeMainLogo: true, removeIcon: true });
+    expect(compressImage).not.toHaveBeenCalled();
+    expect(mockDeleteField).toHaveBeenCalledTimes(2);
+    expect(mockSetDoc).toHaveBeenCalledWith(
+      {},
+      expect.objectContaining({
+        mainLogoDataUrl: 'delete-field',
+        iconDataUrl: 'delete-field',
+        updatedAt: 'server-ts',
+      }),
+      { merge: true }
+    );
   });
 });

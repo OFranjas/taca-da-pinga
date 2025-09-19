@@ -22,6 +22,12 @@
   margin-bottom: 1rem;
 }
 
+.headerActions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .title {
   font-size: clamp(1.25rem, 2.2vw, 1.6rem);
   font-weight: 800;
@@ -45,6 +51,24 @@
 .logoutBtn:hover {
   background: #ef4444;
   color: #fff;
+  transform: translateY(-1px);
+}
+
+.secondaryAction {
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--accent-green);
+  padding: 0.5rem 1.05rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.secondaryAction:hover {
+  background: rgba(16, 185, 129, 0.24);
   transform: translateY(-1px);
 }
 
@@ -128,6 +152,14 @@
 .loginBtn:hover {
   background: #0e9e63;
   transform: translateY(-1px);
+}
+
+.errorText {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: 640px) {

@@ -1,0 +1,248 @@
+:root {
+  --brand-card-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  --brand-border-muted: rgba(148, 163, 184, 0.35);
+  --brand-surface: linear-gradient(135deg, rgba(236, 253, 245, 0.72), rgba(240, 249, 255, 0.65));
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend {
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 0.75rem;
+}
+
+.assetsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.1rem;
+}
+
+.assetCard {
+  background: var(--brand-surface);
+  border-radius: 16px;
+  padding: 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: var(--brand-card-shadow);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.assetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.assetTitle {
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  display: block;
+}
+
+.assetHint {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(30, 41, 59, 0.75);
+}
+
+.constraints {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(30, 64, 175, 0.75);
+}
+
+.previewFrameWide,
+.previewFrameSquare {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+  border: 2px dashed var(--brand-border-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.previewFrameWide {
+  min-height: 196px;
+}
+
+.previewFrameSquare {
+  width: clamp(160px, 40vw, 220px);
+  height: clamp(160px, 40vw, 220px);
+  align-self: center;
+}
+
+.previewPlaceholder {
+  text-align: center;
+  color: rgba(100, 116, 139, 0.8);
+  font-size: 0.9rem;
+  padding: 0 1.25rem;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+}
+
+.previewImageSmall {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  background: #111827;
+  color: #f8fafc;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.uploadButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.22);
+  background: #0f172a;
+}
+
+.fileName {
+  font-size: 0.82rem;
+  color: rgba(15, 23, 42, 0.75);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clearButton {
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.clearButton:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.errorMessage {
+  color: #b91c1c;
+  background: rgba(254, 226, 226, 0.7);
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.statusMessage {
+  color: #0f766e;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  background: var(--accent-green, #22c55e);
+  color: #fff;
+  border: none;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.25);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.saveButton:not(:disabled):hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 720px) {
+  .assetCard {
+    padding: 1rem;
+  }
+
+  .previewFrameWide {
+    min-height: 168px;
+  }
+}
