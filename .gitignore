@@ -40,3 +40,31 @@ pnpm-debug.log*
 !.yarn/install-state.gz
 !.yarn/sdks
 !.yarn/versions
+
+# Firebase Admin service account keys
+serviceAccountKey.json
+**/serviceAccountKey.json
+*.serviceAccountKey.json
+*serviceAccountKey*.json
+
+# Local tooling output / logs
+tools/*.log
+tools/.env.local
+
+# Lockfiles
+package-lock.json
+**/package-lock.json
+!yarn.lock
+**/yarn.lock
+
+# non-root yarn.lock
+tools/yarn.lock
+test-rules/yarn.lock
+
+# Yarn install artifacts
+.yarn/
+**/.yarn/
+.yarn/**/*
+**/.yarn/**/*
+.yarn/install-state.gz
+**/.yarn/install-state.gz

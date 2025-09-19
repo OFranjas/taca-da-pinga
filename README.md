@@ -127,6 +127,11 @@ Then run the tests separately:
 yarn --cwd rules-tests test
 ```
 
+### Admin access (custom claims)
+
+Admin-only Firestore writes are gated by a custom claim: `admin: true`.  
+Grant/revoke admin locally (no Cloud Functions required). See [docs/DEV.md](docs/DEV.md#admin-custom-claims).
+
 ## Runbook
 
 - Local dev: [docs/DEV.md](docs/DEV.md)
