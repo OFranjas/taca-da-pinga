@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './BrandingForm.module.css';
+import { Button } from './ui/Button';
+import { Card } from './ui/Card';
+import { FileInput } from './ui/FileInput';
 
 function revokeObjectUrl(ref) {
   if (ref.current) {
@@ -145,21 +148,34 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
       <fieldset className={styles.fieldset} disabled={disableForm}>
         <legend className={styles.legend}>Branding assets</legend>
         <div className={styles.assetsGrid}>
-          <div className={styles.assetCard}>
-            <div className={styles.assetHeader}>
-              <div>
-                <label htmlFor="mainLogo" className={styles.assetTitle}>
-                  Main logo
-                </label>
-                <p className={styles.assetHint}>Displayed on scoreboards and landing page</p>
-              </div>
-              {mainPreview ? (
-                <button type="button" className={styles.clearButton} onClick={handleRemoveMainLogo}>
-                  Remove
-                </button>
-              ) : null}
-            </div>
-            <p className={styles.constraints}>JPEG/PNG up to 600×600px (auto-compressed)</p>
+          <Card variant="glass" padding="lg" className={styles.assetCard}>
+            <FileInput
+              id="mainLogo"
+              ref={mainInputRef}
+              accept="image/*"
+              onChange={handleMainLogoChange}
+              fileName={mainLogoFile?.name ?? null}
+              buttonLabel="Choose image"
+              label={<span className={styles.assetTitle}>Main logo</span>}
+              hint={
+                <>
+                  <p className={styles.assetHint}>Displayed on scoreboards and landing page</p>
+                  <p className={styles.constraints}>JPEG/PNG up to 600×600px (auto-compressed)</p>
+                </>
+              }
+              action={
+                mainPreview ? (
+                  <Button
+                    type="button"
+                    variant="dangerSubtle"
+                    size="sm"
+                    onClick={handleRemoveMainLogo}
+                  >
+                    Remove
+                  </Button>
+                ) : null
+              }
+            />
             <div className={styles.previewFrameWide}>
               {mainPreview ? (
                 <img src={mainPreview} alt="Main logo preview" className={styles.previewImage} />
@@ -169,37 +185,31 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 </div>
               )}
             </div>
-            <div className={styles.uploadRow}>
-              <input
-                id="mainLogo"
-                ref={mainInputRef}
-                type="file"
-                accept="image/*"
-                className={styles.fileInput}
-                onChange={handleMainLogoChange}
-              />
-              <label htmlFor="mainLogo" className={styles.uploadButton}>
-                Choose image
-              </label>
-              {mainLogoFile ? <span className={styles.fileName}>{mainLogoFile.name}</span> : null}
-            </div>
-          </div>
+          </Card>
 
-          <div className={styles.assetCard}>
-            <div className={styles.assetHeader}>
-              <div>
-                <label htmlFor="icon" className={styles.assetTitle}>
-                  Icon
-                </label>
-                <p className={styles.assetHint}>Used for favicons &amp; mobile shortcuts</p>
-              </div>
-              {iconPreview ? (
-                <button type="button" className={styles.clearButton} onClick={handleRemoveIcon}>
-                  Remove
-                </button>
-              ) : null}
-            </div>
-            <p className={styles.constraints}>Square images look best (auto-resized)</p>
+          <Card variant="glass" padding="lg" className={styles.assetCard}>
+            <FileInput
+              id="icon"
+              ref={iconInputRef}
+              accept="image/*"
+              onChange={handleIconChange}
+              fileName={iconFile?.name ?? null}
+              buttonLabel="Choose image"
+              label={<span className={styles.assetTitle}>Icon</span>}
+              hint={
+                <>
+                  <p className={styles.assetHint}>Used for favicons &amp; mobile shortcuts</p>
+                  <p className={styles.constraints}>Square images look best (auto-resized)</p>
+                </>
+              }
+              action={
+                iconPreview ? (
+                  <Button type="button" variant="dangerSubtle" size="sm" onClick={handleRemoveIcon}>
+                    Remove
+                  </Button>
+                ) : null
+              }
+            />
             <div className={styles.previewFrameSquare}>
               {iconPreview ? (
                 <img src={iconPreview} alt="Icon preview" className={styles.previewImageSmall} />
@@ -209,39 +219,29 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 </div>
               )}
             </div>
-            <div className={styles.uploadRow}>
-              <input
-                id="icon"
-                ref={iconInputRef}
-                type="file"
-                accept="image/*"
-                className={styles.fileInput}
-                onChange={handleIconChange}
-              />
-              <label htmlFor="icon" className={styles.uploadButton}>
-                Choose image
-              </label>
-              {iconFile ? <span className={styles.fileName}>{iconFile.name}</span> : null}
-            </div>
-          </div>
+          </Card>
         </div>
       </fieldset>
 
-      {errorMessage ? (
-        <p role="alert" className={styles.errorMessage}>
-          {errorMessage}
-        </p>
-      ) : null}
-      {statusMessage ? (
-        <p role="status" className={styles.statusMessage}>
-          {statusMessage}
-        </p>
+      {errorMessage || statusMessage ? (
+        <div className={styles.statusStack}>
+          {errorMessage ? (
+            <p role="alert" className={styles.errorMessage}>
+              {errorMessage}
+            </p>
+          ) : null}
+          {statusMessage ? (
+            <p role="status" className={styles.statusMessage}>
+              {statusMessage}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <div className={styles.actions}>
-        <button type="submit" className={styles.saveButton} disabled={disableForm}>
+        <Button type="submit" disabled={disableForm}>
           {saving ? 'Saving…' : 'Save branding'}
-        </button>
+        </Button>
       </div>
     </form>
   );

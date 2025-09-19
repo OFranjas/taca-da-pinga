@@ -1,18 +1,10 @@
-:root {
-  /* Paleta de Cores */
-  --bg-page: #f3f4f6;
-  --bg-card: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --accent-green: #10b981;
-  --accent-hover: rgba(16, 185, 129, 0.1);
-}
+@import './styles/tokens.css';
 
-/* Importa depois dos @tailwind ou no topo se não usares Tailwind */
 body {
-  background: var(--bg-page);
+  background: var(--color-page-bg);
   margin: 0;
-  font-family: sans-serif;
+  font-family: var(--font-family-sans);
+  color: var(--color-text-primary);
 }
 
 html,
@@ -20,18 +12,21 @@ body,
 #root {
   height: 100%;
 }
+
 html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* prevent page-wide horizontal scroll */
+  overflow-x: hidden;
   width: 100%;
 }
+
 *,
 *::before,
 ::after {
-  box-sizing: border-box; /* safer sizing */
+  box-sizing: border-box;
 }
+
 img,
 svg,
 video,

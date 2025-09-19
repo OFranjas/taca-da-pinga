@@ -5,8 +5,11 @@ import Header from '../components/Header';
 import { auth } from '../firebase';
 import BrandingForm from '../components/BrandingForm';
 import { getBranding, updateBranding } from '../services/branding.service';
-import styles from './Admin.module.css';
 import pageStyles from './Branding.module.css';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Input } from '../components/ui/Input';
+import { Section } from '../components/ui/Section';
 
 function useAdminAuth() {
   const [user, setUser] = useState(null);
@@ -80,44 +83,46 @@ export default function Branding() {
     return (
       <>
         <Header />
-        <div className={styles.card}>
-          <h2 className={styles.title}>Admin Login</h2>
-          {loginError ? (
-            <p role="alert" className={styles.errorText}>
-              {loginError}
-            </p>
-          ) : null}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setLoginError(null);
-              login().catch((err) => {
-                setLoginError(err?.message || 'Failed to login');
-              });
-            }}
-            className={styles.loginForm}
-          >
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
-              required
-            />
-            <button type="submit" className={styles.loginBtn}>
-              Login
-            </button>
-          </form>
-        </div>
+        <main className={pageStyles.page}>
+          <Card className={pageStyles.loginCard} padding="lg" radius="lg">
+            <h2 className={pageStyles.loginHeader}>Admin Login</h2>
+            {loginError ? (
+              <p role="alert" className={pageStyles.alert}>
+                {loginError}
+              </p>
+            ) : null}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLoginError(null);
+                login().catch((err) => {
+                  setLoginError(err?.message || 'Failed to login');
+                });
+              }}
+              className={pageStyles.loginForm}
+            >
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={pageStyles.loginInput}
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className={pageStyles.loginInput}
+              />
+              <Button type="submit" className={pageStyles.loginButton}>
+                Login
+              </Button>
+            </form>
+          </Card>
+        </main>
       </>
     );
   }
@@ -125,8 +130,15 @@ export default function Branding() {
   return (
     <>
       <Header />
-      <main className={pageStyles.wrapper}>
-        <div className={pageStyles.heroShell}>
+      <main className={pageStyles.page}>
+        <Section
+          as="div"
+          variant="accent"
+          padding="lg"
+          radius="xl"
+          shadow="elevated"
+          className={pageStyles.heroShell}
+        >
           <div className={pageStyles.heroContent}>
             <span className={pageStyles.microTitle}>Admin · Branding</span>
             <h1 className={pageStyles.heroTitle}>Customize the Taça da Pinga visuals</h1>
@@ -136,18 +148,14 @@ export default function Branding() {
             </p>
           </div>
           <div className={pageStyles.heroActions}>
-            <button
-              type="button"
-              className={pageStyles.backButton}
-              onClick={() => navigate('/admin')}
-            >
+            <Button type="button" variant="accentSubtle" onClick={() => navigate('/admin')}>
               ← Voltar ao painel
-            </button>
-            <button onClick={logout} className={pageStyles.logoutButton}>
+            </Button>
+            <Button type="button" variant="danger" onClick={logout}>
               Logout
-            </button>
+            </Button>
           </div>
-        </div>
+        </Section>
 
         {loadError ? (
           <p role="alert" className={pageStyles.errorBanner}>
@@ -155,7 +163,14 @@ export default function Branding() {
           </p>
         ) : null}
 
-        <section className={pageStyles.formSection}>
+        <Section
+          as="section"
+          variant="muted"
+          padding="lg"
+          radius="xl"
+          shadow="card"
+          className={pageStyles.formSection}
+        >
           <BrandingForm
             initialBranding={initialData}
             isLoading={isLoading}
@@ -165,7 +180,7 @@ export default function Branding() {
               setInitialData(refreshed || {});
             }}
           />
-        </section>
+        </Section>
       </main>
     </>
   );
