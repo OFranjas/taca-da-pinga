@@ -24,3 +24,7 @@ VITE_FIREBASE_APP_ID=
 
 - Separate Firebase projects for `develop` and `production`.
 - Never reuse prod keys locally.
+
+## Admin claims configuration
+
+No environment variables are required. The tooling uses `tools/serviceAccountKey.json` (local only).
