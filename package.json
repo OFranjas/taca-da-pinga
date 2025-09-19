@@ -23,7 +23,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
-    "test:rules": "yarn --cwd rules-tests install --immutable && firebase emulators:exec --only firestore \"yarn --cwd rules-tests test\"",
+    "test:rules": "./scripts/test-rules.sh",
     "lint": "eslint --cache --max-warnings=0 \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --cache --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "format": "prettier --write .",
