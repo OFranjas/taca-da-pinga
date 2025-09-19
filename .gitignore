@@ -54,7 +54,7 @@ tools/.env.local
 # Lockfiles
 package-lock.json
 **/package-lock.json
-yarn.lock
+!yarn.lock
 **/yarn.lock
 
 # non-root yarn.lock
