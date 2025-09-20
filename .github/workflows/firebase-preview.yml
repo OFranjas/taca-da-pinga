@@ -1,0 +1,185 @@
+name: Firebase Hosting Preview
+
+on:
+  pull_request:
+    branches: [develop, production]
+
+jobs:
+  deploy-preview:
+    name: Deploy preview channel
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Authenticate to Google Cloud
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Firebase preview channel
+        id: firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          set -eo pipefail
+          if [ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -z "${FIREBASE_TOKEN:-}" ]; then
+            echo "::error::Firebase credentials not configured. Add a FIREBASE_SERVICE_ACCOUNT or FIREBASE_TOKEN secret."
+            exit 1
+          fi
+
+          ./node_modules/.bin/firebase hosting:channel:deploy pr-${{ github.event.number }} --json > firebase-output.json
+
+          node <<'NODE'
+          const fs = require('fs');
+          const outputPath = 'firebase-output.json';
+
+          if (!fs.existsSync(outputPath)) {
+            console.error('::error::Firebase CLI did not create an output file.');
+            process.exit(1);
+          }
+
+          let data;
+          try {
+            data = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+          } catch (error) {
+            console.error('::error::Failed to parse Firebase CLI JSON output.');
+            console.error(error);
+            process.exit(1);
+          }
+
+          if (data.status !== 'success') {
+            console.error('::error::Firebase deploy failed.');
+            console.error(JSON.stringify(data, null, 2));
+            process.exit(1);
+          }
+
+          const urls = [];
+          const seen = new Set();
+          const queue = [data.result];
+
+          while (queue.length) {
+            const value = queue.shift();
+            if (!value || typeof value !== 'object') continue;
+
+            const candidates = [];
+            if (typeof value.url === 'string') candidates.push(value.url);
+            if (typeof value.previewUrl === 'string') candidates.push(value.previewUrl);
+            if (typeof value.previewURL === 'string') candidates.push(value.previewURL);
+            if (Array.isArray(value.urls)) candidates.push(...value.urls);
+            if (Array.isArray(value.previewUrls)) candidates.push(...value.previewUrls);
+
+            for (const candidate of candidates) {
+              if (typeof candidate === 'string' && candidate.startsWith('http') && !seen.has(candidate)) {
+                seen.add(candidate);
+                urls.push(candidate);
+              }
+            }
+
+            for (const nested of Object.values(value)) {
+              if (nested && typeof nested === 'object') queue.push(nested);
+            }
+          }
+
+          if (!urls.length) {
+            console.error('::error::Unable to determine Firebase preview URL.');
+            console.error(JSON.stringify(data, null, 2));
+            process.exit(1);
+          }
+
+          const expireTime = (() => {
+            if (!data.result || typeof data.result !== 'object') return '';
+            if (typeof data.result.expireTime === 'string') return data.result.expireTime;
+            if (typeof data.result.expirationTime === 'string') return data.result.expirationTime;
+            return '';
+          })();
+
+          console.log(`Preview URL: ${urls[0]}`);
+
+          const lines = [`preview_url=${urls[0]}`];
+          if (expireTime) {
+            lines.push(`preview_expires=${expireTime}`);
+          }
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `${lines.join('\n')}\n`);
+          NODE
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.firebase.outputs.preview_url }}
+          PREVIEW_EXPIRES: ${{ steps.firebase.outputs.preview_expires }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const url = process.env.PREVIEW_URL;
+            if (!url) {
+              core.setFailed('Missing preview URL');
+              return;
+            }
+            const expires = process.env.PREVIEW_EXPIRES;
+            let expiresSuffix = '';
+            if (expires) {
+              const parsed = new Date(expires);
+              if (!Number.isNaN(parsed.valueOf())) {
+                expiresSuffix = ` (expires ${parsed.toUTCString()})`;
+              } else {
+                expiresSuffix = ` (expires ${expires})`;
+              }
+            }
+            const marker = '<!-- firebase-preview -->';
+            const body = `${marker}\n🚀 Firebase preview available: ${url}${expiresSuffix}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
