@@ -13,6 +13,23 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
+## GitHub Secrets
+
+The CI/CD workflows rely on the same Firebase configuration. Add these repository secrets:
+
+| Secret                              | Required | Description                                                                      |
+| ----------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `VITE_FIREBASE_API_KEY`             | ✅       | Firebase client config (same value as local dev)                                 |
+| `VITE_FIREBASE_AUTH_DOMAIN`         | ✅       | Firebase client config                                                           |
+| `VITE_FIREBASE_PROJECT_ID`          | ✅       | Firebase client config + default project fallback                                |
+| `VITE_FIREBASE_STORAGE_BUCKET`      | ✅       | Firebase client config                                                           |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | ✅       | Firebase client config                                                           |
+| `VITE_FIREBASE_APP_ID`              | ✅       | Firebase client config                                                           |
+| `FIREBASE_SERVICE_ACCOUNT`          | ✅       | Base64/JSON service account with Hosting + Firestore Rules deploy permissions    |
+| `FIREBASE_PROJECT_ID`               | ⬜       | Override when the repo default project differs from the service account defaults |
+
+> The service account must be able to create Hosting channels/sites and deploy Firestore rules (e.g. roles: `Firebase Hosting Admin` + `Firebase Rules Admin`).
+
 ## Runtime Config
 
 - Admin allowlist: `app_config/admins` document in Firestore (or custom claim `admin`).

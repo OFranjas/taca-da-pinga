@@ -42,6 +42,20 @@ Dev test user (local only): testing@tests.com / testing
 
 - Build: yarn build (outputs to dist/). Use `yarn preview` to preview the production build.
 
+## CI / Hosting Pipelines
+
+- **PR Preview** (`.github/workflows/pr-preview.yml`)
+  - Runs on every pull request and manual dispatch.
+  - Installs deps, builds, deploys `hosting:preview` and clones the release to the static site `preview-taca-da-pinga.web.app`.
+  - Useful for reviewers: the workflow comments the refreshable preview URL on the PR.
+
+- **Deploy Develop** (`.github/workflows/deploy-develop.yml`)
+  - Runs on every push to `develop`.
+  - Executes lint → `test:ci` → `test:rules` → `typecheck` → `build` before deploying `hosting:develop` (site `develop-taca-da-pinga`).
+  - The deploy step assumes `FIREBASE_SERVICE_ACCOUNT` can publish Hosting releases and Firestore rules.
+
+Inspect failed runs in GitHub → Actions. Most failures stem from missing secrets or insufficient Firebase IAM roles.
+
 ## Admin (custom claims)
 
 Admin-only Firestore writes are protected by a custom claim: `admin: true`.  
