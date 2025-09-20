@@ -38,7 +38,6 @@
     },
     {
       "target": "develop",
-      "site": "develop-taca-da-pinga",
       "public": "dist",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "headers": [

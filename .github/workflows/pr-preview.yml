@@ -2,9 +2,7 @@ name: PR Preview
 
 on:
   pull_request:
-    branches:
-      - develop
-      - production
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -94,6 +92,47 @@ jobs:
 
           echo "${FIREBASE_SERVICE_ACCOUNT}" > "${HOME}/firebaseServiceAccount.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=${HOME}/firebaseServiceAccount.json" >> "${GITHUB_ENV}"
+
+      - name: Ensure static preview site exists
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          STATIC_SITE: ${{ env.PREVIEW_STATIC_SITE }}
+        run: |
+          set -o errexit
+          set -o pipefail
+
+          PROJECT_ID="${FIREBASE_PROJECT_ID:-$FIREBASE_DEFAULT_PROJECT}"
+
+          ./node_modules/.bin/firebase hosting:sites:list --project "${PROJECT_ID}" --json > firebase-sites.json
+
+          STATUS=$(node <<'NODE'
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('firebase-sites.json', 'utf8'));
+          const sites = [];
+          if (Array.isArray(payload?.result)) {
+            sites.push(...payload.result);
+          } else if (Array.isArray(payload?.result?.sites)) {
+            sites.push(...payload.result.sites);
+          } else if (Array.isArray(payload?.sites)) {
+            sites.push(...payload.sites);
+          }
+
+          const target = process.env.STATIC_SITE;
+          const found = sites.some((entry) => {
+            if (!entry) return false;
+            const name = typeof entry === 'string' ? entry : entry.name || entry.site || entry.id;
+            if (!name) return false;
+            return name === target || name.endsWith(`/${target}`);
+          });
+
+          process.stdout.write(found ? 'exists' : 'missing');
+          NODE
+          )
+
+          if [ "${STATUS}" = "missing" ]; then
+            echo "Creating hosting site ${STATIC_SITE} in project ${PROJECT_ID}" >&2
+            ./node_modules/.bin/firebase hosting:sites:create "${STATIC_SITE}" --project "${PROJECT_ID}" --non-interactive
+          fi
 
       - name: Deploy to Firebase preview channel
         id: deploy
