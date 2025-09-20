@@ -1,0 +1,104 @@
+name: Firebase Hosting Preview
+
+on:
+  pull_request:
+    branches: [develop, production]
+
+jobs:
+  deploy-preview:
+    name: Deploy preview channel
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Deploy to Firebase preview channel
+        id: firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          set -eo pipefail
+          ./node_modules/.bin/firebase hosting:channel:deploy pr-${{ github.event.number }} --json > firebase-output.json
+          cat firebase-output.json
+          URL=$(jq -r '
+            def firstUrl(obj):
+              if obj == null then empty else (obj.url // (obj.urls[0] // empty)) end;
+            if (.result | type) == "array" then
+              ([.result[] | firstUrl(.)] | map(select(. != "")) | .[0] // empty)
+            else
+              firstUrl(.result)
+            end
+          ' firebase-output.json)
+          if [ -z "$URL" ] || [ "$URL" = "null" ]; then
+            echo "::error::Unable to determine Firebase preview URL"
+            exit 1
+          fi
+          echo "preview_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.firebase.outputs.preview_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const url = process.env.PREVIEW_URL;
+            if (!url) {
+              core.setFailed('Missing preview URL');
+              return;
+            }
+            const marker = '<!-- firebase-preview -->';
+            const body = `${marker}\n🚀 Firebase preview available: ${url}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
