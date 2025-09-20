@@ -20,7 +20,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PREVIEW_CHANNEL: preview
+      PREVIEW_CHANNEL: taca-da-pinga
+      FIREBASE_HOSTING_SITE: preview
+      PREVIEW_CUSTOM_DOMAIN: preview--taca-da-pinga.web.app
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
       VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -104,7 +106,12 @@ jobs:
             PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
           fi
 
-          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} > firebase-deploy.json
+          SITE_ARG=""
+          if [ -n "${FIREBASE_HOSTING_SITE:-}" ]; then
+            SITE_ARG="--site ${FIREBASE_HOSTING_SITE}"
+          fi
+
+          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} ${SITE_ARG} > firebase-deploy.json
 
           node <<'NODE'
           const fs = require('fs');
@@ -143,7 +150,12 @@ jobs:
             return undefined;
           };
 
-          const url = candidates.map(extractUrl).find(Boolean);
+          let url = candidates.map(extractUrl).find(Boolean);
+
+          const preferred = process.env.PREVIEW_CUSTOM_DOMAIN;
+          if ((!url || preferred) && preferred) {
+            url = preferred.startsWith('http') ? preferred : `https://${preferred}`;
+          }
 
           if (!url) {
             throw new Error('Firebase deploy output missing preview URL: ' + JSON.stringify(payload));
