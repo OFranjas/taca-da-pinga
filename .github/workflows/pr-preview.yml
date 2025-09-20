@@ -156,17 +156,7 @@ jobs:
             exit 1
           fi
 
-          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --project "${PROJECT_ID}" --json > firebase-deploy.json 2> firebase-deploy.log
-          STATUS=$?
-
-          if [ "${STATUS}" -ne 0 ]; then
-            echo "firebase hosting:channel:deploy failed" >&2
-            cat firebase-deploy.log >&2 || true
-            if [ -f firebase-deploy.json ]; then
-              cat firebase-deploy.json >&2
-            fi
-            exit ${STATUS}
-          fi
+          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --project "${PROJECT_ID}" --json | tee firebase-deploy.json
 
           node <<'NODE'
           const fs = require('fs');
