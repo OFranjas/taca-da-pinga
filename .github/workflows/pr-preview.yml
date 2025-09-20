@@ -82,14 +82,40 @@ jobs:
           const fs = require('fs');
 
           const payload = JSON.parse(fs.readFileSync('firebase-deploy.json', 'utf8'));
-          const bucket = Array.isArray(payload?.result)
-            ? payload.result
-            : payload?.result
-            ? [payload.result]
-            : [payload];
 
-          const candidate = bucket.find((item) => item && (item.url || item.previewUrl || item?.version?.previewUrl || item?.hosting?.url));
-          const url = candidate?.url || candidate?.previewUrl || candidate?.version?.previewUrl || candidate?.hosting?.url;
+          const stack = [payload];
+          const candidates = [];
+
+          while (stack.length) {
+            const current = stack.pop();
+            if (!current) continue;
+
+            if (Array.isArray(current)) {
+              stack.push(...current);
+              continue;
+            }
+
+            if (typeof current === 'object') {
+              candidates.push(current);
+              stack.push(...Object.values(current));
+            }
+          }
+
+          const extractUrl = (obj) => {
+            if (!obj || typeof obj !== 'object') return undefined;
+            if (typeof obj.url === 'string' && obj.url.startsWith('http')) return obj.url;
+            if (typeof obj.previewUrl === 'string' && obj.previewUrl.startsWith('http')) return obj.previewUrl;
+            if (obj.hosting && typeof obj.hosting.url === 'string' && obj.hosting.url.startsWith('http')) {
+              return obj.hosting.url;
+            }
+            if (obj.version && typeof obj.version === 'object') {
+              const nested = extractUrl(obj.version);
+              if (nested) return nested;
+            }
+            return undefined;
+          };
+
+          const url = candidates.map(extractUrl).find(Boolean);
 
           if (!url) {
             throw new Error('Firebase deploy output missing preview URL: ' + JSON.stringify(payload));
