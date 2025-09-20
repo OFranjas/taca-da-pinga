@@ -21,6 +21,12 @@ jobs:
 
     env:
       PREVIEW_CHANNEL: pr-${{ github.event.number }}
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
     steps:
       - name: Checkout
@@ -36,6 +42,28 @@ jobs:
 
       - name: Prepare Yarn 4
         run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Validate Firebase web config
+        run: |
+          missing=0
+          for key in \
+            VITE_FIREBASE_API_KEY \
+            VITE_FIREBASE_AUTH_DOMAIN \
+            VITE_FIREBASE_PROJECT_ID \
+            VITE_FIREBASE_STORAGE_BUCKET \
+            VITE_FIREBASE_MESSAGING_SENDER_ID \
+            VITE_FIREBASE_APP_ID
+          do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing secret: $key" >&2
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Firebase web configuration secrets are required for the preview build" >&2
+            exit 1
+          fi
 
       - name: Cache Yarn global cache
         uses: actions/cache@v4
@@ -76,7 +104,7 @@ jobs:
             PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
           fi
 
-          yarn firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} > firebase-deploy.json
+          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} > firebase-deploy.json
 
           node <<'NODE'
           const fs = require('fs');
