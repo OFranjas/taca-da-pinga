@@ -18,12 +18,6 @@
     "baseUrl": "."
   },
   "include": ["src", "vite.config.js", "eslint.config.js"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/**/*.test.js",
-    "src/**/*.test.jsx",
-    "src/**/__tests__/**"
-  ],
+  "exclude": ["dist", "build", "node_modules"],
   "references": []
 }
