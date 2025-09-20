@@ -1,0 +1,109 @@
+:root {
+  color-scheme: light;
+  --ui-font-family:
+    'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ui-font-weight-regular: 400;
+  --ui-font-weight-medium: 500;
+  --ui-font-weight-semibold: 600;
+  --ui-font-weight-bold: 700;
+  --ui-font-weight-extrabold: 800;
+
+  --ui-space-3xs: 0.125rem;
+  --ui-space-2xs: 0.25rem;
+  --ui-space-xs: 0.5rem;
+  --ui-space-sm: 0.75rem;
+  --ui-space-md: 1rem;
+  --ui-space-lg: 1.5rem;
+  --ui-space-xl: 2rem;
+  --ui-space-2xl: 3rem;
+  --ui-space-3xl: 4rem;
+
+  --ui-radius-xs: 0.35rem;
+  --ui-radius-sm: 0.5rem;
+  --ui-radius-md: 0.75rem;
+  --ui-radius-lg: 1rem;
+  --ui-radius-xl: 1.5rem;
+  --ui-radius-full: 999px;
+
+  --ui-color-page: #f1f5f9;
+  --ui-color-surface: #ffffff;
+  --ui-color-surface-muted: #f8fafc;
+  --ui-color-surface-strong: #e2e8f0;
+  --ui-color-border-subtle: rgba(148, 163, 184, 0.28);
+  --ui-color-border-strong: rgba(30, 64, 175, 0.45);
+  --ui-color-accent: #22c55e;
+  --ui-color-accent-soft: rgba(34, 197, 94, 0.12);
+  --ui-color-accent-strong: #047857;
+  --ui-color-danger: #ef4444;
+  --ui-color-danger-soft: rgba(248, 113, 113, 0.16);
+  --ui-color-warning: #facc15;
+  --ui-color-text-primary: #0f172a;
+  --ui-color-text-secondary: rgba(15, 23, 42, 0.74);
+  --ui-color-text-muted: rgba(15, 23, 42, 0.52);
+  --ui-color-text-inverted: #ffffff;
+
+  --ui-shadow-soft: 0 20px 40px rgba(15, 23, 42, 0.08);
+  --ui-shadow-card: 0 32px 60px rgba(15, 118, 110, 0.12);
+  --ui-shadow-elevated: 0 40px 80px rgba(15, 23, 42, 0.16);
+
+  --ui-text-size-xs: 0.75rem;
+  --ui-text-size-sm: 0.875rem;
+  --ui-text-size-base: 1rem;
+  --ui-text-size-lg: 1.125rem;
+  --ui-text-size-xl: 1.5rem;
+  --ui-text-size-2xl: 2rem;
+  --ui-text-size-3xl: 2.5rem;
+  --ui-text-size-4xl: 3.25rem;
+
+  --ui-line-height-tight: 1.2;
+  --ui-line-height-snug: 1.35;
+  --ui-line-height-base: 1.5;
+  --ui-line-height-relaxed: 1.65;
+  --ui-line-height-loose: 1.8;
+
+  --ui-transition-fast: 120ms ease;
+  --ui-transition-base: 180ms ease;
+
+  --ui-max-page-width: 1400px;
+  --ui-max-content-width: 1200px;
+  --ui-header-height: 4.25rem;
+}
+
+body {
+  background: var(--ui-color-page);
+  color: var(--ui-color-text-primary);
+  font-family: var(--ui-font-family);
+}
+
+a {
+  color: inherit;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --ui-text-size-xl: 1.9rem;
+    --ui-text-size-2xl: 2.4rem;
+    --ui-text-size-3xl: 2.85rem;
+    --ui-text-size-4xl: 3.6rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --ui-space-xl: 2.5rem;
+    --ui-space-2xl: 4rem;
+    --ui-space-3xl: 6rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --ui-text-size-xl: 2.2rem;
+    --ui-text-size-2xl: 2.8rem;
+    --ui-text-size-3xl: 3.25rem;
+    --ui-text-size-4xl: 4rem;
+    --ui-space-xl: 3rem;
+    --ui-space-2xl: 5rem;
+    --ui-space-3xl: 7rem;
+  }
+}

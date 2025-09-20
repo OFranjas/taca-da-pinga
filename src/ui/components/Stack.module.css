@@ -1,0 +1,136 @@
+.root {
+  display: flex;
+  gap: var(--ui-space-md);
+  width: 100%;
+}
+
+.directionRow {
+  flex-direction: row;
+}
+
+.directionColumn {
+  flex-direction: column;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.alignStart {
+  align-items: flex-start;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.alignStretch {
+  align-items: stretch;
+}
+
+.justifyStart {
+  justify-content: flex-start;
+}
+
+.justifyCenter {
+  justify-content: center;
+}
+
+.justifyBetween {
+  justify-content: space-between;
+}
+
+.justifyEnd {
+  justify-content: flex-end;
+}
+
+.gapSm {
+  gap: var(--ui-space-sm);
+}
+
+.gapMd {
+  gap: var(--ui-space-md);
+}
+
+.gapLg {
+  gap: var(--ui-space-lg);
+}
+
+.gapXl {
+  gap: var(--ui-space-xl);
+}
+
+.switchRowSm {
+}
+
+.switchRowMd {
+}
+
+.switchRowLg {
+}
+
+.switchRowXl {
+}
+
+.switchRowTv {
+}
+
+.switchColumnSm {
+}
+
+.switchColumnMd {
+}
+
+.switchColumnLg {
+}
+
+.switchColumnXl {
+}
+
+.switchColumnTv {
+}
+
+@media (min-width: 480px) {
+  .switchRowSm {
+    flex-direction: row;
+  }
+  .switchColumnSm {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 768px) {
+  .switchRowMd {
+    flex-direction: row;
+  }
+  .switchColumnMd {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1024px) {
+  .switchRowLg {
+    flex-direction: row;
+  }
+  .switchColumnLg {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1280px) {
+  .switchRowXl {
+    flex-direction: row;
+  }
+  .switchColumnXl {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1920px) {
+  .switchRowTv {
+    flex-direction: row;
+  }
+  .switchColumnTv {
+    flex-direction: column;
+  }
+}

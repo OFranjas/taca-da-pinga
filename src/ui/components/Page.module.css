@@ -1,0 +1,88 @@
+.root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: var(--ui-color-page);
+  padding-top: var(--ui-space-lg);
+  padding-bottom: var(--ui-space-2xl);
+  padding-left: var(--ui-space-md);
+  padding-right: var(--ui-space-md);
+  box-sizing: border-box;
+}
+
+.fullHeight {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xl);
+  width: 100%;
+}
+
+.toneDefault {
+  background: var(--ui-color-page);
+}
+
+.toneFrost {
+  background: radial-gradient(circle at top, rgba(236, 253, 245, 0.65), rgba(241, 245, 249, 0.45));
+}
+
+.paddingNone {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.paddingSm {
+  padding-top: var(--ui-space-md);
+  padding-bottom: var(--ui-space-xl);
+}
+
+.paddingMd {
+  padding-top: var(--ui-space-lg);
+  padding-bottom: var(--ui-space-2xl);
+}
+
+.paddingLg {
+  padding-top: var(--ui-space-xl);
+  padding-bottom: var(--ui-space-3xl);
+}
+
+.widthFluid {
+  max-width: none;
+}
+
+.widthPage {
+  max-width: var(--ui-max-page-width);
+}
+
+.widthContent {
+  max-width: var(--ui-max-content-width);
+}
+
+.widthFluid,
+.widthPage,
+.widthContent {
+  width: 100%;
+}
+
+.inner.widthPage,
+.inner.widthContent {
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .root {
+    padding-left: var(--ui-space-lg);
+    padding-right: var(--ui-space-lg);
+  }
+}
+
+@media (min-width: 1280px) {
+  .root {
+    padding-left: var(--ui-space-xl);
+    padding-right: var(--ui-space-xl);
+  }
+}

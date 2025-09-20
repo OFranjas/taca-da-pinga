@@ -1,0 +1,151 @@
+.root {
+  width: 100%;
+  display: grid;
+  gap: var(--ui-space-lg);
+}
+
+.modeFixed {
+  grid-template-columns: repeat(var(--grid-columns, 1), minmax(0, 1fr));
+}
+
+.modeAutoFit {
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-column, 220px), 1fr));
+}
+
+.gapSm {
+  gap: var(--ui-space-md);
+}
+
+.gapMd {
+  gap: var(--ui-space-lg);
+}
+
+.gapLg {
+  gap: var(--ui-space-xl);
+}
+
+.alignStart {
+  align-items: start;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.alignStretch {
+  align-items: stretch;
+}
+
+.justifyStart {
+  justify-items: start;
+}
+
+.justifyCenter {
+  justify-items: center;
+}
+
+.justifyStretch {
+  justify-items: stretch;
+}
+
+@media (min-width: 480px) {
+  .modeFixed {
+    grid-template-columns: repeat(var(--grid-columns-sm, var(--grid-columns, 1)), minmax(0, 1fr));
+  }
+  .modeAutoFit {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(var(--grid-min-column-sm, var(--grid-min-column, 220px)), 1fr)
+    );
+  }
+}
+
+@media (min-width: 768px) {
+  .modeFixed {
+    grid-template-columns: repeat(
+      var(--grid-columns-md, var(--grid-columns-sm, var(--grid-columns, 1))),
+      minmax(0, 1fr)
+    );
+  }
+  .modeAutoFit {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        var(--grid-min-column-md, var(--grid-min-column-sm, var(--grid-min-column, 220px))),
+        1fr
+      )
+    );
+  }
+}
+
+@media (min-width: 1024px) {
+  .modeFixed {
+    grid-template-columns: repeat(
+      var(
+        --grid-columns-lg,
+        var(--grid-columns-md, var(--grid-columns-sm, var(--grid-columns, 1)))
+      ),
+      minmax(0, 1fr)
+    );
+  }
+  .modeAutoFit {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        var(
+          --grid-min-column-lg,
+          var(--grid-min-column-md, var(--grid-min-column-sm, var(--grid-min-column, 220px)))
+        ),
+        1fr
+      )
+    );
+  }
+}
+
+@media (min-width: 1280px) {
+  .modeFixed {
+    grid-template-columns: repeat(
+      var(
+        --grid-columns-xl,
+        var(
+          --grid-columns-lg,
+          var(--grid-columns-md, var(--grid-columns-sm, var(--grid-columns, 1)))
+        )
+      ),
+      minmax(0, 1fr)
+    );
+  }
+  .modeAutoFit {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(
+        var(
+          --grid-min-column-xl,
+          var(
+            --grid-min-column-lg,
+            var(--grid-min-column-md, var(--grid-min-column-sm, var(--grid-min-column, 220px)))
+          )
+        ),
+        1fr
+      )
+    );
+  }
+}
+
+@media (min-width: 1920px) {
+  .modeFixed {
+    grid-template-columns: repeat(
+      var(
+        --grid-columns-tv,
+        var(
+          --grid-columns-xl,
+          var(
+            --grid-columns-lg,
+            var(--grid-columns-md, var(--grid-columns-sm, var(--grid-columns, 1)))
+          )
+        )
+      ),
+      minmax(0, 1fr)
+    );
+  }
+}
