@@ -103,6 +103,11 @@ jobs:
 
           PROJECT_ID="${FIREBASE_PROJECT_ID:-$FIREBASE_DEFAULT_PROJECT}"
 
+          if [ -z "${PROJECT_ID}" ]; then
+            echo "Missing Firebase project id" >&2
+            exit 1
+          fi
+
           ./node_modules/.bin/firebase hosting:sites:list --project "${PROJECT_ID}" --json > firebase-sites.json
 
           STATUS=$(node <<'NODE'
@@ -131,7 +136,10 @@ jobs:
 
           if [ "${STATUS}" = "missing" ]; then
             echo "Creating hosting site ${STATIC_SITE} in project ${PROJECT_ID}" >&2
-            ./node_modules/.bin/firebase hosting:sites:create "${STATIC_SITE}" --project "${PROJECT_ID}" --non-interactive
+            ./node_modules/.bin/firebase hosting:sites:create "${STATIC_SITE}" --project "${PROJECT_ID}" --non-interactive || {
+              echo "Failed to create hosting site ${STATIC_SITE}. Ensure the service account can manage hosting sites." >&2
+              exit 1
+            }
           fi
 
       - name: Deploy to Firebase preview channel
@@ -142,12 +150,23 @@ jobs:
           set -o errexit
           set -o pipefail
 
-          PROJECT_ARG=""
-          if [ -n "${FIREBASE_PROJECT_ID:-}" ]; then
-            PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
+          PROJECT_ID="${FIREBASE_PROJECT_ID:-$FIREBASE_DEFAULT_PROJECT}"
+          if [ -z "${PROJECT_ID}" ]; then
+            echo "Missing Firebase project id" >&2
+            exit 1
           fi
 
-          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} > firebase-deploy.json
+          ./node_modules/.bin/firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --project "${PROJECT_ID}" --json > firebase-deploy.json 2> firebase-deploy.log
+          STATUS=$?
+
+          if [ "${STATUS}" -ne 0 ]; then
+            echo "firebase hosting:channel:deploy failed" >&2
+            cat firebase-deploy.log >&2 || true
+            if [ -f firebase-deploy.json ]; then
+              cat firebase-deploy.json >&2
+            fi
+            exit ${STATUS}
+          fi
 
           node <<'NODE'
           const fs = require('fs');
@@ -208,6 +227,10 @@ jobs:
           set -o pipefail
 
           PROJECT_ID="${FIREBASE_PROJECT_ID:-$FIREBASE_DEFAULT_PROJECT}"
+          if [ -z "${PROJECT_ID}" ]; then
+            echo "Missing Firebase project id" >&2
+            exit 1
+          fi
           SOURCE_SITE="${PREVIEW_SOURCE_SITE}"
           STATIC_SITE="${PREVIEW_STATIC_SITE}"
 
