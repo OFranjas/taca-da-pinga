@@ -21,7 +21,10 @@ jobs:
 
     env:
       PREVIEW_CHANNEL: preview
+      PREVIEW_SOURCE_SITE: taca-da-pinga
+      PREVIEW_STATIC_SITE: preview--taca-da-pinga
       PREVIEW_CUSTOM_DOMAIN: preview--taca-da-pinga.web.app
+      FIREBASE_DEFAULT_PROJECT: taca-da-pinga
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
       VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
       VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -157,6 +160,24 @@ jobs:
 
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `preview_url=${url}\n`, 'utf8');
           NODE
+
+      - name: Promote preview to static domain
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          set -o errexit
+          set -o pipefail
+
+          PROJECT_ID="${FIREBASE_PROJECT_ID:-$FIREBASE_DEFAULT_PROJECT}"
+          SOURCE_SITE="${PREVIEW_SOURCE_SITE}"
+          STATIC_SITE="${PREVIEW_STATIC_SITE}"
+
+          if [ -z "${SOURCE_SITE}" ] || [ -z "${STATIC_SITE}" ]; then
+            echo "Preview source and static site IDs must be provided" >&2
+            exit 1
+          fi
+
+          ./node_modules/.bin/firebase hosting:clone "${SOURCE_SITE}:${PREVIEW_CHANNEL}" "${STATIC_SITE}:live" --project "${PROJECT_ID}"
 
       - name: Comment preview URL
         uses: actions/github-script@v7
