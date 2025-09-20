@@ -1,0 +1,126 @@
+name: PR Preview
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - production
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+
+    env:
+      PREVIEW_CHANNEL: pr-${{ github.event.number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure Firebase credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT}" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT secret" >&2
+            exit 1
+          fi
+
+          echo "${FIREBASE_SERVICE_ACCOUNT}" > "${HOME}/firebaseServiceAccount.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${HOME}/firebaseServiceAccount.json" >> "${GITHUB_ENV}"
+
+      - name: Deploy to Firebase preview channel
+        id: deploy
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          set -o errexit
+          set -o pipefail
+
+          PROJECT_ARG=""
+          if [ -n "${FIREBASE_PROJECT_ID:-}" ]; then
+            PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
+          fi
+
+          yarn firebase hosting:channel:deploy "${PREVIEW_CHANNEL}" --json ${PROJECT_ARG} > firebase-deploy.json
+
+          node <<'NODE'
+          const fs = require('fs');
+
+          const payload = JSON.parse(fs.readFileSync('firebase-deploy.json', 'utf8'));
+          const bucket = Array.isArray(payload?.result)
+            ? payload.result
+            : payload?.result
+            ? [payload.result]
+            : [payload];
+
+          const candidate = bucket.find((item) => item && (item.url || item.previewUrl || item?.version?.previewUrl || item?.hosting?.url));
+          const url = candidate?.url || candidate?.previewUrl || candidate?.version?.previewUrl || candidate?.hosting?.url;
+
+          if (!url) {
+            throw new Error('Firebase deploy output missing preview URL: ' + JSON.stringify(payload));
+          }
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `preview_url=${url}\n`, 'utf8');
+          NODE
+
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const marker = '<!-- firebase-preview -->';
+            const previewUrl = process.env.PREVIEW_URL;
+
+            if (!previewUrl) {
+              throw new Error('Preview URL missing from deploy step output');
+            }
+
+            const body = `${marker}\n🚀 Firebase preview is ready: ${previewUrl}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find((comment) => comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
