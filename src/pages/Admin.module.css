@@ -4,6 +4,24 @@
   --shadow: 0 2px 10px rgba(17, 24, 39, 0.08);
 }
 
+.pageContentCentered {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  gap: var(--ui-space-lg);
+  padding: var(--ui-space-xl) var(--ui-space-md);
+  box-sizing: border-box;
+  min-height: max(calc(100dvh - var(--ui-header-height) - 2 * var(--ui-space-xl)), 0px);
+}
+
+@media (max-width: 640px) {
+  .pageContentCentered {
+    min-height: auto;
+    place-items: start;
+    padding-top: var(--ui-space-2xl);
+  }
+}
+
 .card {
   max-width: 760px;
   margin: 1.25rem auto;
@@ -110,56 +128,6 @@
   color: #fff;
   box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
   transform: translateY(-1px);
-}
-
-/* Login form */
-.loginForm {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-top: 1rem;
-}
-.input {
-  flex: 1 1 220px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  font-size: 1rem;
-  outline: none;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-.input:focus {
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-
-.loginBtn {
-  background: var(--accent-green);
-  color: #fff;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.2s;
-}
-.loginBtn:hover {
-  background: #0e9e63;
-  transform: translateY(-1px);
-}
-
-.errorText {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 8px;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
 }
 
 @media (max-width: 640px) {

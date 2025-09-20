@@ -1,0 +1,57 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-lg);
+  width: 100%;
+}
+
+.toneTransparent {
+  background: transparent;
+}
+
+.toneMuted {
+  background: var(--ui-color-surface-muted);
+  border-radius: var(--ui-radius-xl);
+  border: 1px solid var(--ui-color-border-subtle);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.alignStart {
+  align-items: flex-start;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.alignStretch {
+  align-items: stretch;
+}
+
+.gapSm {
+  gap: var(--ui-space-md);
+}
+
+.gapMd {
+  gap: var(--ui-space-lg);
+}
+
+.gapLg {
+  gap: var(--ui-space-xl);
+}
+
+.paddingNone {
+  padding: 0;
+}
+
+.paddingSm {
+  padding: var(--ui-space-md);
+}
+
+.paddingMd {
+  padding: var(--ui-space-lg);
+}
+
+.paddingLg {
+  padding: var(--ui-space-xl);
+}

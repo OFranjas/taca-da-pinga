@@ -1,0 +1,87 @@
+.root {
+  margin: 0;
+  color: var(--ui-color-text-primary);
+}
+
+.variantEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--ui-text-size-xs);
+  font-weight: var(--ui-font-weight-bold);
+  color: var(--ui-color-text-muted);
+}
+
+.variantHero {
+  font-size: var(--ui-text-size-3xl);
+  font-weight: var(--ui-font-weight-extrabold);
+  line-height: var(--ui-line-height-tight);
+}
+
+.variantHeading {
+  font-size: var(--ui-text-size-2xl);
+  font-weight: var(--ui-font-weight-bold);
+  line-height: var(--ui-line-height-snug);
+}
+
+.variantSubtitle {
+  font-size: var(--ui-text-size-lg);
+  font-weight: var(--ui-font-weight-medium);
+  line-height: var(--ui-line-height-relaxed);
+  color: var(--ui-color-text-secondary);
+}
+
+.variantBody {
+  font-size: var(--ui-text-size-base);
+  font-weight: var(--ui-font-weight-regular);
+  line-height: var(--ui-line-height-relaxed);
+}
+
+.variantLabel {
+  font-size: var(--ui-text-size-sm);
+  font-weight: var(--ui-font-weight-semibold);
+  line-height: var(--ui-line-height-snug);
+}
+
+.toneDefault {
+  color: var(--ui-color-text-primary);
+}
+
+.toneMuted {
+  color: var(--ui-color-text-muted);
+}
+
+.toneSecondary {
+  color: var(--ui-color-text-secondary);
+}
+
+.toneDanger {
+  color: var(--ui-color-danger);
+}
+
+.alignStart {
+  text-align: left;
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignEnd {
+  text-align: right;
+}
+
+.weightRegular {
+  font-weight: var(--ui-font-weight-regular);
+}
+
+.weightMedium {
+  font-weight: var(--ui-font-weight-medium);
+}
+
+.weightSemibold {
+  font-weight: var(--ui-font-weight-semibold);
+}
+
+.weightBold {
+  font-weight: var(--ui-font-weight-bold);
+}

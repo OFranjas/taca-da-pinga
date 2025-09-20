@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
 vi.mock('../../firebase', () => ({ db: {} }));
 
 const mockDoc = vi.fn(() => ({}));
@@ -7,16 +9,16 @@ const mockServerTimestamp = vi.fn(() => 'server-ts');
 const mockDeleteField = vi.fn(() => 'delete-field');
 
 vi.mock('firebase/firestore', () => ({
-  doc: (...args: unknown[]) => mockDoc(...args),
-  getDoc: (...args: unknown[]) => mockGetDoc(...args),
-  setDoc: (...args: unknown[]) => mockSetDoc(...args),
-  serverTimestamp: () => mockServerTimestamp(),
-  deleteField: () => mockDeleteField(),
+  doc: mockDoc,
+  getDoc: mockGetDoc,
+  setDoc: mockSetDoc,
+  serverTimestamp: mockServerTimestamp,
+  deleteField: mockDeleteField,
 }));
 
 const compressImage = vi.fn();
 vi.mock('../../utils/image', () => ({
-  compressImage: (...args: unknown[]) => compressImage(...args),
+  compressImage,
 }));
 
 describe('branding.service', () => {

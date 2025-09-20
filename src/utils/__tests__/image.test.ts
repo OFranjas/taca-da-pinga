@@ -1,5 +1,12 @@
-const originalFileReader = global.FileReader;
-const OriginalImage = global.Image as typeof Image | undefined;
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+const domOverrides = globalThis as typeof globalThis & {
+  FileReader?: typeof FileReader;
+  Image?: typeof Image;
+};
+
+const originalFileReader = domOverrides.FileReader;
+const OriginalImage = domOverrides.Image;
 const originalCreateElement = document.createElement;
 
 let toDataURLMock: ReturnType<typeof vi.fn>;
@@ -18,7 +25,7 @@ beforeEach(() => {
     }
   }
 
-  global.FileReader = StubFileReader as unknown as typeof FileReader;
+  domOverrides.FileReader = StubFileReader as unknown as typeof FileReader;
 
   class StubImage {
     public width = 800;
@@ -33,8 +40,7 @@ beforeEach(() => {
     }
   }
 
-  // @ts-expect-error - overriding for test
-  global.Image = StubImage;
+  domOverrides.Image = StubImage as unknown as typeof Image;
 
   toDataURLMock = vi.fn();
   vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
@@ -53,18 +59,15 @@ beforeEach(() => {
 afterEach(() => {
   vi.restoreAllMocks();
   if (originalFileReader) {
-    global.FileReader = originalFileReader;
+    domOverrides.FileReader = originalFileReader;
   } else {
-    // @ts-expect-error - removing test stub when FileReader was undefined
-    delete global.FileReader;
+    Reflect.deleteProperty(domOverrides, 'FileReader');
   }
 
   if (OriginalImage) {
-    // @ts-expect-error - restoring for test environment
-    global.Image = OriginalImage;
+    domOverrides.Image = OriginalImage;
   } else {
-    // @ts-expect-error - removing stub
-    delete global.Image;
+    Reflect.deleteProperty(domOverrides, 'Image');
   }
 });
 

@@ -1,12 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './globals.css';
+import './ui/theme.css';
 import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import { ToastContainer } from 'react-toastify';
-import './globals.css'; // Assuming you have a global CSS file for styles
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Failed to find the root element');
+}
+
+const root = ReactDOM.createRoot(rootElement);
+
 root.render(
   <React.StrictMode>
     <App />

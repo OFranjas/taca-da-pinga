@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
 vi.mock('../../firebase', () => ({ db: {} }));
 
 const mockCollection = vi.fn(() => ({}));
@@ -16,23 +18,23 @@ const mockWriteBatch = vi.fn(() => ({ update: batchUpdate, commit: batchCommit }
 const mockServerTimestamp = vi.fn(() => 'server-ts');
 
 vi.mock('firebase/firestore', () => ({
-  collection: (...args: unknown[]) => mockCollection(...args),
-  query: (...args: unknown[]) => mockQuery(...args),
-  orderBy: (...args: unknown[]) => mockOrderBy(...args),
-  where: (...args: unknown[]) => mockWhere(...args),
-  getDocs: (...args: unknown[]) => mockGetDocs(...args),
-  addDoc: (...args: unknown[]) => mockAddDoc(...args),
-  doc: (...args: unknown[]) => mockDoc(...args),
-  updateDoc: (...args: unknown[]) => mockUpdateDoc(...args),
-  deleteDoc: (...args: unknown[]) => mockDeleteDoc(...args),
-  limit: (...args: unknown[]) => mockLimit(...args),
-  writeBatch: (...args: unknown[]) => mockWriteBatch(...args),
-  serverTimestamp: () => mockServerTimestamp(),
+  collection: mockCollection,
+  query: mockQuery,
+  orderBy: mockOrderBy,
+  where: mockWhere,
+  getDocs: mockGetDocs,
+  addDoc: mockAddDoc,
+  doc: mockDoc,
+  updateDoc: mockUpdateDoc,
+  deleteDoc: mockDeleteDoc,
+  limit: mockLimit,
+  writeBatch: mockWriteBatch,
+  serverTimestamp: mockServerTimestamp,
 }));
 
 const compressImage = vi.fn();
 vi.mock('../../utils/image', () => ({
-  compressImage: (...args: unknown[]) => compressImage(...args),
+  compressImage,
 }));
 
 describe('sponsors.service', () => {
