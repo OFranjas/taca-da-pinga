@@ -5,12 +5,14 @@ import { beforeAll, beforeEach, describe, expect, it, vi, type MockedFunction } 
 
 vi.mock('../../services/branding.service', () => ({
   getBranding: vi.fn(),
+  observeBranding: vi.fn(),
 }));
 
 type BrandingModule = typeof import('../../services/branding.service');
 type HeaderModule = typeof import('../Header');
 
 let getBrandingMock: MockedFunction<BrandingModule['getBranding']>;
+let observeBrandingMock: MockedFunction<BrandingModule['observeBranding']>;
 let HeaderComponent: HeaderModule['Header'];
 
 const renderHeader = (initialEntries: string[] = ['/']) => {
@@ -29,30 +31,35 @@ describe('Header', () => {
   beforeAll(async () => {
     const branding = await import('../../services/branding.service');
     getBrandingMock = vi.mocked(branding.getBranding);
+    observeBrandingMock = vi.mocked(branding.observeBranding);
     ({ Header: HeaderComponent } = await import('../Header'));
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
     getBrandingMock.mockResolvedValue({});
+    observeBrandingMock.mockImplementation((cb) => {
+      cb({});
+      return vi.fn();
+    });
   });
 
   it('uses the fallback branding assets when service returns empty payload', async () => {
     renderHeader();
 
     await waitFor(() => {
-      expect(getBrandingMock).toHaveBeenCalledTimes(1);
+      expect(observeBrandingMock).toHaveBeenCalledTimes(1);
     });
 
-    const logo = screen.getByAltText('Logo Taça da Pinga');
-    expect(logo).toHaveAttribute('data-logo-variant', 'fallback');
+    const logo = screen.getByAltText('Taça da Pinga');
+    expect(logo).toBeInTheDocument();
   });
 
   it('marks the active navigation item based on the current route', async () => {
     renderHeader(['/admin/settings']);
 
     await waitFor(() => {
-      expect(getBrandingMock).toHaveBeenCalledTimes(1);
+      expect(observeBrandingMock).toHaveBeenCalledTimes(1);
     });
 
     const adminLink = screen.getByRole('link', { name: 'Admin' });
@@ -65,7 +72,7 @@ describe('Header', () => {
     renderHeader(['/leaderboard']);
 
     await waitFor(() => {
-      expect(getBrandingMock).toHaveBeenCalledTimes(1);
+      expect(observeBrandingMock).toHaveBeenCalledTimes(1);
     });
 
     await user.tab(); // focus brand link

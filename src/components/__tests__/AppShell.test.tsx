@@ -4,23 +4,30 @@ import { beforeAll, describe, expect, it, vi, type MockedFunction } from 'vitest
 
 vi.mock('../../services/branding.service', () => ({
   getBranding: vi.fn(),
+  observeBranding: vi.fn(),
 }));
 
 type BrandingModule = typeof import('../../services/branding.service');
 type AppShellModule = typeof import('../AppShell');
 
 let getBrandingMock: MockedFunction<BrandingModule['getBranding']>;
+let observeBrandingMock: MockedFunction<BrandingModule['observeBranding']>;
 let AppShellComponent: AppShellModule['AppShell'] | null = null;
 
 describe('AppShell', () => {
   beforeAll(async () => {
     const branding = await import('../../services/branding.service');
     getBrandingMock = vi.mocked(branding.getBranding);
+    observeBrandingMock = vi.mocked(branding.observeBranding);
     ({ AppShell: AppShellComponent } = await import('../AppShell'));
   });
 
   it('configures the responsive grid columns for each breakpoint', async () => {
     getBrandingMock.mockResolvedValue({});
+    observeBrandingMock.mockImplementation((cb) => {
+      cb({});
+      return vi.fn();
+    });
 
     const Component = AppShellComponent;
     if (!Component) {
@@ -37,7 +44,7 @@ describe('AppShell', () => {
     );
 
     await waitFor(() => {
-      expect(getBrandingMock).toHaveBeenCalledTimes(1);
+      expect(observeBrandingMock).toHaveBeenCalledTimes(1);
     });
 
     const grid = screen.getByTestId('app-shell-grid');

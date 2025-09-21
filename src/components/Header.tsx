@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState, type FocusEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Grid, Stack, Text } from '../ui';
 import { mergeClasses } from '../ui/components/utils';
-import { getBranding, type BrandingData } from '../services/branding.service';
+import { observeBranding, type BrandingData } from '../services/branding.service';
 import defaultLogo from '../assets/logo.png';
-import defaultIcon from '../logo.svg';
+import defaultIcon from '../assets/beer.svg';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
@@ -40,35 +40,23 @@ export function Header() {
   const [branding, setBranding] = useState<BrandingState>({ mainLogo: null, icon: null });
 
   useEffect(() => {
-    let mounted = true;
-    void getBranding()
-      .then((data) => {
-        if (!mounted) {
-          return;
-        }
+    const unsubscribe = observeBranding(
+      (data) => {
         setBranding(resolveBrandingState(data));
-      })
-      .catch(() => {
-        if (!mounted) {
-          return;
-        }
+      },
+      () => {
         setBranding({ mainLogo: null, icon: null });
-      });
+      }
+    );
 
-    return () => {
-      mounted = false;
-    };
+    return unsubscribe;
   }, []);
 
-  const { mainLogoSrc, iconSrc, logoVariant, iconVariant } = useMemo(() => {
-    const mainLogoSrc = branding.mainLogo ?? defaultLogo;
-    const iconSrc = branding.icon ?? branding.mainLogo ?? defaultIcon;
-
+  const { brandImageSrc, brandVariant } = useMemo(() => {
+    const brandImageSrc = branding.icon ?? branding.mainLogo ?? defaultIcon;
     return {
-      mainLogoSrc,
-      iconSrc,
-      logoVariant: branding.mainLogo ? 'remote' : 'fallback',
-      iconVariant: branding.icon ? 'remote' : branding.mainLogo ? 'derived' : 'fallback',
+      brandImageSrc,
+      brandVariant: branding.icon ? 'icon' : branding.mainLogo ? 'logo' : 'fallback',
     } as const;
   }, [branding]);
 
@@ -79,25 +67,12 @@ export function Header() {
     <header className={styles.root} data-testid="app-header">
       <div className={styles.inner}>
         <Link to="/" className={styles.brandLink} aria-label="Ir para a página inicial">
-          <span className={styles.brandVisual} data-logo-variant={logoVariant}>
-            <img
-              src={mainLogoSrc}
-              alt="Logo Taça da Pinga"
-              className={styles.brandImage}
-              data-logo-variant={logoVariant}
-            />
-            <span className={styles.brandGlyph} data-logo-variant={iconVariant}>
-              <img src={iconSrc} alt="Taça da Pinga icon" />
-            </span>
+          <span className={styles.brandAvatar} data-logo-variant={brandVariant}>
+            <img src={brandImageSrc} alt="Taça da Pinga" className={styles.brandImage} />
           </span>
-          <Stack direction="column" gap="sm" className={styles.brandCopy}>
-            <Text as="span" variant="label" tone="secondary" className={styles.brandEyebrow}>
-              Taça da
-            </Text>
-            <Text as="span" variant="heading" weight="bold" className={styles.brandTitle}>
-              Pinga
-            </Text>
-          </Stack>
+          <Text as="span" variant="heading" weight="bold" className={styles.brandTitle}>
+            Taça da Pinga
+          </Text>
         </Link>
 
         <nav aria-label="Main" className={styles.nav} data-testid="header-nav-grid">

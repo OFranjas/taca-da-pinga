@@ -18,9 +18,11 @@ vi.mock('firebase/auth', () => ({
 
 const getBrandingMock = vi.fn();
 const updateBrandingMock = vi.fn();
+const observeBrandingMock = vi.fn();
 vi.mock('../../services/branding.service', () => ({
   getBranding: (...args) => getBrandingMock(...args),
   updateBranding: (...args) => updateBrandingMock(...args),
+  observeBranding: (...args) => observeBrandingMock(...args),
 }));
 
 const { auth } = await import('../../firebase');
@@ -38,6 +40,10 @@ describe('Branding admin page', () => {
     vi.clearAllMocks();
     global.URL.createObjectURL = vi.fn(() => 'blob:preview');
     global.URL.revokeObjectURL = vi.fn();
+    observeBrandingMock.mockImplementation((cb) => {
+      cb({});
+      return vi.fn();
+    });
   });
 
   test('displays existing branding previews', async () => {
