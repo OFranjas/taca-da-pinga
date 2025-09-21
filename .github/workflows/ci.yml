@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [production, develop]
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 jobs:
