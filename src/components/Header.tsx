@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState, type FocusEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button, Grid, Stack, Text } from '../ui';
+import { Button, Grid, Text } from '../ui';
 import { mergeClasses } from '../ui/components/utils';
 import { observeBranding, type BrandingData } from '../services/branding.service';
-import defaultLogo from '../assets/logo.png';
 import defaultIcon from '../assets/beer.svg';
 import styles from './Header.module.css';
 

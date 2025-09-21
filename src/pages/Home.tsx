@@ -2,6 +2,7 @@ import {
   Component,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ErrorInfo,
@@ -9,14 +10,20 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import logo from '../assets/logo.png';
+import defaultBrandImage from '../assets/beer.svg';
 import { listSponsors, type Sponsor } from '../services/sponsors.service';
+import { observeBranding } from '../services/branding.service';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './Home.module.css';
 
 const DEFAULT_ERROR_MESSAGE = 'Não foi possível carregar os patrocinadores.';
 
 type SponsorsStatus = 'loading' | 'success' | 'error';
+
+type BrandingState = {
+  mainLogo: string | null;
+  icon: string | null;
+};
 
 interface SponsorsErrorBoundaryProps {
   children: ReactNode;
@@ -65,6 +72,7 @@ export default function Home() {
   const [status, setStatus] = useState<SponsorsStatus>('loading');
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [branding, setBranding] = useState<BrandingState>({ mainLogo: null, icon: null });
   const isMountedRef = useRef(false);
 
   const fetchSponsors = useCallback(async () => {
@@ -102,6 +110,30 @@ export default function Home() {
       isMountedRef.current = false;
     };
   }, [fetchSponsors]);
+
+  useEffect(() => {
+    const toNullableDataUrl = (value?: string) =>
+      typeof value === 'string' && value.trim().length > 0 ? value : null;
+
+    const unsubscribe = observeBranding(
+      (data) => {
+        setBranding({
+          mainLogo: toNullableDataUrl(data?.mainLogoDataUrl),
+          icon: toNullableDataUrl(data?.iconDataUrl),
+        });
+      },
+      () => {
+        setBranding({ mainLogo: null, icon: null });
+      }
+    );
+
+    return unsubscribe;
+  }, []);
+
+  const heroLogoSrc = useMemo(
+    () => branding.mainLogo ?? branding.icon ?? defaultBrandImage,
+    [branding]
+  );
 
   const renderSponsorsGrid = (items: Sponsor[]) => (
     <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid} role="list">
@@ -223,7 +255,7 @@ export default function Home() {
         <Card variant="muted" padding="lg" className={styles.feedbackCard}>
           <Stack align="center" gap="sm">
             <Text as="p" align="center">
-              Nenhum patrocinador cadastrado ainda.
+              Nenhum patrocinador ainda.
             </Text>
             <Text as="p" variant="label" tone="secondary" align="center">
               Assim que novas marcas entrarem na Taça da Pinga, elas aparecem aqui automaticamente.
@@ -244,7 +276,7 @@ export default function Home() {
           <Card variant="highlight" padding="xl" className={styles.heroCard}>
             <Stack gap="xl" align="center" className={styles.heroContent}>
               <Stack align="center" gap="sm" className={styles.heroHeading}>
-                <img src={logo} alt="Logo Taça da Pinga" className={styles.heroLogo} />
+                <img src={heroLogoSrc} alt="Logo Taça da Pinga" className={styles.heroLogo} />
                 <Text as="span" variant="eyebrow" tone="secondary" align="center">
                   Futebol + comunidade
                 </Text>
@@ -252,8 +284,8 @@ export default function Home() {
                   Taça da Pinga
                 </Text>
                 <Text as="p" variant="subtitle" tone="secondary" align="center">
-                  Acompanhe o campeonato, veja o ranking das equipes e mantenha o time organizado
-                  com o painel administrativo.
+                  Acompanhe o campeonato, veja o ranking das equipas e mantenha tudo organizado com
+                  o painel administrativo.
                 </Text>
               </Stack>
               <Stack

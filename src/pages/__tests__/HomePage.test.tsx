@@ -6,9 +6,15 @@ import type { Sponsor } from '../../services/sponsors.service';
 type ListSponsors = (typeof import('../../services/sponsors.service'))['listSponsors'];
 
 const listSponsorsMock = vi.fn<ListSponsors>();
+type ObserveBranding = (typeof import('../../services/branding.service'))['observeBranding'];
+const observeBrandingMock = vi.fn<ObserveBranding>();
 
 vi.mock('../../services/sponsors.service', () => ({
   listSponsors: listSponsorsMock,
+}));
+
+vi.mock('../../services/branding.service', () => ({
+  observeBranding: observeBrandingMock,
 }));
 
 const { default: HomePage } = await import('../Home');
@@ -30,6 +36,11 @@ const renderHome = () => {
 describe('Home page', () => {
   beforeEach(() => {
     listSponsorsMock.mockReset();
+    observeBrandingMock.mockReset();
+    observeBrandingMock.mockImplementation((callback) => {
+      callback({});
+      return vi.fn();
+    });
   });
 
   test('shows loading skeleton while sponsors load', async () => {
@@ -60,7 +71,21 @@ describe('Home page', () => {
 
     renderHome();
 
-    expect(await screen.findByText(/Nenhum patrocinador cadastrado ainda/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Nenhum patrocinador ainda/i)).toBeInTheDocument();
+  });
+
+  test('uses branding logo when available', async () => {
+    const remoteLogo = 'data:image/png;base64,REMOTE';
+    observeBrandingMock.mockImplementation((callback) => {
+      callback({ mainLogoDataUrl: remoteLogo });
+      return vi.fn();
+    });
+    listSponsorsMock.mockResolvedValue([] as Awaited<ReturnType<ListSponsors>>);
+
+    renderHome();
+
+    const heroLogo = await screen.findByAltText('Logo Taça da Pinga');
+    expect(heroLogo).toHaveAttribute('src', remoteLogo);
   });
 
   test('allows retrying after sponsor load failure', async () => {

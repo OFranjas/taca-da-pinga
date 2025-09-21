@@ -5,7 +5,6 @@ vi.mock('../../firebase', () => ({ db: {} }));
 const mockCollection = vi.fn(() => ({}));
 const mockQuery = vi.fn(() => ({}));
 const mockOrderBy = vi.fn((field: string, dir: string) => ({ field, dir }));
-const mockWhere = vi.fn(() => ({}));
 const mockGetDocs = vi.fn();
 const mockAddDoc = vi.fn();
 const mockDoc = vi.fn(() => ({}));
@@ -21,7 +20,6 @@ vi.mock('firebase/firestore', () => ({
   collection: mockCollection,
   query: mockQuery,
   orderBy: mockOrderBy,
-  where: mockWhere,
   getDocs: mockGetDocs,
   addDoc: mockAddDoc,
   doc: mockDoc,
@@ -65,15 +63,19 @@ describe('sponsors.service', () => {
   });
 
   test('listSponsors with activeOnly filters', async () => {
-    mockGetDocs.mockResolvedValue({ docs: [] });
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'a', data: () => ({ order: 0, name: 'A', active: true }) },
+        { id: 'b', data: () => ({ order: 1, name: 'B', active: false }) },
+      ],
+    });
     const { listSponsors } = await import('../sponsors.service');
-    await listSponsors({ activeOnly: true });
+    const sponsors = await listSponsors({ activeOnly: true });
     expect(mockQuery).toHaveBeenCalledWith(
       {},
-      expect.objectContaining({ field: 'order', dir: 'asc' }),
-      expect.anything()
+      expect.objectContaining({ field: 'order', dir: 'asc' })
     );
-    expect(mockWhere).toHaveBeenCalledWith('active', '==', true);
+    expect(sponsors).toEqual([{ id: 'a', order: 0, name: 'A', active: true }]);
   });
 
   test('createSponsor compresses image, assigns order and timestamps', async () => {
