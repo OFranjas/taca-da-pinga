@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, type FocusEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { FocusEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button, Grid, Stack, Text } from '../ui';
+import { Button, Grid, Text } from '../ui';
 import { mergeClasses } from '../ui/components/utils';
 import { observeBranding, type BrandingData } from '../services/branding.service';
 import defaultLogo from '../assets/logo.png';
@@ -13,14 +14,25 @@ const NAV_ITEMS = [
 ] as const;
 
 type BrandingState = {
-  mainLogo: string | null;
-  icon: string | null;
+  mainLogo: string;
+  icon: string;
+  hasRemoteMainLogo: boolean;
+  hasRemoteIcon: boolean;
 };
 
-const resolveBrandingState = (data: BrandingData | null | undefined): BrandingState => ({
-  mainLogo: data?.mainLogoDataUrl ?? null,
-  icon: data?.iconDataUrl ?? null,
-});
+const resolveBrandingState = (data: BrandingData | null | undefined): BrandingState => {
+  const remoteMainLogo = data?.mainLogoDataUrl?.trim() ?? null;
+  const remoteIcon = data?.iconDataUrl?.trim() ?? null;
+
+  return {
+    mainLogo: remoteMainLogo ?? defaultLogo,
+    icon: remoteIcon ?? defaultIcon,
+    hasRemoteMainLogo: Boolean(remoteMainLogo),
+    hasRemoteIcon: Boolean(remoteIcon),
+  };
+};
+
+const DEFAULT_BRANDING_STATE = resolveBrandingState(undefined);
 
 const isFocusVisible = (element: HTMLElement) =>
   typeof element.matches === 'function' && element.matches(':focus-visible');
@@ -37,7 +49,7 @@ const handleBlur = (event: FocusEvent<HTMLElement>) => {
 
 export function Header() {
   const location = useLocation();
-  const [branding, setBranding] = useState<BrandingState>({ mainLogo: null, icon: null });
+  const [branding, setBranding] = useState<BrandingState>(DEFAULT_BRANDING_STATE);
 
   useEffect(() => {
     const unsubscribe = observeBranding(
@@ -45,7 +57,7 @@ export function Header() {
         setBranding(resolveBrandingState(data));
       },
       () => {
-        setBranding({ mainLogo: null, icon: null });
+        setBranding(DEFAULT_BRANDING_STATE);
       }
     );
 
@@ -53,11 +65,13 @@ export function Header() {
   }, []);
 
   const { brandImageSrc, brandVariant } = useMemo(() => {
-    const brandImageSrc = branding.icon ?? branding.mainLogo ?? defaultIcon;
-    return {
-      brandImageSrc,
-      brandVariant: branding.icon ? 'icon' : branding.mainLogo ? 'logo' : 'fallback',
-    } as const;
+    if (branding.hasRemoteIcon) {
+      return { brandImageSrc: branding.icon, brandVariant: 'icon' as const };
+    }
+    if (branding.hasRemoteMainLogo) {
+      return { brandImageSrc: branding.mainLogo, brandVariant: 'logo' as const };
+    }
+    return { brandImageSrc: defaultIcon, brandVariant: 'fallback' as const };
   }, [branding]);
 
   const isActive = (to: string) =>
