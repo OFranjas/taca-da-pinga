@@ -8,6 +8,10 @@ Purpose: This file briefs AI coding agents (e.g., Codex) on how to work in this 
 - Core rule: UI components MUST NOT call Firestore directly. All I/O goes through the `src/services/` layer.
 - Hosting: Firebase Hosting.
 - Node: 22.19.0.
+- Hosting sites:
+  - `taca-da-pinga` (main)
+  - `preview-taca-da-pinga` (PR previews)
+  - `develop-taca-da-pinga` (auto-deploy for develop)
 - Services: `src/services/leaderboard.js` (getLeaderboard, observeLeaderboard, addPinga, listEvents), `src/services/teams.js` (observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam).
 
 ## Branching & PR Rules
@@ -134,6 +138,10 @@ src/
 - Job should: install, lint, typecheck, test (CI mode), build.
 
 - Your PR must pass CI before merge.
+- Additional workflows:
+  - PR preview deployment (`pr-preview.yml`) builds PRs and refreshes `https://preview-taca-da-pinga.web.app`.
+  - Develop deploy (`deploy-develop.yml`) reruns the full suite on merge and deploys to `https://develop-taca-da-pinga.web.app`.
+- Required secrets (set once in GitHub → Settings → Secrets): the `VITE_FIREBASE_*` client config, `FIREBASE_SERVICE_ACCOUNT` (with Firebase Hosting Admin + Firebase Rules Admin), and optionally `FIREBASE_PROJECT_ID` if the default differs.
 
 ## Rollout & Rollback
 
