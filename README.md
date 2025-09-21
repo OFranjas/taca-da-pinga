@@ -107,6 +107,12 @@ npm run test:rules  # Firestore security rules (emulator)
 - Into `production`: CI must be green **and** at least 1 approval from code owner.
 - Required CI check name: **CI / Lint / Typecheck / Test / Build**
 
+### CI & Deployments
+
+- **PR Preview** – Every pull request builds the app in GitHub Actions and publishes a Firebase Hosting preview at [`https://preview-taca-da-pinga.web.app`](https://preview-taca-da-pinga.web.app). The job reuses the preview channel, so reruns refresh the same URL.
+- **Deploy Develop** – Merges to `develop` rerun lint/test/typecheck/build and deploy the bundle to the dedicated Hosting site [`https://develop-taca-da-pinga.web.app`](https://develop-taca-da-pinga.web.app).
+- Both workflows require the Firebase web config secrets (`VITE_FIREBASE_*`) and a `FIREBASE_SERVICE_ACCOUNT` with Hosting + Rules deploy permissions. See [docs/CONFIG.md](docs/CONFIG.md#github-secrets) for the list.
+
 See [`AGENTS.md`](./AGENTS.md) for exact agent/developer workflows.
 
 ---

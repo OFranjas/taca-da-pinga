@@ -1,98 +1,134 @@
-.header {
+.root {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.78);
-  background: color-mix(in srgb, var(--ui-color-surface) 78%, transparent);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  backdrop-filter: saturate(160%) blur(14px);
-}
-
-/* Agrupa brand + nav e centraliza */
-.centerWrap {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px 16px;
-  display: flex;
-  justify-content: center; /* <- centra tudo */
-  align-items: center;
-  gap: 16px;
   width: 100%;
+  backdrop-filter: saturate(160%) blur(18px);
+  background: color-mix(in srgb, var(--ui-color-surface) 86%, transparent);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-.logo {
-  height: 36px;
-  width: 36px;
-  object-fit: contain;
-}
-.brandText {
-  font-weight: 900;
-  color: var(--ui-color-text-primary);
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
-}
-
-/* Nav */
-.nav {
-  display: inline-flex;
-  gap: 8px;
-}
-.navLink {
-  display: inline-flex;
+.inner {
+  display: flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
-  padding: 0 14px;
-  font-weight: 800;
-  color: var(--ui-color-text-secondary);
-  text-decoration: none;
-  border-radius: 10px;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  background: rgba(255, 255, 255, 0.55);
-}
-.navLink:hover {
-  transform: translateY(-1px);
-  background: var(--ui-color-surface-muted);
-  color: var(--ui-color-text-primary);
+  gap: clamp(var(--ui-space-lg), 5vw, var(--ui-space-2xl));
+  margin: 0 auto;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  width: 100%;
+  max-width: var(--ui-max-page-width);
+  box-sizing: border-box;
 }
 
-.active {
-  background: var(--ui-color-accent);
-  color: var(--ui-color-text-inverted);
-  border-color: transparent;
+.brandLink {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(var(--ui-space-sm), 2vw, var(--ui-space-lg));
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.brandAvatar {
+  display: grid;
+  place-items: center;
+  width: clamp(3rem, 4vw + 2rem, 3.75rem);
+  height: clamp(3rem, 4vw + 2rem, 3.75rem);
+  border-radius: var(--ui-radius-full);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 12px 24px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.brandAvatar[data-logo-variant='fallback'] {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.brandImage {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.18));
+}
+
+.brandTitle {
+  font-size: clamp(var(--ui-text-size-xl), 1.6vw + 0.5rem, var(--ui-text-size-2xl));
+  font-weight: var(--ui-font-weight-semibold);
+  line-height: var(--ui-line-height-tight);
+  white-space: nowrap;
+}
+
+.nav {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+.navGrid {
+  width: auto;
+  min-width: 0;
+}
+
+.navButton {
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
+  transition:
+    box-shadow var(--ui-transition-base),
+    transform var(--ui-transition-fast);
+}
+
+.navButton[data-active='true'] {
   box-shadow: 0 12px 28px rgba(34, 197, 94, 0.26);
 }
-.outline {
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  background: rgba(99, 102, 241, 0.08);
-  color: var(--ui-color-text-primary);
+
+.navButtonActive {
+  font-weight: var(--ui-font-weight-bold);
 }
-.outline:hover {
-  background: rgba(99, 102, 241, 0.16);
-}
-.activeOutline {
-  background: rgba(96, 165, 250, 0.2);
-  color: var(--ui-color-text-primary);
-  border-color: rgba(96, 165, 250, 0.45);
-  box-shadow: 0 10px 26px rgba(59, 130, 246, 0.24);
+
+.navButton[data-focus-visible='true'] {
+  box-shadow:
+    0 0 0 2px var(--ui-color-surface),
+    0 0 0 4px rgba(34, 197, 94, 0.4);
 }
 
 @media (max-width: 640px) {
-  .brandText {
-    display: none;
+  .inner {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ui-space-md);
   }
-  .navLink {
-    height: 34px;
-    padding: 0 12px;
+
+  .navGrid {
+    width: 100%;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1280px) {
+  .inner {
+    padding: var(--ui-space-sm) var(--ui-space-xl);
+  }
+
+  .brandAvatar {
+    width: 3.9rem;
+    height: 3.9rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .inner {
+    padding: var(--ui-space-md) var(--ui-space-2xl);
+    max-width: 1600px;
+  }
+
+  .brandAvatar {
+    width: 4.3rem;
+    height: 4.3rem;
   }
 }
