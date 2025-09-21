@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState, type FocusEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Grid, Text } from '../ui';
 import { mergeClasses } from '../ui/components/utils';
 import { observeBranding, type BrandingData } from '../services/branding.service';
 import defaultIcon from '../assets/beer.svg';
 import styles from './Header.module.css';
+import type { FocusEvent } from 'react';
 
 const NAV_ITEMS = [
   { label: 'Leaderboard', to: '/leaderboard' },
