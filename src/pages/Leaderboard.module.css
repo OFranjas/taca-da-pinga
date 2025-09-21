@@ -1,197 +1,200 @@
-:root {
-  /* from globals */
-  --bg-page: var(--bg-page);
-  --bg-card: var(--bg-card);
-  --text-primary: var(--text-primary);
-  --text-secondary: var(--text-secondary);
-  --accent-green: var(--accent-green);
-  --accent-hover: var(--accent-hover);
-
-  /* neutrals for the component */
-  --bar-track: #e6e8ec; /* slightly darker than card so colors pop */
-  --card-border: #e5e7eb;
-  --shadow: 0 2px 10px rgba(17, 24, 39, 0.08);
-}
-
-.railsLayout {
-  display: grid;
-  grid-template-columns: 220px minmax(580px, 1fr) 220px; /* wider rails, slimmer table */
-  gap: 20px;
-  align-items: start;
-  background: var(--bg-page);
-  min-height: calc(100vh - 64px);
-  padding: 1rem 1rem 2.2rem;
-  box-sizing: border-box;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-/* Content wrapper: max width a bit tighter so rails breathe */
-.wrapper {
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xl);
   width: 100%;
-  max-width: 860px; /* was 980; narrows the table area */
-  margin: 0 auto;
-  padding: 0;
-  background: transparent;
-  min-height: auto;
-  box-sizing: border-box;
 }
 
-/* Tablet: rails become a strip above the table */
-@media (max-width: 1024px) {
-  .railsLayout {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 0.75rem 0.75rem 1.75rem;
-  }
-  .wrapper {
-    max-width: 760px;
-  }
-}
-
-/* Mobile: tighter content width */
-@media (max-width: 640px) {
-  .wrapper {
-    max-width: 560px;
-  }
-}
-
-.wrapper {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 1rem 1rem 2.5rem;
-  background: var(--bg-page);
-  min-height: calc(100vh - 64px);
-  box-sizing: border-box;
-}
-
-.pageHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0.5rem 0 0.75rem;
-  border-bottom: 1px solid var(--card-border);
-}
-
-.title {
-  margin: 0;
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.list {
-  margin-top: 1rem;
+.layout {
   display: grid;
-  gap: 12px;
+  gap: var(--ui-space-xl);
+  grid-template-areas:
+    'left'
+    'content'
+    'right';
 }
 
-/* tighter layout */
-.row {
+.railSlot {
+  width: 100%;
+}
+
+.leftRail {
+  grid-area: left;
+}
+
+.rightRail {
+  grid-area: right;
+}
+
+.content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xl);
+}
+
+.heroCard {
+  gap: var(--ui-space-lg);
+}
+
+.heroStats {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 10px;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--ui-space-lg);
 }
 
-/* rank pill: squarer and calmer */
-.rank {
+.heroStatCard {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 1px 4px rgba(17, 24, 39, 0.05);
-  color: var(--text-secondary);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-radius: var(--ui-radius-lg);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(34, 197, 94, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(6px);
+  min-height: 100%;
 }
 
-/* medal backgrounds for rank cards */
-.rankGold {
-  background: #f2c94c;
-  border-color: #e0b83f;
-  color: #111827;
-}
-.rankSilver {
-  background: #c0c0c0;
-  border-color: #aaaaaa;
-  color: #111827;
-}
-.rankBronze {
-  background: #cd7f32;
-  border-color: #b36c2a;
-  color: #ffffff;
-}
-
-/* card container */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-/* header (dot + team + count) */
-.rowHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-/* less rounded dot to match bars */
-.badge {
-  width: 8px;
-  height: 8px;
-  border-radius: 3px;
-  background: var(--accent-green); /* overridden inline for top-5 */
-}
-
-.teamName {
-  color: var(--text-primary);
-  font-weight: 800;
-  flex: 1;
-  min-width: 0;
+.heroTeamName {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.98rem;
 }
 
-/* bar track and bar: less rounded */
-.barTrack {
-  height: 16px;
-  background: var(--bar-track);
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+.tableCard {
+  gap: var(--ui-space-lg);
 }
 
-.bar {
-  height: 100%;
-  width: 0%;
-  background: var(--accent-green); /* overridden inline per rank */
-  border-radius: 4px;
-  transition: width 500ms ease;
+.tableHeaderMeta {
+  gap: var(--ui-space-sm);
+}
+
+.tableCount {
+  white-space: nowrap;
+}
+
+.feedback {
+  padding: var(--ui-space-lg);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-color-surface);
+  border: 1px dashed var(--ui-color-border-subtle);
+  text-align: center;
+  color: var(--ui-color-text-secondary);
+  font-weight: var(--ui-font-weight-medium);
+}
+
+.tableSurface {
+  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(6rem, 14vw, 8rem);
+  --leaderboard-row-height: 80px;
+  --leaderboard-row-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-sm);
+}
+
+.scrollRegion {
+  position: relative;
+  max-height: min(70vh, 720px);
+  overflow-y: auto;
+  padding: var(--ui-space-xs);
+  margin: calc(-1 * var(--ui-space-xs));
+  margin-top: 0;
+  border-radius: calc(var(--ui-radius-lg) - 4px);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(248, 250, 252, 0.6));
+  scrollbar-gutter: stable both-edges;
+}
+
+.scrollRegion:focus-visible {
+  outline: 2px solid var(--ui-color-accent);
+  outline-offset: 2px;
+}
+
+.headerGroup {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: var(--leaderboard-grid-template);
+  align-items: center;
+  padding: var(--ui-space-xs) var(--ui-space-md);
+  border-radius: calc(var(--ui-radius-lg) - 2px);
+  background: var(--ui-color-surface);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.headerCell {
+  font-size: 0.8rem;
+  font-weight: var(--ui-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ui-color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.headerCellEnd {
+  justify-content: flex-end;
+}
+
+.bodyGroup {
+  display: block;
+  padding-top: var(--ui-space-sm);
+}
+
+.virtualRoot {
+  position: relative;
+  width: 100%;
+}
+
+.virtualInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--leaderboard-row-gap, 12px);
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.fullList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--leaderboard-row-gap, 12px);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr) minmax(0, 220px);
+    grid-template-areas: 'left content right';
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroStats {
+    gap: var(--ui-space-md);
+  }
+
+  .scrollRegion {
+    max-height: min(65vh, 640px);
+  }
 }
 
 @media (max-width: 640px) {
-  .row {
-    grid-template-columns: 42px 1fr;
+  .tableSurface {
+    --leaderboard-grid-template: clamp(3rem, 12vw, 3.6rem) minmax(0, 1fr) clamp(5.5rem, 20vw, 7rem);
   }
-  .rank {
-    height: 34px;
+
+  .heroStatCard {
+    padding: var(--ui-space-xs) var(--ui-space-sm);
   }
-  .teamName {
-    font-size: 0.95rem;
-  }
-  .count {
-    font-size: 0.88rem;
+
+  .scrollRegion {
+    padding: var(--ui-space-2xs);
+    margin: calc(-1 * var(--ui-space-2xs));
+    margin-top: 0;
   }
 }

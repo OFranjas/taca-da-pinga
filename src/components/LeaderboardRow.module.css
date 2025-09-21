@@ -1,0 +1,142 @@
+.root {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--leaderboard-grid-template, minmax(3.25rem, 3.75rem) minmax(0, 1fr) clamp(6rem, 16vw, 8rem));
+  align-items: center;
+  height: var(--leaderboard-row-height, 80px);
+  padding: var(--ui-space-xs) var(--ui-space-md);
+  border-radius: calc(var(--ui-radius-lg) - 2px);
+  background: var(--ui-color-surface);
+  border: 1px solid var(--ui-color-border-subtle);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform var(--ui-transition-base), box-shadow var(--ui-transition-base);
+}
+
+.root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: var(--row-fill-width, 0%);
+  max-width: 100%;
+  background: linear-gradient(90deg, var(--row-accent, rgba(34, 197, 94, 0.18)) 0%, transparent 95%);
+  transition: width var(--ui-transition-base);
+  z-index: 0;
+}
+
+.root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.12);
+}
+
+.rankCell,
+.teamCell,
+.scoreCell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+
+.rankCell {
+  justify-content: center;
+}
+
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--ui-radius-full);
+  background: var(--row-rank-bg, rgba(34, 197, 94, 0.16));
+  color: var(--row-rank-color, var(--ui-color-text-primary));
+  font-weight: var(--ui-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  padding: 0 var(--ui-space-xs);
+  letter-spacing: 0.01em;
+}
+
+.teamCell {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ui-space-3xs);
+  min-width: 0;
+}
+
+.teamName {
+  font-weight: var(--ui-font-weight-semibold);
+  font-size: 1.05rem;
+  color: var(--ui-color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meter {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--ui-radius-full);
+  background: rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.meterFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--row-meter-fill-start, rgba(34, 197, 94, 0.75)),
+    var(--row-meter-fill-end, rgba(15, 118, 110, 0.85))
+  );
+  transition: width 220ms ease;
+}
+
+.scoreCell {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--ui-space-3xs);
+  text-align: right;
+}
+
+.scoreValue {
+  font-size: 1.25rem;
+  font-weight: var(--ui-font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  color: var(--row-score-color, var(--ui-color-text-primary));
+}
+
+.scoreLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ui-color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .root {
+    padding-left: var(--ui-space-sm);
+    padding-right: var(--ui-space-sm);
+  }
+
+  .rankBadge {
+    min-width: 2.3rem;
+    height: 2.3rem;
+    font-size: 1rem;
+  }
+
+  .teamName {
+    font-size: 1rem;
+  }
+
+  .scoreValue {
+    font-size: 1.1rem;
+  }
+}
