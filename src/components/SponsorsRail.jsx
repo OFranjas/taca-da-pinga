@@ -1,5 +1,8 @@
 import React from 'react';
 import styles from './SponsorsRail.module.css';
+/**
+ * @param {{ images?: string[]; side?: 'left' | 'right' }} props
+ */
 export default function SponsorsRail({ images = [], side = 'left' }) {
   if (!images?.length) return null;
   return (
