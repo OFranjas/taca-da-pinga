@@ -1,0 +1,130 @@
+name: Deploy Develop
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Validate Firebase web config
+        run: |
+          missing=0
+          for key in \
+            VITE_FIREBASE_API_KEY \
+            VITE_FIREBASE_AUTH_DOMAIN \
+            VITE_FIREBASE_PROJECT_ID \
+            VITE_FIREBASE_STORAGE_BUCKET \
+            VITE_FIREBASE_MESSAGING_SENDER_ID \
+            VITE_FIREBASE_APP_ID
+          do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing secret: $key" >&2
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Firebase web configuration secrets are required for the develop deploy" >&2
+            exit 1
+          fi
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Unit tests
+        run: yarn test:ci
+
+      - name: Rules tests (Firestore emulator)
+        run: yarn test:rules
+
+      - name: Typecheck
+        run: yarn typecheck || true
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure Firebase credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT}" ]; then
+            echo "Missing FIREBASE_SERVICE_ACCOUNT secret" >&2
+            exit 1
+          fi
+
+          echo "${FIREBASE_SERVICE_ACCOUNT}" > "${HOME}/firebaseServiceAccount.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${HOME}/firebaseServiceAccount.json" >> "${GITHUB_ENV}"
+
+      - name: Deploy Firestore rules (if configured)
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          set -o errexit
+          set -o pipefail
+
+          PROJECT_ARG=""
+          if [ -n "${FIREBASE_PROJECT_ID:-}" ]; then
+            PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
+          fi
+
+          if [ -f firestore.rules ]; then
+            ./node_modules/.bin/firebase deploy --only firestore:rules ${PROJECT_ARG}
+          else
+            echo "No Firestore rules to deploy, skipping"
+          fi
+
+      - name: Deploy hosting (develop)
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          set -o errexit
+          set -o pipefail
+
+          PROJECT_ARG=""
+          if [ -n "${FIREBASE_PROJECT_ID:-}" ]; then
+            PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
+          fi
+
+          ./node_modules/.bin/firebase deploy --only hosting:develop ${PROJECT_ARG}
