@@ -1,16 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam } from '../services/teams';
 import { toast } from 'react-toastify';
 import styles from './ManageTeamsPanel.module.css';
 import ConfirmModal from './ConfirmModal';
 
+type Team = {
+  id: string;
+  name: string;
+  pingas: number;
+};
+
 export default function ManageTeamsPanel() {
-  const [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [newName, setNewName] = useState('');
   const [filter, setFilter] = useState('');
-  const [toDelete, setToDelete] = useState(null);
+  const [toDelete, setToDelete] = useState<Team | null>(null);
 
-  useEffect(() => observeTeamsOrderedByName(setTeams), []);
+  useEffect(() => {
+    const unsubscribe = observeTeamsOrderedByName((nextTeams: Team[]) => {
+      setTeams(nextTeams);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const createTeam = async () => {
     const nameTrim = newName.trim();
@@ -20,24 +32,33 @@ export default function ManageTeamsPanel() {
     }
     try {
       await createTeamIfNotExists(nameTrim);
-    } catch (e) {
-      if (e?.code === 'already-exists') {
-        toast.error('Equipa já existe');
-        return;
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        const { code } = error as { code?: string };
+        if (code === 'already-exists') {
+          toast.error('Equipa já existe');
+          return;
+        }
       }
-      throw e;
+      throw error;
     }
     toast.success('Equipa criada');
     setNewName('');
   };
 
   const confirmDelete = async () => {
+    if (!toDelete) {
+      return;
+    }
     await deleteTeam(toDelete.id);
     toast.info(`"${toDelete.name}" deleted`);
     setToDelete(null);
   };
 
-  const visible = teams.filter((t) => t.name.toLowerCase().includes(filter.toLowerCase()));
+  const visible = useMemo(
+    () => teams.filter((team) => team.name.toLowerCase().includes(filter.toLowerCase())),
+    [filter, teams]
+  );
 
   return (
     <div className={styles.panel}>

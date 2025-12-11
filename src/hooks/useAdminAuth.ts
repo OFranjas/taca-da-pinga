@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 
-type UseAdminAuthResult = {
+export type UseAdminAuthResult = {
   user: User | null;
   email: string;
   password: string;

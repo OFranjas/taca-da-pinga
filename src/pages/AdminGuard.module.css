@@ -1,0 +1,37 @@
+.centered {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  gap: var(--ui-space-xl);
+  padding: var(--ui-space-xl) var(--ui-space-md);
+  box-sizing: border-box;
+  min-height: max(
+    calc(100dvh - var(--ui-header-height) - 2 * var(--ui-space-xl)),
+    0px
+  );
+}
+
+.helper {
+  max-width: 420px;
+}
+
+.helper a {
+  color: var(--ui-color-accent);
+  text-decoration: none;
+}
+
+.helper a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .centered {
+    min-height: auto;
+    place-items: start;
+    padding-top: var(--ui-space-2xl);
+  }
+
+  .helper {
+    text-align: left;
+  }
+}
