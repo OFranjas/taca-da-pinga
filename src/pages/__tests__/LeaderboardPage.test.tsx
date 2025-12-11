@@ -60,13 +60,13 @@ describe('Leaderboard page', () => {
 
     renderLeaderboard();
 
-    expect(await screen.findByText(/Nenhuma equipe cadastrada ainda/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Ainda não há equipas inscritas/i)).toBeInTheDocument();
   });
 
   it('limits the amount of DOM rows when the dataset is large', async () => {
     const manyTeams = Array.from({ length: 120 }, (_, index) => ({
       id: `team-${index}`,
-      name: `Equipe ${index}`,
+      name: `Equipa ${index}`,
       pingas: 120 - index,
     }));
 
@@ -78,7 +78,7 @@ describe('Leaderboard page', () => {
     renderLeaderboard();
 
     const renderedRows = await screen.findAllByTestId('leaderboard-row');
-    expect(renderedRows[0]).toHaveTextContent('Equipe 0');
+    expect(renderedRows[0]).toHaveTextContent('Equipa 0');
     expect(renderedRows.length).toBeLessThanOrEqual(MAX_RENDERED_ROWS);
   });
 });

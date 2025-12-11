@@ -27,7 +27,7 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 
-const numberFormatter = new Intl.NumberFormat('pt-BR');
+const numberFormatter = new Intl.NumberFormat('pt-PT');
 
 const sponsorLeft = [s1, s3, s5, s7, s10, s11];
 const sponsorRight = [s2, s4, s6, s8, s9, s12];
@@ -54,7 +54,7 @@ const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
       const safeName =
         typeof team.name === 'string' && team.name.trim().length > 0
           ? team.name.trim()
-          : 'Equipe sem nome';
+          : 'Equipa sem nome';
       const safePingas = Number(team.pingas ?? 0);
       return {
         id: team.id,
@@ -67,7 +67,7 @@ const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
         return b.pingas - a.pingas;
       }
 
-      return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+      return a.name.localeCompare(b.name, 'pt-PT', { sensitivity: 'base' });
     });
 
 const getRowsetHeight = (length: number) => {
@@ -98,11 +98,14 @@ export default function Leaderboard() {
   const shouldVirtualize = teams.length > VIRTUALIZE_THRESHOLD;
 
   useEffect(() => {
-    if (!shouldVirtualize) {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = 0;
-      }
+    if (!shouldVirtualize && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
       setScrollTop(0);
+    }
+  }, [shouldVirtualize, teams.length]);
+
+  useEffect(() => {
+    if (!shouldVirtualize) {
       return;
     }
 
@@ -153,10 +156,7 @@ export default function Leaderboard() {
 
   const totalPingas = useMemo(() => teams.reduce((total, team) => total + team.pingas, 0), [teams]);
 
-  const topTeam = teams[0];
-  const secondaryTeam = teams[1];
-
-  const tableAriaLabel = 'Classificação geral das equipes por pingas acumuladas';
+  const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
 
   return (
     <>
@@ -168,62 +168,12 @@ export default function Leaderboard() {
           </div>
 
           <div className={styles.content}>
-            <Section padding="none">
-              <Card variant="highlight" padding="xl" className={styles.heroCard}>
-                <Stack gap="sm">
-                  <Text as="span" variant="eyebrow" tone="secondary">
-                    Taça da Pinga · Painel ao vivo
-                  </Text>
-                  <Text as="h1" variant="hero">
-                    Leaderboard atualizado
-                  </Text>
-                  <Text as="p" variant="subtitle" tone="muted">
-                    Acompanhe a disputa em tempo real e veja quem está abrindo vantagem nas pingas.
-                  </Text>
-                </Stack>
-
-                <div className={styles.heroStats}>
-                  <div className={styles.heroStatCard}>
-                    <Text as="span" variant="label" tone="secondary">
-                      Equipe líder
-                    </Text>
-                    <Text as="p" variant="heading" weight="bold" className={styles.heroTeamName}>
-                      {topTeam ? topTeam.name : 'Ainda sem equipes'}
-                    </Text>
-                    <Text as="p" variant="body" tone="secondary">
-                      {topTeam
-                        ? `${numberFormatter.format(topTeam.pingas)} pingas`
-                        : 'Aguardando primeiras pontuações'}
-                    </Text>
-                  </div>
-
-                  <div className={styles.heroStatCard}>
-                    <Text as="span" variant="label" tone="secondary">
-                      Vice-liderança
-                    </Text>
-                    <Text as="p" variant="heading" weight="bold" className={styles.heroTeamName}>
-                      {secondaryTeam ? secondaryTeam.name : 'Em disputa'}
-                    </Text>
-                    <Text as="p" variant="body" tone="secondary">
-                      {secondaryTeam
-                        ? `${numberFormatter.format(secondaryTeam.pingas)} pingas`
-                        : 'Atualiza em tempo real'}
-                    </Text>
-                  </div>
-
-                  <div className={styles.heroStatCard}>
-                    <Text as="span" variant="label" tone="secondary">
-                      Pingas totais registradas
-                    </Text>
-                    <Text as="p" variant="heading" weight="bold" className={styles.heroTeamName}>
-                      {numberFormatter.format(totalPingas)}
-                    </Text>
-                    <Text as="p" variant="body" tone="secondary">
-                      Soma de todas as equipes em disputa
-                    </Text>
-                  </div>
-                </div>
-              </Card>
+            <Section padding="none" className={styles.introSection}>
+              <Stack gap="sm" className={styles.introHeader}>
+                <Text as="span" variant="eyebrow" tone="secondary">
+                  Taça da Pinga · Painel oficial
+                </Text>
+              </Stack>
             </Section>
 
             <Section padding="none">
@@ -236,27 +186,36 @@ export default function Leaderboard() {
                 >
                   <div>
                     <Text as="h2" variant="heading">
-                      Ranking das equipes
+                      Leaderboard das equipas
                     </Text>
                     <Text as="p" variant="body" tone="secondary">
-                      Atualiza automaticamente conforme novos registros entram.
+                      Atualiza automaticamente à medida que chegam novas pingas.
                     </Text>
                   </div>
-                  <Text as="p" variant="label" tone="secondary" className={styles.tableCount}>
-                    {teams.length === 1
-                      ? '1 equipe participando'
-                      : `${teams.length} equipes participando`}
-                  </Text>
+                  <div className={styles.tableBadges}>
+                    <Text as="p" variant="label" tone="secondary" className={styles.tableCount}>
+                      {teams.length === 1
+                        ? '1 equipa em prova'
+                        : `${teams.length} equipas em prova`}
+                    </Text>
+                    <div className={styles.totalBadge} aria-label="Pingas totais registadas">
+                      <Text as="span" variant="label" tone="muted">
+                        Pingas totais
+                      </Text>
+                      <Text as="span" variant="heading" weight="bold" className={styles.totalValue}>
+                        {numberFormatter.format(totalPingas)}
+                      </Text>
+                    </div>
+                  </div>
                 </Stack>
 
                 {!isLoaded ? (
                   <div role="status" className={styles.feedback}>
-                    Carregando leaderboard…
+                    A carregar a classificação…
                   </div>
                 ) : teams.length === 0 ? (
                   <div role="status" className={styles.feedback}>
-                    Nenhuma equipe cadastrada ainda. Assim que uma equipe ganhar pingas, ela aparece
-                    aqui.
+                    Ainda não há equipas inscritas. Assim que surgirem pingas, aparecerão aqui.
                   </div>
                 ) : (
                   <div
@@ -279,7 +238,7 @@ export default function Leaderboard() {
                             #
                           </span>
                           <span role="columnheader" className={styles.headerCell}>
-                            Equipe
+                            Equipa
                           </span>
                           <span
                             role="columnheader"

@@ -72,8 +72,16 @@ export default function Branding() {
 
   const handleSave = async (payload: UpdateBrandingPayload) => {
     await updateBranding(payload);
-    const refreshed = await getBranding();
-    setInitialData(refreshed ?? {});
+    // Refresh branding in the background to keep previews up to date without blocking UI feedback.
+    void getBranding()
+      .then((refreshed) => {
+        setInitialData(refreshed ?? {});
+        setLoadError(null);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Failed to load branding';
+        setLoadError(message);
+      });
   };
 
   if (isCheckingAuth) {

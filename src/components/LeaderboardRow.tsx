@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import styles from './LeaderboardRow.module.css';
 
-const fallbackFormatter = new Intl.NumberFormat('pt-BR');
+const fallbackFormatter = new Intl.NumberFormat('pt-PT');
 
 type LeaderboardRowTone = {
   accent: string;
@@ -124,7 +124,7 @@ export function LeaderboardRow({
           aria-valuemin={0}
           aria-valuenow={safePingas}
           aria-valuemax={ariaValueMax}
-          aria-valuetext={`${teamName} possui ${scoreText} pingas`}
+          aria-valuetext={`${teamName} tem ${scoreText} pingas`}
         >
           <div className={styles.meterFill} style={{ width: `${fillPercent}%` }} aria-hidden />
         </div>
