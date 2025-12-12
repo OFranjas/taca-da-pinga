@@ -66,12 +66,22 @@ MSG
 fi
 
 echo "⏱  Ensuring rules test dependencies" >&2
-yarn --cwd rules-tests install --immutable
+if [ -f rules-tests/package-lock.json ]; then
+  (cd rules-tests && npm ci)
+else
+  yarn --cwd rules-tests install --immutable
+fi
 
 echo "🚀  Launching Firestore emulator" >&2
 
 run_tests() {
-  firebase emulators:exec --only firestore "yarn --cwd rules-tests test"
+  local test_cmd
+  if [ -f rules-tests/package-lock.json ]; then
+    test_cmd="npm --prefix rules-tests run test"
+  else
+    test_cmd="yarn --cwd rules-tests test"
+  fi
+  firebase emulators:exec --only firestore "$test_cmd"
 }
 
 if ! output=$(run_tests 2>&1); then
