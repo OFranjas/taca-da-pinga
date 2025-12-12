@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  where,
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
@@ -33,12 +34,13 @@ interface ListSponsorsOptions {
 export async function listSponsors(options: ListSponsorsOptions = {}): Promise<Sponsor[]> {
   const { activeOnly = false } = options;
   const sponsorsRef = collection(db, SPONSORS_COLLECTION);
-  const snap = await getDocs(query(sponsorsRef, orderBy('order', 'asc')));
-  const mapped = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
-  if (!activeOnly) {
-    return mapped;
+  const constraints = [orderBy('order', 'asc')];
+  if (activeOnly) {
+    constraints.push(where('active', '==', true));
   }
-  return mapped.filter((sponsor) => sponsor.active);
+  const snap = await getDocs(query(sponsorsRef, ...constraints));
+  const mapped = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
+  return mapped;
 }
 
 interface CreateSponsorParams {

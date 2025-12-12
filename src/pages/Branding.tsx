@@ -5,6 +5,7 @@ import BrandingForm from '../components/BrandingForm';
 import { AdminLoginCard } from '../components/AdminLoginCard';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import { getBranding, updateBranding, type BrandingData } from '../services/branding.service';
+import { toast } from 'react-toastify';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './Branding.module.css';
 
@@ -81,6 +82,7 @@ export default function Branding() {
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : 'Failed to load branding';
         setLoadError(message);
+        toast.error('Não foi possível atualizar a prévia do branding. Recarregue a página.');
       });
   };
 

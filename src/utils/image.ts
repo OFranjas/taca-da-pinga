@@ -73,10 +73,13 @@ function encodeCanvas(canvas: HTMLCanvasElement, format: ImageFormat, quality?: 
       dataUrl = canvas.toDataURL(mime, constrainedQuality);
     }
   } catch (error) {
-    if (format === 'webp') {
-      return '';
-    }
-    throw error;
+    const errorMessage =
+      format === 'webp'
+        ? 'Failed to encode image as webp; falling back to alternative formats'
+        : 'Failed to encode image';
+    const wrappedError = error instanceof Error ? error : new Error(String(error));
+    wrappedError.message = `${errorMessage}: ${wrappedError.message}`;
+    throw wrappedError;
   }
   if (!dataUrl.startsWith('data:image')) {
     throw new Error('Failed to encode image');
@@ -164,13 +167,17 @@ export async function compressImage(
       .filter((val): val is number => typeof val === 'number')
       .filter((val, idx, arr) => arr.indexOf(val) === idx);
     for (const q of webpQualities) {
-      const webpOutput = encodeCanvas(canvas, 'webp', q);
-      if (
-        webpOutput &&
-        webpOutput.startsWith('data:image/webp') &&
-        webpOutput.length <= MAX_DATA_URL_LENGTH
-      ) {
-        return webpOutput;
+      try {
+        const webpOutput = encodeCanvas(canvas, 'webp', q);
+        if (
+          webpOutput &&
+          webpOutput.startsWith('data:image/webp') &&
+          webpOutput.length <= MAX_DATA_URL_LENGTH
+        ) {
+          return webpOutput;
+        }
+      } catch (error) {
+        console.warn(error);
       }
     }
 

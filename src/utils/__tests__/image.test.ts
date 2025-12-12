@@ -204,7 +204,7 @@ describe('compressImage', () => {
     enqueueCanvasConfig({ hasTransparency: false });
 
     toDataURLMock.mockImplementation((type?: string) => {
-      if (type === 'image/webp' || type === 'image/png') {
+      if (['image/webp', 'image/png'].includes(type ?? '')) {
         return 'data:' + (type ?? 'image/png') + ';base64,' + 'a'.repeat(220000);
       }
       return 'data:image/jpeg;base64,' + 'a'.repeat(120000);
