@@ -20,6 +20,8 @@ type BrandingState = {
   hasRemoteIcon: boolean;
 };
 
+type BrandVariant = 'icon' | 'logo' | 'fallback' | 'loading';
+
 const resolveBrandingState = (data: BrandingData | null | undefined): BrandingState => {
   const remoteMainLogo = data?.mainLogoDataUrl?.trim() ?? null;
   const remoteIcon = data?.iconDataUrl?.trim() ?? null;
@@ -49,7 +51,7 @@ const handleBlur = (event: FocusEvent<HTMLElement>) => {
 
 export function Header() {
   const location = useLocation();
-  const [branding, setBranding] = useState<BrandingState>(DEFAULT_BRANDING_STATE);
+  const [branding, setBranding] = useState<BrandingState | null>(null);
 
   useEffect(() => {
     const unsubscribe = observeBranding(
@@ -64,7 +66,13 @@ export function Header() {
     return unsubscribe;
   }, []);
 
-  const { brandImageSrc, brandVariant } = useMemo(() => {
+  const { brandImageSrc, brandVariant } = useMemo((): {
+    brandImageSrc: string | null;
+    brandVariant: BrandVariant;
+  } => {
+    if (!branding) {
+      return { brandImageSrc: null, brandVariant: 'loading' as const };
+    }
     if (branding.hasRemoteIcon) {
       return { brandImageSrc: branding.icon, brandVariant: 'icon' as const };
     }
@@ -82,7 +90,11 @@ export function Header() {
       <div className={styles.inner}>
         <Link to="/" className={styles.brandLink} aria-label="Ir para a página inicial">
           <span className={styles.brandAvatar} data-logo-variant={brandVariant}>
-            <img src={brandImageSrc} alt="Taça da Pinga" className={styles.brandImage} />
+            {brandImageSrc ? (
+              <img src={brandImageSrc} alt="Taça da Pinga" className={styles.brandImage} />
+            ) : (
+              <span className={styles.brandPlaceholder} aria-hidden="true" />
+            )}
           </span>
           <Text as="span" variant="heading" weight="bold" className={styles.brandTitle}>
             Taça da Pinga

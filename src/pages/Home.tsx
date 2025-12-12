@@ -72,7 +72,7 @@ export default function Home() {
   const [status, setStatus] = useState<SponsorsStatus>('loading');
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [branding, setBranding] = useState<BrandingState>({ mainLogo: null, icon: null });
+  const [branding, setBranding] = useState<BrandingState | null>(null);
   const isMountedRef = useRef(false);
 
   const fetchSponsors = useCallback(async () => {
@@ -130,10 +130,12 @@ export default function Home() {
     return unsubscribe;
   }, []);
 
-  const heroLogoSrc = useMemo(
-    () => branding.mainLogo ?? branding.icon ?? defaultBrandImage,
-    [branding]
-  );
+  const heroLogoSrc = useMemo(() => {
+    if (!branding) {
+      return null;
+    }
+    return branding.mainLogo ?? branding.icon ?? defaultBrandImage;
+  }, [branding]);
 
   const renderSponsorsGrid = (items: Sponsor[]) => (
     <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid} role="list">
@@ -276,7 +278,13 @@ export default function Home() {
           <Card variant="highlight" padding="xl" className={styles.heroCard}>
             <Stack gap="xl" align="center" className={styles.heroContent}>
               <Stack align="center" gap="sm" className={styles.heroHeading}>
-                <img src={heroLogoSrc} alt="Logo Taça da Pinga" className={styles.heroLogo} />
+                <div className={styles.heroLogoWrapper}>
+                  {heroLogoSrc ? (
+                    <img src={heroLogoSrc} alt="Logo Taça da Pinga" className={styles.heroLogo} />
+                  ) : (
+                    <span className={styles.heroLogoSkeleton} aria-hidden="true" />
+                  )}
+                </div>
                 <Text as="span" variant="eyebrow" tone="secondary" align="center">
                   Futebol + comunidade
                 </Text>
