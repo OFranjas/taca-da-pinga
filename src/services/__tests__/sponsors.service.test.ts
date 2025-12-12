@@ -5,7 +5,6 @@ vi.mock('../../firebase', () => ({ db: {} }));
 const mockCollection = vi.fn(() => ({}));
 const mockQuery = vi.fn(() => ({}));
 const mockOrderBy = vi.fn((field: string, dir: string) => ({ field, dir }));
-const mockWhere = vi.fn(() => ({}));
 const mockGetDocs = vi.fn();
 const mockAddDoc = vi.fn();
 const mockDoc = vi.fn(() => ({}));
@@ -16,12 +15,16 @@ const batchUpdate = vi.fn();
 const batchCommit = vi.fn();
 const mockWriteBatch = vi.fn(() => ({ update: batchUpdate, commit: batchCommit }));
 const mockServerTimestamp = vi.fn(() => 'server-ts');
+const mockWhere = vi.fn((field: string, op: string, value: unknown) => ({
+  field,
+  op,
+  value,
+}));
 
 vi.mock('firebase/firestore', () => ({
   collection: mockCollection,
   query: mockQuery,
   orderBy: mockOrderBy,
-  where: mockWhere,
   getDocs: mockGetDocs,
   addDoc: mockAddDoc,
   doc: mockDoc,
@@ -30,6 +33,7 @@ vi.mock('firebase/firestore', () => ({
   limit: mockLimit,
   writeBatch: mockWriteBatch,
   serverTimestamp: mockServerTimestamp,
+  where: mockWhere,
 }));
 
 const compressImage = vi.fn();
@@ -65,15 +69,24 @@ describe('sponsors.service', () => {
   });
 
   test('listSponsors with activeOnly filters', async () => {
-    mockGetDocs.mockResolvedValue({ docs: [] });
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'a', data: () => ({ order: 0, name: 'A', active: true }) },
+        { id: 'b', data: () => ({ order: 1, name: 'B', active: false }) },
+      ],
+    });
     const { listSponsors } = await import('../sponsors.service');
-    await listSponsors({ activeOnly: true });
+    mockWhere.mockReturnValueOnce({ field: 'active', op: '==', value: true });
+    const sponsors = await listSponsors({ activeOnly: true });
     expect(mockQuery).toHaveBeenCalledWith(
       {},
       expect.objectContaining({ field: 'order', dir: 'asc' }),
-      expect.anything()
+      expect.objectContaining({ field: 'active', op: '==', value: true })
     );
-    expect(mockWhere).toHaveBeenCalledWith('active', '==', true);
+    expect(sponsors).toEqual([
+      { id: 'a', order: 0, name: 'A', active: true },
+      { id: 'b', order: 1, name: 'B', active: false },
+    ]);
   });
 
   test('createSponsor compresses image, assigns order and timestamps', async () => {

@@ -8,11 +8,10 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  updateDoc,
   where,
+  updateDoc,
   writeBatch,
 } from 'firebase/firestore';
-import type { QueryConstraint } from 'firebase/firestore';
 import { compressImage } from '../utils/image';
 import { db } from '../firebase';
 
@@ -35,12 +34,13 @@ interface ListSponsorsOptions {
 export async function listSponsors(options: ListSponsorsOptions = {}): Promise<Sponsor[]> {
   const { activeOnly = false } = options;
   const sponsorsRef = collection(db, SPONSORS_COLLECTION);
-  const constraints: QueryConstraint[] = [orderBy('order', 'asc')];
+  const constraints = [orderBy('order', 'asc')];
   if (activeOnly) {
     constraints.push(where('active', '==', true));
   }
   const snap = await getDocs(query(sponsorsRef, ...constraints));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
+  const mapped = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
+  return mapped;
 }
 
 interface CreateSponsorParams {

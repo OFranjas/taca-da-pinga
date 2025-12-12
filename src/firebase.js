@@ -18,12 +18,12 @@ const env = (key, fallback) => {
 };
 
 const firebaseConfig = {
-  apiKey: env('FIREBASE_API_KEY'),
-  authDomain: env('FIREBASE_AUTH_DOMAIN'),
-  projectId: env('FIREBASE_PROJECT_ID'),
-  storageBucket: env('FIREBASE_STORAGE_BUCKET'),
-  messagingSenderId: env('FIREBASE_MESSAGING_SENDER_ID'),
-  appId: env('FIREBASE_APP_ID'),
+  apiKey: env('FIREBASE_API_KEY', 'test-api-key'),
+  authDomain: env('FIREBASE_AUTH_DOMAIN', 'test.localhost'),
+  projectId: env('FIREBASE_PROJECT_ID', 'taca-da-pinga-test'),
+  storageBucket: env('FIREBASE_STORAGE_BUCKET', 'taca-da-pinga-test.appspot.com'),
+  messagingSenderId: env('FIREBASE_MESSAGING_SENDER_ID', '000000000000'),
+  appId: env('FIREBASE_APP_ID', '1:000000000000:web:test'),
 };
 
 const app = initializeApp(firebaseConfig);

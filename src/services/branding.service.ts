@@ -1,4 +1,12 @@
-import { deleteField, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  deleteField,
+  doc,
+  getDoc,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+  type Unsubscribe,
+} from 'firebase/firestore';
 import { compressImage } from '../utils/image';
 import { db } from '../firebase';
 
@@ -53,4 +61,28 @@ export async function updateBranding({
   }
 
   await setDoc(ref, updates, { merge: true });
+}
+
+export function observeBranding(
+  callback: (data: BrandingData) => void,
+  onError?: (error: unknown) => void
+): Unsubscribe {
+  const ref = doc(db, BRANDING_COLLECTION, BRANDING_DOC_ID);
+  return onSnapshot(
+    ref,
+    (snap) => {
+      if (!snap.exists()) {
+        callback({});
+        return;
+      }
+      const data = snap.data() as BrandingData | undefined;
+      callback({
+        mainLogoDataUrl: data?.mainLogoDataUrl,
+        iconDataUrl: data?.iconDataUrl,
+      });
+    },
+    (error) => {
+      onError?.(error);
+    }
+  );
 }

@@ -1,19 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { observeTeamsOrderedByName } from '../services/teams';
 import { addPinga } from '../services/leaderboard';
 import { toast } from 'react-toastify';
 import styles from './AddPingasPanel.module.css';
 
+type TeamOption = {
+  id: string;
+  name: string;
+  pingas: number;
+};
+
 export default function AddPingasPanel() {
-  const [teams, setTeams] = useState([]);
+  const [teams, setTeams] = useState<TeamOption[]>([]);
   const [search, setSearch] = useState('');
-  const [filtered, setFiltered] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [filtered, setFiltered] = useState<TeamOption[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<TeamOption | null>(null);
   const [amount, setAmount] = useState(1);
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   // Load teams
-  useEffect(() => observeTeamsOrderedByName(setTeams), []);
+  useEffect(() => {
+    const unsubscribe = observeTeamsOrderedByName((nextTeams: TeamOption[]) => {
+      setTeams(nextTeams);
+    });
+
+    return unsubscribe;
+  }, []);
 
   // Filter suggestions
   useEffect(() => {
@@ -21,13 +33,13 @@ export default function AddPingasPanel() {
       setFiltered([]);
       return;
     }
-    setFiltered(teams.filter((t) => t.name.toLowerCase().includes(search.toLowerCase())));
+    setFiltered(teams.filter((team) => team.name.toLowerCase().includes(search.toLowerCase())));
   }, [search, teams, selectedTeam]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
-    const handleClick = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+    const handleClick = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setFiltered([]);
       }
     };
@@ -47,20 +59,21 @@ export default function AddPingasPanel() {
       setSearch('');
       setSelectedTeam(null);
       setAmount(1);
-    } catch (e) {
-      toast.error(e.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível adicionar pingas';
+      toast.error(message);
     }
   };
 
   // Handle amount input + arrow keys
-  const handleAmountChange = (e) => {
-    const v = parseInt(e.target.value, 10);
+  const handleAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const v = parseInt(event.target.value, 10);
     setAmount(isNaN(v) || v < 1 ? 1 : v);
   };
-  const handleAmountKey = (e) => {
-    if (e.key === 'ArrowUp') setAmount((a) => a + 1);
-    if (e.key === 'ArrowDown') setAmount((a) => Math.max(1, a - 1));
-    if (e.key === 'Enter') handleAdd();
+  const handleAmountKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowUp') setAmount((value) => value + 1);
+    if (event.key === 'ArrowDown') setAmount((value) => Math.max(1, value - 1));
+    if (event.key === 'Enter') void handleAdd();
   };
 
   return (

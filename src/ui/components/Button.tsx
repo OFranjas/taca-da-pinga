@@ -1,25 +1,21 @@
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 import styles from './Button.module.css';
 import { mergeClasses } from './utils';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-type ButtonBaseProps = {
+type ButtonOwnProps<TElement extends ElementType> = {
+  as?: TElement;
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
+  className?: string;
+  children?: ReactNode;
 };
 
-type ButtonAsButton = ButtonBaseProps & {
-  as?: 'button';
-} & ComponentPropsWithoutRef<'button'>;
-
-type ButtonAsAnchor = ButtonBaseProps & {
-  as: 'a';
-} & ComponentPropsWithoutRef<'a'>;
-
-export type ButtonProps = ButtonAsButton | ButtonAsAnchor;
+export type ButtonProps<TElement extends ElementType = 'button'> = ButtonOwnProps<TElement> &
+  Omit<ComponentPropsWithoutRef<TElement>, keyof ButtonOwnProps<TElement>>;
 
 const variantClassMap: Record<ButtonVariant, string> = {
   primary: styles.variantPrimary,
@@ -34,35 +30,19 @@ const sizeClassMap: Record<ButtonSize, string> = {
   lg: styles.sizeLg,
 };
 
-export function Button(props: ButtonProps) {
-  if (props.as === 'a') {
-    const {
-      as: _as,
-      variant = 'primary',
-      size = 'md',
-      fullWidth = false,
-      className,
-      ...anchorProps
-    } = props;
-    const classNames = mergeClasses(
-      styles.root,
-      variantClassMap[variant],
-      sizeClassMap[size],
-      fullWidth ? styles.fullWidth : undefined,
-      className
-    );
-    return <a {...anchorProps} className={classNames} />;
-  }
-
+export function Button<TElement extends ElementType = 'button'>(props: ButtonProps<TElement>) {
   const {
-    as: _as = 'button',
+    as,
     variant = 'primary',
     size = 'md',
     fullWidth = false,
     className,
-    type = 'button',
-    ...buttonProps
+    children,
+    ...rest
   } = props;
+
+  const Component = (as ?? 'button') as ElementType;
+  const componentProps = rest as ComponentPropsWithoutRef<TElement>;
 
   const classNames = mergeClasses(
     styles.root,
@@ -72,5 +52,18 @@ export function Button(props: ButtonProps) {
     className
   );
 
-  return <button type={type} {...buttonProps} className={classNames} />;
+  if (!as || Component === 'button') {
+    const { type, ...buttonProps } = componentProps as ComponentPropsWithoutRef<'button'>;
+    return (
+      <button type={type ?? 'button'} {...buttonProps} className={classNames}>
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <Component {...componentProps} className={classNames}>
+      {children}
+    </Component>
+  );
 }

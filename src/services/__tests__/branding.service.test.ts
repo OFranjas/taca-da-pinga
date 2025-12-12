@@ -5,6 +5,7 @@ vi.mock('../../firebase', () => ({ db: {} }));
 const mockDoc = vi.fn(() => ({}));
 const mockGetDoc = vi.fn();
 const mockSetDoc = vi.fn();
+const mockOnSnapshot = vi.fn();
 const mockServerTimestamp = vi.fn(() => 'server-ts');
 const mockDeleteField = vi.fn(() => 'delete-field');
 
@@ -12,6 +13,7 @@ vi.mock('firebase/firestore', () => ({
   doc: mockDoc,
   getDoc: mockGetDoc,
   setDoc: mockSetDoc,
+  onSnapshot: mockOnSnapshot,
   serverTimestamp: mockServerTimestamp,
   deleteField: mockDeleteField,
 }));
@@ -24,6 +26,10 @@ vi.mock('../../utils/image', () => ({
 describe('branding.service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockOnSnapshot.mockImplementation((_ref, next) => {
+      next({ exists: () => false });
+      return vi.fn();
+    });
   });
 
   test('getBranding returns empty object when doc missing', async () => {
@@ -87,5 +93,32 @@ describe('branding.service', () => {
       }),
       { merge: true }
     );
+  });
+
+  test('observeBranding emits branding updates', async () => {
+    const unsubscribe = vi.fn();
+    mockOnSnapshot.mockImplementation((_ref, next) => {
+      next({
+        exists: () => true,
+        data: () => ({ mainLogoDataUrl: 'logo', iconDataUrl: 'icon' }),
+      });
+      return unsubscribe;
+    });
+    const { observeBranding } = await import('../branding.service');
+    const callback = vi.fn();
+    const result = observeBranding(callback);
+    expect(callback).toHaveBeenCalledWith({ mainLogoDataUrl: 'logo', iconDataUrl: 'icon' });
+    expect(result).toBe(unsubscribe);
+  });
+
+  test('observeBranding emits empty object when doc missing', async () => {
+    mockOnSnapshot.mockImplementation((_ref, next) => {
+      next({ exists: () => false });
+      return vi.fn();
+    });
+    const { observeBranding } = await import('../branding.service');
+    const callback = vi.fn();
+    observeBranding(callback);
+    expect(callback).toHaveBeenCalledWith({});
   });
 });

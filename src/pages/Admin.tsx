@@ -1,13 +1,12 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import { toast } from 'react-toastify';
 import AddPingasPanel from '../components/AddPingasPanel';
+import Header from '../components/Header';
 import ManageTeamsPanel from '../components/ManageTeamsPanel';
 import { useAdminAuth } from '../hooks/useAdminAuth';
-import { AdminLoginCard } from '../components/AdminLoginCard';
-import { Page, Section, Card, Stack, Text } from '../ui';
-import styles from './Admin.module.css';
-import { toast } from 'react-toastify';
+import { AdminGuard } from './AdminGuard';
+import { AdminShell, type AdminShellNavItem } from './AdminShell';
 
 const ADMIN_SECTIONS = {
   Add: 'add',
@@ -16,10 +15,22 @@ const ADMIN_SECTIONS = {
 
 type AdminSection = (typeof ADMIN_SECTIONS)[keyof typeof ADMIN_SECTIONS];
 
+const NAV_ITEMS: AdminShellNavItem<AdminSection>[] = [
+  {
+    id: ADMIN_SECTIONS.Add,
+    label: 'Adicionar Pingas',
+    description: 'Atualiza pontuações',
+  },
+  {
+    id: ADMIN_SECTIONS.Manage,
+    label: 'Gerir Equipas',
+    description: 'Organiza equipas',
+  },
+];
+
 export default function Admin() {
   const navigate = useNavigate();
-  const { user, email, password, setEmail, setPassword, login, logout, isCheckingAuth } =
-    useAdminAuth();
+  const auth = useAdminAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>(ADMIN_SECTIONS.Add);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -30,122 +41,48 @@ export default function Admin() {
       setLoginError(null);
       setIsLoggingIn(true);
       try {
-        await login();
-        toast.success('Logged in successfully');
+        await auth.login();
+        toast.success('Sessão iniciada');
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Failed to login';
+        const message = error instanceof Error ? error.message : 'Falha no login';
         setLoginError(message);
         toast.error(message);
       } finally {
         setIsLoggingIn(false);
       }
     },
-    [login]
+    [auth]
   );
 
   const handleLogout = useCallback(async () => {
-    await logout();
-    toast.info('Logged out');
-  }, [logout]);
-
-  if (isCheckingAuth) {
-    return (
-      <>
-        <Header />
-        <Page
-          tone="default"
-          width="content"
-          padding="none"
-          fullHeight={false}
-          innerClassName={styles.pageContentCentered}
-        >
-          <Section padding="none">
-            <Card variant="muted" padding="lg">
-              <Stack align="center" justify="center">
-                <Text as="p" variant="label" tone="secondary" align="center">
-                  Verificando sessão...
-                </Text>
-              </Stack>
-            </Card>
-          </Section>
-        </Page>
-      </>
-    );
-  }
-
-  if (!user) {
-    return (
-      <>
-        <Header />
-        <Page
-          tone="default"
-          width="content"
-          padding="none"
-          fullHeight={false}
-          innerClassName={styles.pageContentCentered}
-        >
-          <Section padding="none" align="center">
-            <AdminLoginCard
-              email={email}
-              password={password}
-              onEmailChange={setEmail}
-              onPasswordChange={setPassword}
-              onSubmit={handleLoginSubmit}
-              error={loginError}
-              isSubmitting={isLoggingIn}
-            />
-          </Section>
-        </Page>
-      </>
-    );
-  }
+    await auth.logout();
+    toast.info('Sessão terminada');
+  }, [auth]);
 
   return (
     <>
       <Header />
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Painel Admin</h2>
-          <div className={styles.headerActions}>
-            <button
-              type="button"
-              className={styles.secondaryAction}
-              onClick={() => navigate('/admin/branding')}
-            >
-              Branding
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                void handleLogout();
-              }}
-              className={styles.logoutBtn}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-        <div className={styles.tabBar} role="tablist" aria-label="Admin sections">
-          <button
-            role="tab"
-            aria-selected={activeSection === ADMIN_SECTIONS.Add}
-            className={activeSection === ADMIN_SECTIONS.Add ? styles.activeTab : styles.tab}
-            onClick={() => setActiveSection(ADMIN_SECTIONS.Add)}
-          >
-            Adicionar Pingas
-          </button>
-          <button
-            role="tab"
-            aria-selected={activeSection === ADMIN_SECTIONS.Manage}
-            className={activeSection === ADMIN_SECTIONS.Manage ? styles.activeTab : styles.tab}
-            onClick={() => setActiveSection(ADMIN_SECTIONS.Manage)}
-          >
-            Gerir Equipas
-          </button>
-        </div>
-
-        {activeSection === ADMIN_SECTIONS.Add ? <AddPingasPanel /> : <ManageTeamsPanel />}
-      </div>
+      <AdminGuard
+        auth={auth}
+        onSubmit={handleLoginSubmit}
+        isSubmitting={isLoggingIn}
+        error={loginError}
+      >
+        <AdminShell
+          title="Painel Admin"
+          navItems={NAV_ITEMS}
+          activeNav={activeSection}
+          onSelectNav={(section) => {
+            setActiveSection(section);
+          }}
+          onNavigateBranding={() => navigate('/admin/branding')}
+          onLogout={() => {
+            void handleLogout();
+          }}
+        >
+          {activeSection === ADMIN_SECTIONS.Add ? <AddPingasPanel /> : <ManageTeamsPanel />}
+        </AdminShell>
+      </AdminGuard>
     </>
   );
 }

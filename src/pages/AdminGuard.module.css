@@ -1,0 +1,79 @@
+.centered {
+  display: grid;
+  gap: var(--ui-space-xl);
+  padding: var(--ui-space-xl) var(--ui-space-md);
+  box-sizing: border-box;
+  min-height: max(calc(100dvh - var(--ui-header-height) - 2 * var(--ui-space-xl)), 0px);
+}
+
+.guardShell {
+  display: flex;
+  justify-content: center;
+}
+
+.loadingCard {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+.guardGrid {
+  display: grid;
+  gap: var(--ui-space-md);
+  width: 100%;
+  align-items: stretch;
+  grid-template-columns: 1fr;
+  max-width: 1100px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+.helperCard {
+  position: relative;
+  overflow: hidden;
+  min-height: auto;
+}
+
+.helperHeading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+}
+
+.helperCopy {
+  color: var(--ui-color-text-secondary);
+}
+
+.helperCard a {
+  color: var(--ui-color-accent);
+  font-weight: var(--ui-font-weight-semibold);
+  text-decoration: none;
+}
+
+.helperCard a:hover {
+  text-decoration: underline;
+}
+
+.formColumn {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.formColumn > * {
+  width: 100%;
+  max-width: 520px;
+}
+
+@media (max-width: 640px) {
+  .centered {
+    min-height: auto;
+    padding-top: var(--ui-space-2xl);
+  }
+
+  .guardGrid {
+    gap: var(--ui-space-lg);
+  }
+}
+
+/* Desktop keeps cards stacked */
