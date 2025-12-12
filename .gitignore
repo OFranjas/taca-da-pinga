@@ -60,3 +60,6 @@ package-lock.json
 # non-root yarn.lock
 tools/yarn.lock
 test-rules/yarn.lock
+
+# Cursor
+*.cursor

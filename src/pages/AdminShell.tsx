@@ -60,6 +60,11 @@ export function AdminShell<TNav extends string = string>({
     return activeItem?.label ?? '';
   }, [activeNav, navItems]);
 
+  const activeNavDescription = useMemo(() => {
+    const activeItem = navItems.find((item) => item.id === activeNav);
+    return activeItem?.description;
+  }, [activeNav, navItems]);
+
   const handleSelectNav = (id: TNav) => {
     onSelectNav(id);
     setSidebarOpen(false);
@@ -85,12 +90,18 @@ export function AdminShell<TNav extends string = string>({
               className={className}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span>{item.label}</span>
-              {item.description ? (
-                <Text as="span" variant="label" tone="muted">
-                  {item.description}
+              <span className={styles.navDot} aria-hidden />
+              <div className={styles.navCopy}>
+                <Text as="span" variant="label" className={styles.navLabel}>
+                  {item.label}
                 </Text>
-              ) : null}
+                {item.description ? (
+                  <Text as="span" variant="label" tone="muted" className={styles.navDescription}>
+                    {item.description}
+                  </Text>
+                ) : null}
+              </div>
+              {isActive ? <span className={styles.navGlow} aria-hidden /> : null}
             </button>
           </li>
         );
@@ -100,15 +111,57 @@ export function AdminShell<TNav extends string = string>({
 
   return (
     <>
-      <Page tone="default" padding="none" width="fluid">
-        <Section className={styles.section} padding="lg">
+      <Page tone="frost" width="page" padding="md" className={styles.page}>
+        <Section padding="none" className={styles.heroSection}>
+          <Card variant="highlight" padding="lg" className={styles.heroCard}>
+            <Stack gap="md">
+              <Stack gap="sm" className={styles.heroHeading}>
+                <Text as="span" variant="eyebrow" className={styles.eyebrow}>
+                  Painel
+                </Text>
+                <Stack gap="sm">
+                  <Stack direction="row" align="center" justify="between" gap="md" wrap>
+                    <Stack gap="sm" className={styles.titleGroup}>
+                      <Text as="h1" variant="hero" className={styles.title}>
+                        {title}
+                      </Text>
+                      <Text as="p" variant="subtitle" className={styles.subtitle}>
+                        Adiciona pingas, gere equipas e atualiza branding num painel único.
+                      </Text>
+                    </Stack>
+                    <Stack direction="row" gap="xs" className={styles.heroActionsDesktop}>
+                      <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
+                        Branding
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={handleLogout}>
+                        Terminar sessão
+                      </Button>
+                    </Stack>
+                  </Stack>
+                  <Stack direction="row" gap="xs" className={styles.heroActionsMobile}>
+                    <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
+                      Branding
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleLogout}>
+                      Terminar sessão
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Stack>
+          </Card>
+        </Section>
+
+        <Section padding="none" className={styles.shellSection}>
           <Grid columns={{ base: 1, lg: 12 }} gap="lg" className={styles.layout} align="start">
             <div className={styles.sidebarDesktop}>
-              <Card variant="muted" padding="md" className={styles.sidebarCard} fullHeight>
+              <Card variant="muted" padding="lg" className={styles.sidebarCard} fullHeight>
                 <Stack gap="md">
-                  <Text as="p" variant="label" tone="secondary" className={styles.sidebarTitle}>
-                    Navegação
-                  </Text>
+                  <div className={styles.sidebarHeader}>
+                    <Text as="p" variant="label" tone="secondary" className={styles.sidebarTitle}>
+                      Navegação rápida
+                    </Text>
+                  </div>
                   <nav aria-label="Secções do painel" id={desktopNavId}>
                     {renderNavItems(handleSelectNav)}
                   </nav>
@@ -116,47 +169,46 @@ export function AdminShell<TNav extends string = string>({
               </Card>
             </div>
             <div className={styles.main}>
-              <Card variant="muted" padding="md" gap="md">
-                <Stack gap="sm">
-                  <Stack
-                    gap="sm"
-                    direction="column"
-                    justify="between"
-                    switchDirectionAt="md"
-                    switchTo="row"
-                    align="stretch"
-                  >
-                    <Stack direction="row" align="center" gap="sm">
-                      <button
-                        type="button"
-                        className={styles.mobileToggle}
-                        onClick={() => setSidebarOpen(true)}
-                        aria-expanded={isSidebarOpen}
-                        aria-controls={mobilePanelId}
-                        aria-haspopup="dialog"
-                      >
-                        Menu
-                      </button>
-                      <Text as="h1" variant="heading" className={styles.topbarHeading}>
-                        {title}
-                      </Text>
-                    </Stack>
-                    <div className={styles.actions}>
-                      <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
-                        Branding
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={handleLogout}>
-                        Terminar sessão
-                      </Button>
-                    </div>
-                  </Stack>
+              <div className={styles.mobileNavBar}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-expanded={isSidebarOpen}
+                  aria-controls={mobilePanelId}
+                  aria-haspopup="dialog"
+                >
+                  Menu
+                </Button>
+                <div className={styles.mobileContext}>
+                  <Text as="span" variant="label" tone="muted">
+                    {activeNavLabel ? 'Secção' : 'Escolhe uma secção'}
+                  </Text>
                   {activeNavLabel ? (
-                    <Text as="p" variant="label" tone="muted">
-                      Secção atual: {activeNavLabel}
+                    <Text as="span" variant="heading" className={styles.mobileHeading}>
+                      {activeNavLabel}
                     </Text>
                   ) : null}
+                </div>
+              </div>
+              <Card variant="elevated" padding="xl" className={styles.contentCard} fullHeight>
+                <Stack gap="md" className={styles.contentHeader}>
+                  <Stack gap="sm">
+                    <Text as="h2" variant="heading" className={styles.sectionHeading}>
+                      {activeNavLabel || 'Painel Admin'}
+                    </Text>
+                    {activeNavDescription ? (
+                      <Text as="p" variant="subtitle" className={styles.sectionSubtitle}>
+                        {activeNavDescription}
+                      </Text>
+                    ) : (
+                      <Text as="p" variant="subtitle" className={styles.sectionSubtitle}>
+                        Usa os controlos abaixo para gerir rapidamente o evento.
+                      </Text>
+                    )}
+                  </Stack>
                   {breadcrumbs && breadcrumbs.length > 0 ? (
-                    <nav aria-label="Breadcrumbs" className={styles.breadcrumbs}>
+                    <nav aria-label="Breadcrumbs" className={styles.breadcrumbsInline}>
                       {breadcrumbs.map((crumb, index) => (
                         <Fragment key={`${crumb.label}-${index}`}>
                           {crumb.href ? (
@@ -174,9 +226,7 @@ export function AdminShell<TNav extends string = string>({
                     </nav>
                   ) : null}
                 </Stack>
-              </Card>
-              <Card variant="elevated" padding="lg" className={styles.contentCard} fullHeight>
-                {children}
+                <div className={styles.content}>{children}</div>
               </Card>
             </div>
           </Grid>
@@ -191,17 +241,31 @@ export function AdminShell<TNav extends string = string>({
           onClick={() => setSidebarOpen(false)}
         >
           <div className={styles.mobileSidebar} onClick={(event) => event.stopPropagation()}>
-            <Card variant="muted" padding="md" className={styles.mobileSidebarCard}>
+            <Card variant="muted" padding="lg" className={styles.mobileSidebarCard}>
               <div className={styles.mobileSidebarHeader}>
-                <Text as="p" variant="subtitle" id={mobileTitleId}>
-                  Navegação
-                </Text>
+                <div>
+                  <Text
+                    as="p"
+                    variant="eyebrow"
+                    className={styles.mobileEyebrow}
+                    id={mobileTitleId}
+                  >
+                    Painel Admin
+                  </Text>
+                  <Text as="p" variant="heading" className={styles.mobileTitle}>
+                    Navegação
+                  </Text>
+                  <Text as="p" variant="subtitle" tone="secondary">
+                    Acede às secções rápidas ou termina sessão.
+                  </Text>
+                </div>
                 <button
                   type="button"
                   className={styles.mobileClose}
                   onClick={() => setSidebarOpen(false)}
+                  aria-label="Fechar menu"
                 >
-                  Fechar
+                  ×
                 </button>
               </div>
               <nav aria-label="Secções do painel" id={mobilePanelId}>
