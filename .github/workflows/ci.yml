@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-yarn-berry-cache-
 
       - name: Install
-        run: yarn install --immutable
+        run: yarn install --immutable --ignore-scripts
 
       - name: Lint
         run: yarn lint

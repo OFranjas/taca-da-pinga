@@ -80,7 +80,7 @@ jobs:
             ${{ runner.os }}-yarn-berry-cache-
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --immutable --ignore-scripts
 
       - name: Build
         run: yarn build
