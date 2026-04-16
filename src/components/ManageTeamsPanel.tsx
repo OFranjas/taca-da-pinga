@@ -1,8 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam } from '../services/teams';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import styles from './ManageTeamsPanel.module.css';
-import ConfirmModal from './ConfirmModal';
 
 type Team = {
   id: string;
@@ -63,19 +75,19 @@ export default function ManageTeamsPanel() {
   return (
     <div className={styles.panel}>
       <div className={styles.top}>
-        <input
+        <Input
           type="text"
           placeholder="Nova equipa..."
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           className={styles.input}
         />
-        <button onClick={createTeam} className={styles.createBtn}>
+        <Button type="button" onClick={createTeam} className={styles.createBtn}>
           Criar
-        </button>
+        </Button>
       </div>
       <div className={styles.filterWrapper}>
-        <input
+        <Input
           type="text"
           placeholder="Filtrar equipas..."
           value={filter}
@@ -92,26 +104,41 @@ export default function ManageTeamsPanel() {
               <span className={styles.teamName}>{team.name}</span>
             </div>
             <div className={styles.right}>
-              <span className={styles.countPill}>{team.pingas}</span>
-              <button
+              <Badge variant="outline" className={styles.countPill}>
+                {team.pingas}
+              </Badge>
+              <Button
+                type="button"
+                variant="destructive"
                 onClick={() => setToDelete(team)}
                 className={styles.deleteBtn}
                 aria-label={`Delete ${team.name}`}
               >
                 Eliminar
-              </button>
+              </Button>
             </div>
           </li>
         ))}
       </ul>
 
-      <ConfirmModal
-        isOpen={!!toDelete}
-        title="Eliminar Equipa?"
-        message={`Tem a certeza de que deseja eliminar "${toDelete?.name}"?`}
-        onCancel={() => setToDelete(null)}
-        onConfirm={confirmDelete}
-      />
+      <AlertDialog open={!!toDelete} onOpenChange={(open) => !open && setToDelete(null)}>
+        <AlertDialogContent className={styles.confirmContent}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar Equipa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {toDelete
+                ? `Tem a certeza de que deseja eliminar "${toDelete.name}"?`
+                : 'Tem a certeza de que deseja eliminar esta equipa?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmDelete}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

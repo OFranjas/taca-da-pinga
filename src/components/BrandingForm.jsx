@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { FieldLegend, FieldSet } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import styles from './BrandingForm.module.css';
 
 function revokeObjectUrl(ref) {
@@ -142,8 +146,8 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <fieldset className={styles.fieldset} disabled={disableForm}>
-        <legend className={styles.legend}>Branding assets</legend>
+      <FieldSet className={styles.fieldset} disabled={disableForm}>
+        <FieldLegend className={styles.legend}>Branding assets</FieldLegend>
         <div className={styles.assetsGrid}>
           <div className={styles.assetCard}>
             <div className={styles.assetHeader}>
@@ -154,9 +158,15 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <p className={styles.assetHint}>Displayed on scoreboards and landing page</p>
               </div>
               {mainPreview ? (
-                <button type="button" className={styles.clearButton} onClick={handleRemoveMainLogo}>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className={styles.clearButton}
+                  onClick={handleRemoveMainLogo}
+                >
                   Remove
-                </button>
+                </Button>
               ) : null}
             </div>
             <p className={styles.constraints}>JPEG/PNG up to 600×600px (auto-compressed)</p>
@@ -170,7 +180,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
               )}
             </div>
             <div className={styles.uploadRow}>
-              <input
+              <Input
                 id="mainLogo"
                 ref={mainInputRef}
                 type="file"
@@ -194,9 +204,15 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <p className={styles.assetHint}>Used for favicons &amp; mobile shortcuts</p>
               </div>
               {iconPreview ? (
-                <button type="button" className={styles.clearButton} onClick={handleRemoveIcon}>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className={styles.clearButton}
+                  onClick={handleRemoveIcon}
+                >
                   Remove
-                </button>
+                </Button>
               ) : null}
             </div>
             <p className={styles.constraints}>Square images look best (auto-resized)</p>
@@ -210,7 +226,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
               )}
             </div>
             <div className={styles.uploadRow}>
-              <input
+              <Input
                 id="icon"
                 ref={iconInputRef}
                 type="file"
@@ -225,23 +241,23 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
             </div>
           </div>
         </div>
-      </fieldset>
+      </FieldSet>
 
       {errorMessage ? (
-        <p role="alert" className={styles.errorMessage}>
-          {errorMessage}
-        </p>
+        <Alert variant="destructive" className={styles.errorMessage}>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
       ) : null}
       {statusMessage ? (
-        <p role="status" className={styles.statusMessage}>
-          {statusMessage}
-        </p>
+        <Alert className={styles.statusMessage}>
+          <AlertDescription role="status">{statusMessage}</AlertDescription>
+        </Alert>
       ) : null}
 
       <div className={styles.actions}>
-        <button type="submit" className={styles.saveButton} disabled={disableForm}>
+        <Button type="submit" className={styles.saveButton} disabled={disableForm}>
           {saving ? 'Saving…' : 'Save branding'}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -7,6 +7,10 @@
   gap: var(--ui-space-md);
 }
 
+.fieldGroup {
+  gap: var(--ui-space-md);
+}
+
 .field {
   display: flex;
   flex-direction: column;

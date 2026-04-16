@@ -1,4 +1,12 @@
-import { Fragment, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useId, useMemo, useState, type ReactNode } from 'react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './AdminShell.module.css';
 
@@ -38,22 +46,6 @@ export function AdminShell<TNav extends string = string>({
   const mobileNavId = useId();
   const desktopNavId = `${mobileNavId}-desktop`;
   const mobilePanelId = `${mobileNavId}-panel`;
-  const mobileTitleId = `${mobileNavId}-title`;
-
-  useEffect(() => {
-    if (!isSidebarOpen) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSidebarOpen]);
 
   const activeNavLabel = useMemo(() => {
     const activeItem = navItems.find((item) => item.id === activeNav);
@@ -232,64 +224,40 @@ export function AdminShell<TNav extends string = string>({
           </Grid>
         </Section>
       </Page>
-      {isSidebarOpen ? (
-        <div
-          className={styles.mobileBackdrop}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={mobileTitleId}
-          onClick={() => setSidebarOpen(false)}
-        >
-          <div className={styles.mobileSidebar} onClick={(event) => event.stopPropagation()}>
-            <Card variant="muted" padding="lg" className={styles.mobileSidebarCard}>
-              <div className={styles.mobileSidebarHeader}>
-                <div>
-                  <Text
-                    as="p"
-                    variant="eyebrow"
-                    className={styles.mobileEyebrow}
-                    id={mobileTitleId}
-                  >
-                    Painel Admin
-                  </Text>
-                  <Text as="p" variant="heading" className={styles.mobileTitle}>
-                    Navegação
-                  </Text>
-                  <Text as="p" variant="subtitle" tone="secondary">
-                    Acede às secções rápidas ou termina sessão.
-                  </Text>
-                </div>
-                <button
-                  type="button"
-                  className={styles.mobileClose}
-                  onClick={() => setSidebarOpen(false)}
-                  aria-label="Fechar menu"
-                >
-                  ×
-                </button>
-              </div>
-              <nav aria-label="Secções do painel" id={mobilePanelId}>
-                {renderNavItems(handleSelectNav)}
-              </nav>
-              <div className={styles.actions}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setSidebarOpen(false);
-                    onNavigateBranding();
-                  }}
-                >
-                  Branding
-                </Button>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  Terminar sessão
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </div>
-      ) : null}
+      <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent side="right" className={styles.mobileSidebarCard}>
+          <SheetTitle className="sr-only">Navegação</SheetTitle>
+          <SheetHeader className={styles.mobileSidebarHeader}>
+            <Text as="p" variant="eyebrow" className={styles.mobileEyebrow}>
+              Painel Admin
+            </Text>
+            <Text as="p" variant="heading" className={styles.mobileTitle}>
+              Navegação
+            </Text>
+            <SheetDescription className={styles.mobileDescription}>
+              Acede às secções rápidas ou termina sessão.
+            </SheetDescription>
+          </SheetHeader>
+          <nav aria-label="Secções do painel" id={mobilePanelId}>
+            {renderNavItems(handleSelectNav)}
+          </nav>
+          <SheetFooter className={styles.actions}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setSidebarOpen(false);
+                onNavigateBranding();
+              }}
+            >
+              Branding
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              Terminar sessão
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

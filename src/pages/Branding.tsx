@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import BrandingForm from '../components/BrandingForm';
 import { AdminLoginCard } from '../components/AdminLoginCard';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import { getBranding, updateBranding, type BrandingData } from '../services/branding.service';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './Branding.module.css';
 
 type UpdateBrandingPayload = Parameters<typeof updateBranding>[0];
 
 export default function Branding() {
-  const navigate = useNavigate();
   const { user, email, setEmail, password, setPassword, isCheckingAuth, login, logout } =
     useAdminAuth();
   const [initialData, setInitialData] = useState<BrandingData>({});
@@ -165,7 +164,7 @@ export default function Branding() {
                 switchDirectionAt="md"
                 switchTo="row"
               >
-                <Button type="button" variant="secondary" onClick={() => navigate('/admin')}>
+                <Button as={Link} to="/admin" variant="secondary">
                   ← Voltar ao painel
                 </Button>
                 <Button

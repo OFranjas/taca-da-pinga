@@ -1,6 +1,6 @@
 import { useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AddPingasPanel from '../components/AddPingasPanel';
 import Header from '../components/Header';
 import ManageTeamsPanel from '../components/ManageTeamsPanel';

@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { observeTeamsOrderedByName } from '../services/teams';
 import { addPinga } from '../services/leaderboard';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
 import styles from './AddPingasPanel.module.css';
 
 type TeamOption = {
@@ -80,7 +89,7 @@ export default function AddPingasPanel() {
     <div className={styles.panel}>
       <div className={styles.searchRow}>
         <div className={styles.searchWrapper} ref={wrapperRef}>
-          <input
+          <Input
             type="text"
             placeholder="Procurar equipa..."
             value={search}
@@ -91,21 +100,27 @@ export default function AddPingasPanel() {
             className={styles.searchInput}
           />
           {filtered.length > 0 && (
-            <div className={styles.suggestions}>
-              {filtered.slice(0, 6).map((t) => (
-                <div
-                  key={t.id}
-                  className={styles.suggestion}
-                  onClick={() => {
-                    setSelectedTeam(t);
-                    setSearch(t.name);
-                    setFiltered([]);
-                  }}
-                >
-                  {t.name}
-                </div>
-              ))}
-            </div>
+            <Command className={styles.suggestions}>
+              <CommandList>
+                <CommandEmpty>Nenhuma equipa encontrada.</CommandEmpty>
+                <CommandGroup>
+                  {filtered.slice(0, 6).map((team) => (
+                    <CommandItem
+                      key={team.id}
+                      value={team.name}
+                      className={styles.suggestion}
+                      onSelect={() => {
+                        setSelectedTeam(team);
+                        setSearch(team.name);
+                        setFiltered([]);
+                      }}
+                    >
+                      {team.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
           )}
         </div>
         <div
@@ -114,33 +129,37 @@ export default function AddPingasPanel() {
           onKeyDown={handleAmountKey}
           aria-label="Quantidade"
         >
-          <button
+          <Button
+            type="button"
+            variant="default"
             className={styles.minusBtn}
             onClick={() => setAmount((a) => Math.max(1, a - 1))}
             aria-label="Diminuir"
           >
             –
-          </button>
-          <input
+          </Button>
+          <Input
             type="number"
             min="1"
             value={amount}
             onChange={handleAmountChange}
             className={styles.amountInput}
           />
-          <button
+          <Button
+            type="button"
+            variant="default"
             className={styles.plusBtn}
             onClick={() => setAmount((a) => a + 1)}
             aria-label="Aumentar"
           >
             +
-          </button>
+          </Button>
         </div>
       </div>
 
-      <button onClick={handleAdd} className={styles.addButton}>
+      <Button type="button" onClick={handleAdd} className={styles.addButton}>
         Adicionar Pingas
-      </button>
+      </Button>
     </div>
   );
 }

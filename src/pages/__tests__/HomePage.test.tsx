@@ -127,7 +127,7 @@ describe('Home page', () => {
 
     const router = renderHome();
 
-    const leaderboardButton = await screen.findByRole('button', { name: /Ver leaderboard/i });
+    const leaderboardButton = await screen.findByRole('link', { name: /Ver leaderboard/i });
     await act(async () => {
       await userEvent.click(leaderboardButton);
     });
@@ -142,7 +142,7 @@ describe('Home page', () => {
 
     const router = renderHome();
 
-    const adminButton = await screen.findByRole('button', { name: /Painel admin/i });
+    const adminButton = await screen.findByRole('link', { name: /Painel admin/i });
     await act(async () => {
       await userEvent.click(adminButton);
     });

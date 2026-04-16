@@ -1,4 +1,7 @@
 import type { FormEvent } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Button, Card, Stack, Text } from '../ui';
 import styles from './AdminLoginCard.module.css';
 
@@ -33,38 +36,44 @@ export function AdminLoginCard({
             {title}
           </Text>
           {error ? (
-            <Text as="p" role="alert" tone="danger" className={styles.error}>
-              {error}
-            </Text>
+            <Alert variant="destructive" className={styles.error}>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
         </Stack>
         <form className={styles.form} onSubmit={onSubmit}>
-          <label className={styles.field} htmlFor="admin-login-email">
-            <span className={styles.label}>Email</span>
-            <input
-              id="admin-login-email"
-              type="email"
-              value={email}
-              onChange={(event) => onEmailChange(event.currentTarget.value)}
-              className={styles.input}
-              autoComplete="email"
-              required
-              disabled={isSubmitting}
-            />
-          </label>
-          <label className={styles.field} htmlFor="admin-login-password">
-            <span className={styles.label}>Senha</span>
-            <input
-              id="admin-login-password"
-              type="password"
-              value={password}
-              onChange={(event) => onPasswordChange(event.currentTarget.value)}
-              className={styles.input}
-              autoComplete="current-password"
-              required
-              disabled={isSubmitting}
-            />
-          </label>
+          <FieldGroup className={styles.fieldGroup}>
+            <Field className={styles.field}>
+              <FieldLabel htmlFor="admin-login-email" className={styles.label}>
+                Email
+              </FieldLabel>
+              <Input
+                id="admin-login-email"
+                type="email"
+                value={email}
+                onChange={(event) => onEmailChange(event.currentTarget.value)}
+                className={styles.input}
+                autoComplete="email"
+                required
+                disabled={isSubmitting}
+              />
+            </Field>
+            <Field className={styles.field}>
+              <FieldLabel htmlFor="admin-login-password" className={styles.label}>
+                Senha
+              </FieldLabel>
+              <Input
+                id="admin-login-password"
+                type="password"
+                value={password}
+                onChange={(event) => onPasswordChange(event.currentTarget.value)}
+                className={styles.input}
+                autoComplete="current-password"
+                required
+                disabled={isSubmitting}
+              />
+            </Field>
+          </FieldGroup>
           <div className={styles.actions}>
             <Button type="submit" fullWidth disabled={isSubmitting}>
               {submitLabel}

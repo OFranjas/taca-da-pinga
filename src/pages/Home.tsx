@@ -8,11 +8,12 @@ import {
   type ErrorInfo,
   type ReactNode,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import defaultBrandImage from '../assets/beer.svg';
 import { listSponsors, type Sponsor } from '../services/sponsors.service';
 import { observeBranding } from '../services/branding.service';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './Home.module.css';
 
@@ -68,7 +69,6 @@ class SponsorsErrorBoundary extends Component<
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const [status, setStatus] = useState<SponsorsStatus>('loading');
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -198,8 +198,8 @@ export default function Home() {
                 className={styles.sponsorCard}
                 aria-hidden="true"
               >
-                <div className={styles.skeletonBlock} />
-                <div className={styles.skeletonLine} />
+                <Skeleton className={styles.skeletonBlock} />
+                <Skeleton className={styles.skeletonLine} />
               </Card>
             ))}
           </Grid>
@@ -307,23 +307,21 @@ export default function Home() {
                 className={styles.ctaGroup}
               >
                 <Button
+                  as={Link}
+                  to="/leaderboard"
                   size="lg"
                   fullWidth
                   className={styles.ctaButton}
-                  onClick={() => {
-                    navigate('/leaderboard');
-                  }}
                 >
                   Ver leaderboard
                 </Button>
                 <Button
+                  as={Link}
+                  to="/admin"
                   size="lg"
                   variant="secondary"
                   fullWidth
                   className={styles.ctaButton}
-                  onClick={() => {
-                    navigate('/admin');
-                  }}
                 >
                   Painel admin
                 </Button>

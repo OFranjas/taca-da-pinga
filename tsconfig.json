@@ -15,7 +15,10 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "types": ["vite/client", "vitest/globals"],
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src", "vite.config.js", "eslint.config.js"],
   "exclude": ["dist", "build", "node_modules"],

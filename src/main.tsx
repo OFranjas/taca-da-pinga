@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import './globals.css';
 import './ui/theme.css';
-import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from '@/components/ui/sonner';
 
 const rootElement = document.getElementById('root');
 
@@ -18,6 +17,6 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <App />
-    <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
+    <Toaster position="bottom-right" duration={3000} />
   </React.StrictMode>
 );

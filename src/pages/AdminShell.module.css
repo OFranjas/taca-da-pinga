@@ -293,25 +293,9 @@
   padding-top: var(--ui-space-md);
 }
 
-.mobileBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(2px);
-  display: flex;
-  justify-content: flex-end;
-  z-index: 50;
-}
-
-.mobileSidebar {
-  width: min(420px, 90vw);
-  max-height: 90vh;
-  margin: auto var(--ui-space-md);
-  padding: var(--ui-space-md);
-  box-sizing: border-box;
-}
-
 .mobileSidebarCard {
+  width: min(420px, 90vw);
+  max-width: 90vw;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -326,8 +310,10 @@
 
 .mobileSidebarHeader {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: flex-start;
+  padding: 0;
 }
 
 .mobileEyebrow {
@@ -340,15 +326,10 @@
   margin-top: var(--ui-space-2xs);
 }
 
-.mobileClose {
-  background: transparent;
-  border: none;
+.mobileDescription {
   color: var(--ui-color-text-secondary);
-  font-weight: var(--ui-font-weight-bold);
-  padding: var(--ui-space-2xs);
-  cursor: pointer;
-  font-size: 1.4rem;
-  line-height: 1;
+  font-size: var(--ui-text-size-base);
+  line-height: var(--ui-line-height-relaxed);
 }
 
 .actions {
@@ -408,10 +389,6 @@
   }
 
   .mobileNavBar {
-    display: none;
-  }
-
-  .mobileBackdrop {
     display: none;
   }
 
