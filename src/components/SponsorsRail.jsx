@@ -17,7 +17,10 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
       <div className={styles.stack}>
         {items.map((item, i) => (
           <div key={`${item.alt}-${i}`} className={styles.slot}>
-            <img className={styles.logo} src={item.src} alt={item.alt} />
+            <div className={styles.imageFrame}>
+              <img className={styles.logo} src={item.src} alt={item.alt} />
+            </div>
+            <span className={styles.name}>{item.alt}</span>
           </div>
         ))}
       </div>

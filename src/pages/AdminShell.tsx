@@ -172,16 +172,6 @@ export function AdminShell<TNav extends string = string>({
                 >
                   Menu
                 </Button>
-                <div className={styles.mobileContext}>
-                  <Text as="span" variant="label" tone="muted">
-                    {activeNavLabel ? 'Secção' : 'Escolhe uma secção'}
-                  </Text>
-                  {activeNavLabel ? (
-                    <Text as="span" variant="heading" className={styles.mobileHeading}>
-                      {activeNavLabel}
-                    </Text>
-                  ) : null}
-                </div>
               </div>
               <Card variant="elevated" padding="xl" className={styles.contentCard} fullHeight>
                 <Stack gap="md" className={styles.contentHeader}>

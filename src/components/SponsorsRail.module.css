@@ -15,16 +15,24 @@
 
 .slot {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 7.25rem;
-  aspect-ratio: 16 / 9;
+  gap: 0.55rem;
   background: var(--bg-card);
   border: 1px solid #e5e7eb;
   border-radius: var(--ui-radius-sm);
-  padding: 0;
+  padding: 0.45rem;
   box-shadow: none;
   overflow: hidden;
+}
+
+.imageFrame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: calc(var(--ui-radius-sm) - 2px);
+  background: #fff;
 }
 
 .logo {
@@ -35,37 +43,58 @@
   object-fit: cover;
 }
 
-/* Tablet: one full-width row (4 items) above the table */
+.name {
+  display: block;
+  width: 100%;
+  color: var(--ui-color-text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tablet/mobile: carousel strip above or below the table */
 @media (max-width: 1024px) {
   .rail {
     position: static;
     max-width: none;
+    overflow: hidden;
   }
+
   .stack {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
     gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 0 0 0.3rem;
+    scroll-padding-inline: 0.1rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
   }
+
   .slot {
-    padding: 0;
-    min-height: 6.5rem;
+    flex: 0 0 min(18rem, 42vw);
+    scroll-snap-align: start;
   }
 }
 
-/* Mobile: 2 x 2 grid with bigger tiles */
 @media (max-width: 640px) {
   .rail {
     margin-top: 0;
   }
 
-  .stack {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
   .slot {
-    padding: 0;
-    min-height: 7rem;
+    flex-basis: min(18rem, 78vw);
   }
+
   .logo {
     min-height: 0;
+  }
+
+  .name {
+    font-size: 0.9rem;
   }
 }

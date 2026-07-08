@@ -35,6 +35,7 @@ const numberFormatter = new Intl.NumberFormat('pt-PT');
 
 const sponsorLeft = [s1, s3, s5, s7, s10, s11];
 const sponsorRight = [s2, s4, s6, s8, s9, s12];
+const skeletonRows = Array.from({ length: 8 }, (_, index) => index);
 
 type ServiceTeam = {
   id: string;
@@ -295,8 +296,19 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                 </Stack>
 
                 {!isLoaded ? (
-                  <div role="status" className={styles.feedback}>
-                    A carregar a classificação…
+                  <div
+                    role="status"
+                    className={styles.tableSkeleton}
+                    aria-label="A carregar a classificação"
+                  >
+                    <span className={styles.visuallyHidden}>A carregar a classificação...</span>
+                    {skeletonRows.map((row) => (
+                      <div key={row} className={styles.skeletonRow}>
+                        <span className={styles.skeletonRank} />
+                        <span className={styles.skeletonName} />
+                        <span className={styles.skeletonValue} />
+                      </div>
+                    ))}
                   </div>
                 ) : teams.length === 0 ? (
                   <div role="status" className={styles.feedback}>

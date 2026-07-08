@@ -165,7 +165,11 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
               className={styles.previewFrameWide}
               aria-label="Escolher logotipo principal"
             >
-              {mainPreview ? (
+              {isLoading ? (
+                <div className={styles.previewSkeleton} role="status">
+                  <span className={styles.visuallyHidden}>A carregar logotipo principal...</span>
+                </div>
+              ) : mainPreview ? (
                 <img
                   src={mainPreview}
                   alt="Prévia do logotipo principal"
@@ -206,7 +210,11 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
             </div>
             <p className={styles.constraints}>Imagens quadradas funcionam melhor</p>
             <label htmlFor="icon" className={styles.previewFrameSquare} aria-label="Escolher ícone">
-              {iconPreview ? (
+              {isLoading ? (
+                <div className={styles.previewSkeleton} role="status">
+                  <span className={styles.visuallyHidden}>A carregar ícone...</span>
+                </div>
+              ) : iconPreview ? (
                 <img src={iconPreview} alt="Prévia do ícone" className={styles.previewImageSmall} />
               ) : (
                 <div className={styles.previewPlaceholder}>

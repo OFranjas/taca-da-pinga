@@ -16,10 +16,12 @@ export default function ManageTeamsPanel() {
   const [filter, setFilter] = useState('');
   const [toDelete, setToDelete] = useState<Team | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const unsubscribe = observeTeamsOrderedByName((nextTeams: Team[]) => {
       setTeams(nextTeams);
+      setIsLoaded(true);
     });
 
     return unsubscribe;
@@ -97,27 +99,40 @@ export default function ManageTeamsPanel() {
         />
       </div>
 
-      <ul className={styles.list}>
-        {visible.map((team) => (
-          <li key={team.id} className={styles.item}>
-            <div className={styles.left}>
-              <span className={styles.dot} aria-hidden />
-              <span className={styles.teamName}>{team.name}</span>
+      {!isLoaded ? (
+        <div className={styles.skeletonList} role="status" aria-label="A carregar equipas">
+          <span className={styles.visuallyHidden}>A carregar equipas...</span>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className={styles.skeletonItem}>
+              <span className={styles.skeletonDot} />
+              <span className={styles.skeletonName} />
+              <span className={styles.skeletonPill} />
             </div>
-            <div className={styles.right}>
-              <span className={styles.countPill}>{team.pingas}</span>
-              <button
-                type="button"
-                onClick={() => setToDelete(team)}
-                className={styles.deleteBtn}
-                aria-label={`Delete ${team.name}`}
-              >
-                Eliminar
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
+      ) : (
+        <ul className={styles.list}>
+          {visible.map((team) => (
+            <li key={team.id} className={styles.item}>
+              <div className={styles.left}>
+                <span className={styles.dot} aria-hidden />
+                <span className={styles.teamName}>{team.name}</span>
+              </div>
+              <div className={styles.right}>
+                <span className={styles.countPill}>{team.pingas}</span>
+                <button
+                  type="button"
+                  onClick={() => setToDelete(team)}
+                  className={styles.deleteBtn}
+                  aria-label={`Eliminar ${team.name}`}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <ConfirmModal
         isOpen={!!toDelete}

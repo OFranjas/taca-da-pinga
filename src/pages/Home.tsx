@@ -137,51 +137,63 @@ export default function Home() {
     return branding.mainLogo ?? branding.icon ?? defaultBrandImage;
   }, [branding]);
 
-  const renderSponsorsGrid = (items: Sponsor[]) => (
-    <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid} role="list">
-      {items.map((sponsor) => {
-        const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
-        return (
-          <Card
-            key={sponsor.id}
-            variant="muted"
-            padding="lg"
-            className={styles.sponsorCard}
-            fullHeight
-            role="listitem"
-          >
-            <Stack align="center" gap="md" className={styles.sponsorCardContent}>
-              <div className={styles.sponsorImageFrame}>
-                <img
-                  src={sponsor.imageDataUrl}
-                  alt={sponsor.name}
-                  loading="lazy"
-                  className={styles.sponsorImage}
-                />
-              </div>
-              <Text as="strong" variant="label" className={styles.sponsorName}>
-                {sponsor.name}
-              </Text>
-              {hasLink ? (
-                <Button
-                  as="a"
-                  href={sponsor.link ?? '#'}
-                  target="_blank"
-                  rel="noreferrer"
-                  variant="secondary"
-                  size="sm"
-                  className={styles.sponsorLink}
-                  aria-label={`Abrir o site de ${sponsor.name} em uma nova aba`}
-                >
-                  Visitar site
-                </Button>
-              ) : null}
-            </Stack>
-          </Card>
-        );
-      })}
-    </Grid>
-  );
+  const renderSponsorsGrid = (items: Sponsor[]) => {
+    const carouselItems = items.length > 1 ? [...items, ...items] : items;
+
+    return (
+      <div className={styles.sponsorCarousel} role="list" aria-label="Patrocinadores">
+        <div
+          className={`${styles.sponsorTrack} ${
+            items.length > 1 ? styles.sponsorTrackAnimated : ''
+          }`}
+        >
+          {carouselItems.map((sponsor, index) => {
+            const isDuplicate = index >= items.length;
+            const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
+            return (
+              <Card
+                key={`${sponsor.id}-${index}`}
+                variant="muted"
+                padding="lg"
+                className={styles.sponsorCard}
+                fullHeight
+                role={isDuplicate ? 'presentation' : 'listitem'}
+                aria-hidden={isDuplicate ? 'true' : undefined}
+              >
+                <Stack align="center" gap="md" className={styles.sponsorCardContent}>
+                  <div className={styles.sponsorImageFrame}>
+                    <img
+                      src={sponsor.imageDataUrl}
+                      alt={isDuplicate ? '' : sponsor.name}
+                      loading="lazy"
+                      className={styles.sponsorImage}
+                    />
+                  </div>
+                  <Text as="strong" variant="label" className={styles.sponsorName}>
+                    {sponsor.name}
+                  </Text>
+                  {hasLink && !isDuplicate ? (
+                    <Button
+                      as="a"
+                      href={sponsor.link ?? '#'}
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="secondary"
+                      size="sm"
+                      className={styles.sponsorLink}
+                      aria-label={`Abrir o site de ${sponsor.name} em uma nova aba`}
+                    >
+                      Visitar site
+                    </Button>
+                  ) : null}
+                </Stack>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   const renderSponsorsContent = () => {
     if (status === 'loading') {

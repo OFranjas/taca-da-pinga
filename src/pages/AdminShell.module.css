@@ -234,28 +234,21 @@
 }
 
 .mobileNavBar {
-  position: sticky;
-  top: calc(var(--ui-header-height) + var(--ui-space-xs));
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ui-space-sm);
-  padding: var(--ui-space-sm) var(--ui-space-md);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: var(--ui-radius-lg);
+  position: fixed;
+  top: calc(var(--ui-header-height) + var(--ui-space-sm));
+  left: var(--ui-space-md);
+  z-index: 20;
+  display: inline-flex;
+  width: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  pointer-events: none;
+}
+
+.mobileNavBar > * {
+  pointer-events: auto;
   box-shadow: var(--ui-shadow-soft);
-}
-
-.mobileContext {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ui-space-2xs);
-}
-
-.mobileHeading {
-  font-size: 1.1rem;
 }
 
 .contentCard {

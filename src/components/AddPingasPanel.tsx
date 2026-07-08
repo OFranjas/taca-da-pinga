@@ -21,12 +21,14 @@ export default function AddPingasPanel() {
   const [selectedTeam, setSelectedTeam] = useState<TeamOption | null>(null);
   const [amount, setAmount] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   // Load teams
   useEffect(() => {
     const unsubscribe = observeTeamsOrderedByName((nextTeams: TeamOption[]) => {
       setTeams(nextTeams);
+      setIsLoaded(true);
     });
 
     return unsubscribe;
@@ -95,7 +97,7 @@ export default function AddPingasPanel() {
           <input
             id="team-search"
             type="text"
-            placeholder="Procurar equipa"
+            placeholder={isLoaded ? 'Procurar equipa' : 'A carregar equipas...'}
             aria-label="Procurar equipa"
             autoComplete="off"
             value={search}
@@ -104,7 +106,16 @@ export default function AddPingasPanel() {
               setSelectedTeam(null);
             }}
             className={styles.searchInput}
+            disabled={!isLoaded || isSubmitting}
           />
+          {!isLoaded ? (
+            <div className={styles.searchSkeleton} role="status" aria-label="A carregar equipas">
+              <span className={styles.visuallyHidden}>A carregar equipas...</span>
+              <span />
+              <span />
+              <span />
+            </div>
+          ) : null}
           {filtered.length > 0 && (
             <div className={styles.suggestions}>
               {filtered.slice(0, 6).map((t) => (

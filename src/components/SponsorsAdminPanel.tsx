@@ -26,11 +26,20 @@ export default function SponsorsAdminPanel() {
   const [isSaving, setIsSaving] = useState(false);
   const [busySponsorId, setBusySponsorId] = useState<string | null>(null);
   const [sponsorToDelete, setSponsorToDelete] = useState<Sponsor | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = observeSponsors(setSponsors, {}, () => {
-      toast.error('Não foi possível carregar patrocinadores');
-    });
+    const unsubscribe = observeSponsors(
+      (nextSponsors) => {
+        setSponsors(nextSponsors);
+        setIsLoaded(true);
+      },
+      {},
+      () => {
+        setIsLoaded(true);
+        toast.error('Não foi possível carregar patrocinadores');
+      }
+    );
 
     return () => {
       unsubscribe?.();
@@ -49,6 +58,7 @@ export default function SponsorsAdminPanel() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formElement = event.currentTarget;
     const name = form.name.trim();
     if (!name) {
       toast.error('Indica o nome do patrocinador');
@@ -67,7 +77,7 @@ export default function SponsorsAdminPanel() {
       });
       toast.success('Patrocinador criado');
       setForm(initialForm);
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Não foi possível criar patrocinador';
@@ -142,48 +152,63 @@ export default function SponsorsAdminPanel() {
         </button>
       </form>
 
-      <div className={styles.summary} aria-live="polite">
-        <strong>{activeSponsors.length}</strong> visíveis de {sponsors.length}
-      </div>
+      {isLoaded ? (
+        <div className={styles.summary} aria-live="polite">
+          <strong>{activeSponsors.length}</strong> visíveis de {sponsors.length}
+        </div>
+      ) : null}
 
-      <ul className={styles.list}>
-        {sponsors.map((sponsor) => {
-          const isBusy = busySponsorId === sponsor.id;
-          return (
-            <li key={sponsor.id} className={styles.item}>
-              <div className={styles.logoFrame}>
-                <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
-              </div>
-              <div className={styles.itemCopy}>
-                <strong>{sponsor.name}</strong>
-                <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
-              </div>
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.secondaryButton}
-                  onClick={() => {
-                    void toggleSponsor(sponsor);
-                  }}
-                  disabled={isBusy}
-                >
-                  {sponsor.active ? 'Ocultar' : 'Mostrar'}
-                </button>
-                <button
-                  type="button"
-                  className={styles.dangerButton}
-                  onClick={() => {
-                    setSponsorToDelete(sponsor);
-                  }}
-                  disabled={isBusy}
-                >
-                  Eliminar
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {!isLoaded ? (
+        <div className={styles.skeletonList} role="status" aria-label="A carregar patrocinadores">
+          <span className={styles.visuallyHidden}>A carregar patrocinadores...</span>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className={styles.skeletonItem}>
+              <span className={styles.skeletonLogo} />
+              <span className={styles.skeletonCopy} />
+              <span className={styles.skeletonActions} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ul className={styles.list}>
+          {sponsors.map((sponsor) => {
+            const isBusy = busySponsorId === sponsor.id;
+            return (
+              <li key={sponsor.id} className={styles.item}>
+                <div className={styles.logoFrame}>
+                  <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
+                </div>
+                <div className={styles.itemCopy}>
+                  <strong>{sponsor.name}</strong>
+                  <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
+                </div>
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={styles.secondaryButton}
+                    onClick={() => {
+                      void toggleSponsor(sponsor);
+                    }}
+                    disabled={isBusy}
+                  >
+                    {sponsor.active ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.dangerButton}
+                    onClick={() => {
+                      setSponsorToDelete(sponsor);
+                    }}
+                    disabled={isBusy}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       <ConfirmModal
         isOpen={Boolean(sponsorToDelete)}
