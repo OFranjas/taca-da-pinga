@@ -106,6 +106,7 @@
 
 .sponsorCardContent {
   width: 100%;
+  min-height: 100%;
 }
 
 .sponsorImageFrame {
@@ -113,9 +114,9 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 6rem;
+  min-height: 7rem;
   aspect-ratio: 16 / 9;
-  padding: var(--ui-space-md);
+  padding: var(--ui-space-sm);
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: var(--ui-radius-sm);
   background: var(--ui-color-surface);
@@ -125,7 +126,7 @@
 .sponsorImage {
   display: block;
   width: 100%;
-  max-width: 220px;
+  height: 100%;
   max-height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.12));
@@ -134,6 +135,16 @@
 
 .sponsorCard:hover .sponsorImage {
   transform: scale(1.04);
+}
+
+.sponsorName {
+  display: block;
+  max-width: 100%;
+  color: var(--ui-color-text-primary);
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sponsorLink {

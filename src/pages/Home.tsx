@@ -159,6 +159,9 @@ export default function Home() {
                   className={styles.sponsorImage}
                 />
               </div>
+              <Text as="strong" variant="label" className={styles.sponsorName}>
+                {sponsor.name}
+              </Text>
               {hasLink ? (
                 <Button
                   as="a"
