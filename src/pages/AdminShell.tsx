@@ -5,6 +5,7 @@ import styles from './AdminShell.module.css';
 export type AdminShellNavItem<TNav extends string = string> = {
   id: TNav;
   label: string;
+  mobileLabel?: string;
   description?: string;
 };
 
@@ -109,6 +110,44 @@ export function AdminShell<TNav extends string = string>({
     </ul>
   );
 
+  const renderMobileTabs = () => (
+    <div className={styles.mobileTabRail}>
+      <div className={styles.mobileTabs} role="tablist" aria-label="Secções do painel">
+        {navItems.map((item) => {
+          const isActive = item.id === activeNav;
+          const className = isActive
+            ? `${styles.mobileTab} ${styles.mobileTabActive}`
+            : styles.mobileTab;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-label={item.label}
+              aria-selected={isActive}
+              onClick={() => handleSelectNav(item.id)}
+              className={className}
+            >
+              {item.mobileLabel ?? item.label}
+            </button>
+          );
+        })}
+      </div>
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => setSidebarOpen(true)}
+        aria-expanded={isSidebarOpen}
+        aria-controls={mobilePanelId}
+        aria-haspopup="dialog"
+        className={styles.mobileMoreButton}
+      >
+        Mais
+      </Button>
+    </div>
+  );
+
   return (
     <>
       <Page tone="frost" width="page" padding="md" className={styles.page}>
@@ -161,18 +200,7 @@ export function AdminShell<TNav extends string = string>({
               </Card>
             </div>
             <div className={styles.main}>
-              <div className={styles.mobileNavBar}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setSidebarOpen(true)}
-                  aria-expanded={isSidebarOpen}
-                  aria-controls={mobilePanelId}
-                  aria-haspopup="dialog"
-                >
-                  Menu
-                </Button>
-              </div>
+              {renderMobileTabs()}
               <Card variant="elevated" padding="xl" className={styles.contentCard} fullHeight>
                 <Stack gap="md" className={styles.contentHeader}>
                   <Stack gap="sm">

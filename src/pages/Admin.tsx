@@ -21,14 +21,17 @@ const NAV_ITEMS: AdminShellNavItem<AdminSection>[] = [
   {
     id: ADMIN_SECTIONS.Add,
     label: 'Registar pingas',
+    mobileLabel: 'Pingas',
   },
   {
     id: ADMIN_SECTIONS.Manage,
     label: 'Gerir Equipas',
+    mobileLabel: 'Equipas',
   },
   {
     id: ADMIN_SECTIONS.Sponsors,
     label: 'Gerir Patrocinadores',
+    mobileLabel: 'Patrocínios',
   },
 ];
 

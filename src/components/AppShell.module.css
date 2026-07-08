@@ -52,10 +52,12 @@
 
 .contentSection {
   width: 100%;
+  min-width: 0;
 }
 
 .contentGrid {
   width: 100%;
+  min-width: 0;
   align-content: start;
 }
 

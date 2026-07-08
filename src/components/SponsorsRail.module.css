@@ -3,6 +3,7 @@
   top: 72px;
   align-self: start;
   width: 100%;
+  min-width: 0;
   max-width: 240px; /* matches the rail column */
   padding: 0;
 }
@@ -11,6 +12,7 @@
   display: grid;
   grid-auto-rows: min-content;
   gap: 14px;
+  min-width: 0;
 }
 
 .slot {
@@ -25,6 +27,7 @@
   padding: 0.45rem;
   box-shadow: none;
   overflow: hidden;
+  min-width: 0;
 }
 
 .imageFrame {
@@ -60,23 +63,28 @@
 @media (max-width: 1024px) {
   .rail {
     position: static;
-    max-width: none;
+    width: 100%;
+    max-width: 100%;
     overflow: hidden;
   }
 
   .stack {
-    display: flex;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, min(18rem, 82%));
     gap: 12px;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     padding: 0 0 0.3rem;
-    scroll-padding-inline: 0.1rem;
+    scroll-padding-inline: 0;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
+    width: 100%;
+    max-width: 100%;
   }
 
   .slot {
-    flex: 0 0 min(18rem, 42vw);
+    width: 100%;
     scroll-snap-align: start;
   }
 }
@@ -86,8 +94,8 @@
     margin-top: 0;
   }
 
-  .slot {
-    flex-basis: min(18rem, 78vw);
+  .stack {
+    grid-auto-columns: minmax(0, min(20rem, 86%));
   }
 
   .logo {

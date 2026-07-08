@@ -7,6 +7,8 @@
   );
   column-gap: var(--ui-space-xs);
   align-items: center;
+  width: 100%;
+  min-width: 0;
   height: var(--leaderboard-row-height, 80px);
   padding: 0 var(--ui-space-md);
   border-radius: var(--ui-radius-sm);
@@ -109,6 +111,7 @@
   font-weight: var(--ui-font-weight-extrabold);
   font-variant-numeric: tabular-nums;
   color: var(--row-score-color, var(--ui-color-text-primary));
+  min-width: 0;
 }
 
 .scoreLabel {
@@ -121,9 +124,9 @@
 @media (max-width: 640px) {
   .root {
     height: 64px;
-    padding-left: var(--ui-space-sm);
-    padding-right: var(--ui-space-sm);
-    column-gap: var(--ui-space-xs);
+    padding-left: var(--ui-space-xs);
+    padding-right: var(--ui-space-xs);
+    column-gap: var(--ui-space-2xs);
   }
 
   .rankBadge {
@@ -137,7 +140,7 @@
   }
 
   .scoreValue {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .scoreLabel {

@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: var(--ui-space-lg);
   width: 100%;
+  min-width: 0;
 }
 
 .displayRoot {
@@ -19,6 +20,7 @@
 .layout {
   display: grid;
   gap: var(--ui-space-xl);
+  min-width: 0;
   grid-template-areas:
     'content'
     'top'
@@ -46,6 +48,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-lg);
+  min-width: 0;
 }
 
 .introSection {
@@ -64,6 +67,7 @@
 
 .tableCard {
   gap: var(--ui-space-md);
+  min-width: 0;
   border-radius: var(--ui-radius-lg);
   box-shadow: none;
 }
@@ -172,10 +176,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-sm);
+  width: 100%;
+  min-width: 0;
 }
 
 .scrollRegion {
   position: relative;
+  width: 100%;
+  min-width: 0;
   max-height: min(72vh, 760px);
   overflow-y: auto;
   padding: var(--ui-space-2xs);
@@ -206,6 +214,7 @@
   background: var(--ui-color-surface);
   box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.22);
+  min-width: 0;
 }
 
 .headerCell {
@@ -230,6 +239,7 @@
 .virtualRoot {
   position: relative;
   width: 100%;
+  min-width: 0;
 }
 
 .virtualInner {
@@ -415,7 +425,7 @@
   }
 
   .tableSurface {
-    --leaderboard-grid-template: 3rem minmax(0, 1fr) minmax(5.25rem, 5.75rem);
+    --leaderboard-grid-template: 2.75rem minmax(0, 1fr) minmax(4.25rem, 4.75rem);
     --leaderboard-row-height: 64px;
     --leaderboard-row-gap: 7px;
   }

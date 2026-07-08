@@ -96,29 +96,36 @@
 
 .sponsorGrid {
   width: 100%;
+  min-width: 0;
 }
 
 .sponsorCarousel {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 0 var(--ui-space-xs);
-  scroll-padding-inline: var(--ui-space-xs);
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 0;
   scroll-snap-type: x mandatory;
   scrollbar-width: thin;
 }
 
 .sponsorTrack {
   --sponsor-gap: var(--ui-space-md);
-  display: flex;
-  width: max-content;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 100%);
+  width: 100%;
+  min-width: 0;
   gap: var(--sponsor-gap);
 }
 
 .sponsorCard {
-  flex: 0 0 min(78vw, 20rem);
   align-items: center;
   justify-content: center;
+  width: 100%;
+  min-width: 0;
   text-align: center;
   scroll-snap-align: start;
 }
@@ -172,14 +179,14 @@
 }
 
 @media (min-width: 768px) {
-  .sponsorCard {
-    flex-basis: min(34vw, 21rem);
+  .sponsorTrack {
+    grid-auto-columns: minmax(18rem, min(34vw, 21rem));
   }
 }
 
 @media (min-width: 1180px) {
-  .sponsorCard {
-    flex-basis: 18rem;
+  .sponsorTrack {
+    grid-auto-columns: 18rem;
   }
 }
 
