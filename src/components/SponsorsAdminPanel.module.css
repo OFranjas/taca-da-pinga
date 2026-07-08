@@ -84,12 +84,23 @@
   font-weight: var(--ui-font-weight-extrabold);
   min-height: 2.75rem;
   padding: 0 var(--ui-space-md);
+  transition:
+    transform var(--ui-transition-fast),
+    box-shadow var(--ui-transition-base),
+    background var(--ui-transition-base),
+    color var(--ui-transition-base);
 }
 
 .primaryButton {
-  background: var(--ui-color-accent-strong);
+  background: linear-gradient(120deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.9));
   color: var(--ui-color-text-inverted);
-  box-shadow: none;
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.22);
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px rgba(34, 197, 94, 0.28);
 }
 
 .secondaryButton {

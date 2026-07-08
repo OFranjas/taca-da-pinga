@@ -14,19 +14,25 @@
 }
 
 .slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5.25rem;
+  aspect-ratio: 16 / 9;
   background: var(--bg-card);
   border: 1px solid #e5e7eb;
   border-radius: var(--ui-radius-sm);
   padding: 12px;
   box-shadow: none;
+  overflow: hidden;
 }
 
 .logo {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  max-height: 100%;
   object-fit: contain;
-  aspect-ratio: 2.6 / 1; /* wide tile so logos are visually larger */
 }
 
 /* Tablet: one full-width row (4 items) above the table */
@@ -41,6 +47,7 @@
   }
   .slot {
     padding: 10px;
+    min-height: 4.75rem;
   }
 }
 
@@ -56,9 +63,9 @@
   }
   .slot {
     padding: 12px;
+    min-height: 5.5rem;
   }
   .logo {
-    aspect-ratio: 2.8 / 1;
-    min-height: 54px;
+    min-height: 0;
   }
 }

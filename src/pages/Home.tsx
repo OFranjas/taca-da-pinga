@@ -151,12 +151,14 @@ export default function Home() {
             role="listitem"
           >
             <Stack align="center" gap="md" className={styles.sponsorCardContent}>
-              <img
-                src={sponsor.imageDataUrl}
-                alt={sponsor.name}
-                loading="lazy"
-                className={styles.sponsorImage}
-              />
+              <div className={styles.sponsorImageFrame}>
+                <img
+                  src={sponsor.imageDataUrl}
+                  alt={sponsor.name}
+                  loading="lazy"
+                  className={styles.sponsorImage}
+                />
+              </div>
               {hasLink ? (
                 <Button
                   as="a"
@@ -170,11 +172,7 @@ export default function Home() {
                 >
                   Visitar site
                 </Button>
-              ) : (
-                <Text as="span" variant="label" tone="secondary" align="center">
-                  Sem link disponível
-                </Text>
-              )}
+              ) : null}
             </Stack>
           </Card>
         );

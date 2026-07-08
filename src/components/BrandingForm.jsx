@@ -160,7 +160,11 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
               ) : null}
             </div>
             <p className={styles.constraints}>JPEG/PNG até 600x600px</p>
-            <div className={styles.previewFrameWide}>
+            <label
+              htmlFor="mainLogo"
+              className={styles.previewFrameWide}
+              aria-label="Escolher logotipo principal"
+            >
               {mainPreview ? (
                 <img
                   src={mainPreview}
@@ -172,7 +176,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                   <span>Escolhe um logotipo</span>
                 </div>
               )}
-            </div>
+            </label>
             <div className={styles.uploadRow}>
               <input
                 id="mainLogo"
@@ -182,9 +186,6 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 className={styles.fileInput}
                 onChange={handleMainLogoChange}
               />
-              <label htmlFor="mainLogo" className={styles.uploadButton}>
-                Escolher imagem
-              </label>
               {mainLogoFile ? <span className={styles.fileName}>{mainLogoFile.name}</span> : null}
             </div>
           </div>
@@ -204,7 +205,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
               ) : null}
             </div>
             <p className={styles.constraints}>Imagens quadradas funcionam melhor</p>
-            <div className={styles.previewFrameSquare}>
+            <label htmlFor="icon" className={styles.previewFrameSquare} aria-label="Escolher ícone">
               {iconPreview ? (
                 <img src={iconPreview} alt="Prévia do ícone" className={styles.previewImageSmall} />
               ) : (
@@ -212,7 +213,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                   <span>Escolhe um ícone</span>
                 </div>
               )}
-            </div>
+            </label>
             <div className={styles.uploadRow}>
               <input
                 id="icon"
@@ -222,9 +223,6 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 className={styles.fileInput}
                 onChange={handleIconChange}
               />
-              <label htmlFor="icon" className={styles.uploadButton}>
-                Escolher imagem
-              </label>
               {iconFile ? <span className={styles.fileName}>{iconFile.name}</span> : null}
             </div>
           </div>
