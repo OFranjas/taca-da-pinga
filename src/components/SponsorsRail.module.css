@@ -51,13 +51,14 @@
   }
 
   .stack {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
   .slot {
-    padding: 8px;
+    padding: 12px;
   }
   .logo {
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 2.8 / 1;
+    min-height: 54px;
   }
 }

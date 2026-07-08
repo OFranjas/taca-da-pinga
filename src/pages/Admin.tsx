@@ -24,11 +24,11 @@ const NAV_ITEMS: AdminShellNavItem<AdminSection>[] = [
   },
   {
     id: ADMIN_SECTIONS.Manage,
-    label: 'Equipas',
+    label: 'Gerir Equipas',
   },
   {
     id: ADMIN_SECTIONS.Sponsors,
-    label: 'Patrocinadores',
+    label: 'Gerir Patrocinadores',
   },
 ];
 

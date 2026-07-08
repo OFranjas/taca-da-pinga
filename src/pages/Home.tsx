@@ -292,8 +292,7 @@ export default function Home() {
                   Taça da Pinga
                 </Text>
                 <Text as="p" variant="subtitle" tone="secondary" align="center">
-                  Acompanhe o campeonato, veja o ranking das equipas e mantenha tudo organizado com
-                  o painel administrativo.
+                  A classificação oficial do torneio, sempre pronta para jogadores, bancada e ecrã.
                 </Text>
               </Stack>
               <Stack
@@ -345,10 +344,6 @@ export default function Home() {
               </Text>
               <Text as="h2" variant="heading">
                 Quem torna a Taça da Pinga possível
-              </Text>
-              <Text as="p" tone="secondary">
-                Logos e links são atualizados automaticamente a partir do painel de administração.
-                Obrigado às marcas que apoiam o torneio.
               </Text>
             </Stack>
             {renderSponsorsContent()}

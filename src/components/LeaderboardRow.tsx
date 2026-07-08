@@ -30,7 +30,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#854d0e',
         meterStart: '#facc15',
         meterEnd: '#f59e0b',
-        scoreColor: '#92400e',
+        scoreColor: '#b45309',
       };
     case 2:
       return {
@@ -39,7 +39,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#1f2937',
         meterStart: '#cbd5f5',
         meterEnd: '#94a3b8',
-        scoreColor: '#1e293b',
+        scoreColor: '#64748b',
       };
     case 3:
       return {

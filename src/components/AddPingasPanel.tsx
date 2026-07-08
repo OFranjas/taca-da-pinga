@@ -145,12 +145,13 @@ export default function AddPingasPanel() {
             </button>
             <input
               id="pinga-amount"
-              type="number"
-              min={MIN_PINGAS}
-              max={MAX_PINGAS}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               aria-label="Quantidade de pingas"
               value={amount}
               onChange={handleAmountChange}
+              onFocus={(event) => event.currentTarget.select()}
               className={styles.amountInput}
               disabled={isSubmitting}
             />

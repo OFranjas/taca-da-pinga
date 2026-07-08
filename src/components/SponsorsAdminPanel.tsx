@@ -6,6 +6,7 @@ import {
   updateSponsor,
   type Sponsor,
 } from '../services/sponsors.service';
+import ConfirmModal from './ConfirmModal';
 import { toast } from 'react-toastify';
 import styles from './SponsorsAdminPanel.module.css';
 
@@ -24,6 +25,7 @@ export default function SponsorsAdminPanel() {
   const [form, setForm] = useState<SponsorFormState>(initialForm);
   const [isSaving, setIsSaving] = useState(false);
   const [busySponsorId, setBusySponsorId] = useState<string | null>(null);
+  const [sponsorToDelete, setSponsorToDelete] = useState<Sponsor | null>(null);
 
   useEffect(() => {
     const unsubscribe = observeSponsors(setSponsors, {}, () => {
@@ -89,11 +91,16 @@ export default function SponsorsAdminPanel() {
     }
   }, []);
 
-  const removeSponsor = useCallback(async (sponsor: Sponsor) => {
-    setBusySponsorId(sponsor.id);
+  const removeSponsor = useCallback(async () => {
+    if (!sponsorToDelete) {
+      return;
+    }
+
+    setBusySponsorId(sponsorToDelete.id);
     try {
-      await deleteSponsor(sponsor.id);
+      await deleteSponsor(sponsorToDelete.id);
       toast.info('Patrocinador eliminado');
+      setSponsorToDelete(null);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Não foi possível eliminar patrocinador';
@@ -101,7 +108,7 @@ export default function SponsorsAdminPanel() {
     } finally {
       setBusySponsorId(null);
     }
-  }, []);
+  }, [sponsorToDelete]);
 
   return (
     <div className={styles.panel}>
@@ -166,7 +173,7 @@ export default function SponsorsAdminPanel() {
                   type="button"
                   className={styles.dangerButton}
                   onClick={() => {
-                    void removeSponsor(sponsor);
+                    setSponsorToDelete(sponsor);
                   }}
                   disabled={isBusy}
                 >
@@ -177,6 +184,19 @@ export default function SponsorsAdminPanel() {
           );
         })}
       </ul>
+
+      <ConfirmModal
+        isOpen={Boolean(sponsorToDelete)}
+        title="Eliminar patrocinador?"
+        message={
+          sponsorToDelete ? `Vais remover ${sponsorToDelete.name} da lista de patrocinadores.` : ''
+        }
+        confirmLabel="Eliminar"
+        onCancel={() => setSponsorToDelete(null)}
+        onConfirm={() => {
+          void removeSponsor();
+        }}
+      />
     </div>
   );
 }
