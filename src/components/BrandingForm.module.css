@@ -198,22 +198,28 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .saveButton {
-  background: var(--accent-green, #22c55e);
-  color: #fff;
-  border: none;
-  padding: 0.85rem 1.6rem;
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  min-width: 13.5rem;
+  padding: 0 var(--ui-space-md);
+  background: linear-gradient(120deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.9));
+  color: var(--ui-color-text-inverted);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  border-radius: var(--ui-radius-full);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--ui-font-weight-extrabold);
   cursor: pointer;
   transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.25);
+    background var(--ui-transition-base),
+    transform var(--ui-transition-fast),
+    box-shadow var(--ui-transition-base);
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.22);
 }
 
 .saveButton:disabled {
@@ -223,9 +229,8 @@
 }
 
 .saveButton:not(:disabled):hover {
-  background: #16a34a;
   transform: translateY(-1px);
-  box-shadow: 0 16px 30px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 16px 36px rgba(34, 197, 94, 0.28);
 }
 
 @media (max-width: 720px) {

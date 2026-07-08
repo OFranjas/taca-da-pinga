@@ -234,6 +234,9 @@
 }
 
 .mobileNavBar {
+  position: sticky;
+  top: calc(var(--ui-header-height) + var(--ui-space-xs));
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
