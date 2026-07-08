@@ -221,7 +221,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
   const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
 
-  const sponsorColumns = useMemo(() => {
+  const leaderboardSponsors = useMemo(() => {
     const fallbackSponsors = [...sponsorLeft, ...sponsorRight].map((imageDataUrl, index) => ({
       id: `fallback-${index}`,
       name: `Patrocinador ${index + 1}`,
@@ -229,15 +229,19 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       active: true,
       order: index,
     }));
-    const activeSponsors = sponsors.length > 0 ? sponsors : fallbackSponsors;
-    return activeSponsors.reduce(
+
+    return sponsors.length > 0 ? sponsors : fallbackSponsors;
+  }, [sponsors]);
+
+  const sponsorColumns = useMemo(() => {
+    return leaderboardSponsors.reduce(
       (columns, sponsor, index) => {
         columns[index % 2 === 0 ? 0 : 1].push(sponsor);
         return columns;
       },
       [[], []] as [Sponsor[], Sponsor[]]
     );
-  }, [sponsors]);
+  }, [leaderboardSponsors]);
 
   const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
 
@@ -423,6 +427,10 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                 )}
               </Card>
             </Section>
+
+            <div className={styles.mobileSponsors}>
+              <SponsorsRail sponsors={leaderboardSponsors} side="left" />
+            </div>
           </div>
 
           <div className={`${styles.railSlot} ${styles.rightRail}`}>

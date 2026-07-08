@@ -37,6 +37,10 @@
   grid-area: bottom;
 }
 
+.mobileSponsors {
+  display: block;
+}
+
 .content {
   grid-area: content;
   display: flex;
@@ -289,8 +293,19 @@
     grid-area: right;
   }
 
+  .mobileSponsors {
+    display: none;
+  }
+
   .tableHeaderMeta {
     flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 1023px) {
+  .leftRail,
+  .rightRail {
+    display: none;
   }
 }
 

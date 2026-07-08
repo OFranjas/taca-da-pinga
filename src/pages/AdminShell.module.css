@@ -234,21 +234,23 @@
 }
 
 .mobileNavBar {
-  position: fixed;
-  top: calc(var(--ui-header-height) + var(--ui-space-sm));
-  left: var(--ui-space-md);
+  position: sticky;
+  top: calc(var(--ui-header-height) + var(--ui-space-xs));
   z-index: 20;
-  display: inline-flex;
-  width: auto;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: var(--ui-space-xs);
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-soft);
+  backdrop-filter: blur(12px);
 }
 
 .mobileNavBar > * {
-  pointer-events: auto;
-  box-shadow: var(--ui-shadow-soft);
+  box-shadow: none;
 }
 
 .contentCard {

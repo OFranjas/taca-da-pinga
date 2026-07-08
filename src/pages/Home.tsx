@@ -138,33 +138,25 @@ export default function Home() {
   }, [branding]);
 
   const renderSponsorsGrid = (items: Sponsor[]) => {
-    const carouselItems = items.length > 1 ? [...items, ...items] : items;
-
     return (
       <div className={styles.sponsorCarousel} role="list" aria-label="Patrocinadores">
-        <div
-          className={`${styles.sponsorTrack} ${
-            items.length > 1 ? styles.sponsorTrackAnimated : ''
-          }`}
-        >
-          {carouselItems.map((sponsor, index) => {
-            const isDuplicate = index >= items.length;
+        <div className={styles.sponsorTrack}>
+          {items.map((sponsor) => {
             const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
             return (
               <Card
-                key={`${sponsor.id}-${index}`}
+                key={sponsor.id}
                 variant="muted"
                 padding="lg"
                 className={styles.sponsorCard}
                 fullHeight
-                role={isDuplicate ? 'presentation' : 'listitem'}
-                aria-hidden={isDuplicate ? 'true' : undefined}
+                role="listitem"
               >
                 <Stack align="center" gap="md" className={styles.sponsorCardContent}>
                   <div className={styles.sponsorImageFrame}>
                     <img
                       src={sponsor.imageDataUrl}
-                      alt={isDuplicate ? '' : sponsor.name}
+                      alt={sponsor.name}
                       loading="lazy"
                       className={styles.sponsorImage}
                     />
@@ -172,7 +164,7 @@ export default function Home() {
                   <Text as="strong" variant="label" className={styles.sponsorName}>
                     {sponsor.name}
                   </Text>
-                  {hasLink && !isDuplicate ? (
+                  {hasLink ? (
                     <Button
                       as="a"
                       href={sponsor.link ?? '#'}
