@@ -13,7 +13,7 @@ import Header from '../components/Header';
 import defaultBrandImage from '../assets/beer.svg';
 import { listSponsors, type Sponsor } from '../services/sponsors.service';
 import { observeBranding } from '../services/branding.service';
-import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
+import { Button, Card, Page, Section, Stack, Text } from '../ui';
 import styles from './Home.module.css';
 
 const DEFAULT_ERROR_MESSAGE = 'Não foi possível carregar os patrocinadores.';
@@ -74,6 +74,7 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [branding, setBranding] = useState<BrandingState | null>(null);
   const isMountedRef = useRef(false);
+  const sponsorCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const fetchSponsors = useCallback(async () => {
     if (!isMountedRef.current) {
@@ -137,9 +138,44 @@ export default function Home() {
     return branding.mainLogo ?? branding.icon ?? defaultBrandImage;
   }, [branding]);
 
+  useEffect(() => {
+    if (status !== 'success' || sponsors.length <= 1) {
+      return;
+    }
+
+    const carousel = sponsorCarouselRef.current;
+    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      const maxScrollLeft = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
+      if (maxScrollLeft <= 0) {
+        return;
+      }
+
+      const cards = Array.from(carousel.querySelectorAll<HTMLElement>(`.${styles.sponsorCard}`));
+      const currentLeft = carousel.scrollLeft;
+      const nextCard = cards.find((card) => card.offsetLeft > currentLeft + 8);
+      const nextLeft = nextCard ? nextCard.offsetLeft : 0;
+
+      carousel.scrollTo({
+        left: Math.min(nextLeft, maxScrollLeft),
+        behavior: 'smooth',
+      });
+    }, 4200);
+
+    return () => window.clearInterval(intervalId);
+  }, [sponsors.length, status]);
+
   const renderSponsorsGrid = (items: Sponsor[]) => {
     return (
-      <div className={styles.sponsorCarousel} role="list" aria-label="Patrocinadores">
+      <div
+        className={styles.sponsorCarousel}
+        role="list"
+        aria-label="Patrocinadores"
+        ref={sponsorCarouselRef}
+      >
         <div className={styles.sponsorTrack}>
           {items.map((sponsor) => {
             const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
@@ -194,20 +230,20 @@ export default function Home() {
           <Text as="span" role="status" className={styles.visuallyHidden}>
             Carregando patrocinadores...
           </Text>
-          <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid}>
-            {Array.from({ length: 4 }).map((_, index) => (
+          <div className={styles.skeletonGrid}>
+            {Array.from({ length: 3 }).map((_, index) => (
               <Card
                 key={index}
                 variant="muted"
                 padding="lg"
-                className={styles.sponsorCard}
+                className={styles.skeletonCard}
                 aria-hidden="true"
               >
                 <div className={styles.skeletonBlock} />
                 <div className={styles.skeletonLine} />
               </Card>
             ))}
-          </Grid>
+          </div>
         </div>
       );
     }

@@ -104,27 +104,27 @@
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0 0 var(--ui-space-xs);
+  padding: 0 var(--ui-space-2xs) var(--ui-space-xs);
   overscroll-behavior-x: contain;
   scroll-padding-inline: 0;
   scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
   scrollbar-width: thin;
 }
 
 .sponsorTrack {
   --sponsor-gap: var(--ui-space-md);
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 100%);
-  width: 100%;
+  display: flex;
+  width: max-content;
   min-width: 0;
   gap: var(--sponsor-gap);
 }
 
 .sponsorCard {
+  flex: 0 0 min(21rem, calc(100vw - 5rem));
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: min(21rem, calc(100vw - 5rem));
   min-width: 0;
   text-align: center;
   scroll-snap-align: start;
@@ -179,19 +179,34 @@
 }
 
 @media (min-width: 768px) {
-  .sponsorTrack {
-    grid-auto-columns: minmax(18rem, min(34vw, 21rem));
+  .sponsorCard {
+    flex-basis: min(34vw, 21rem);
+    width: min(34vw, 21rem);
   }
 }
 
 @media (min-width: 1180px) {
-  .sponsorTrack {
-    grid-auto-columns: 18rem;
+  .sponsorCard {
+    flex-basis: 18rem;
+    width: 18rem;
   }
 }
 
 .skeletonContainer {
   width: 100%;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--ui-space-md);
+}
+
+.skeletonCard {
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
 }
 
 .skeletonBlock,

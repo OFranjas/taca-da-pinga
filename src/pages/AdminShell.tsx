@@ -196,6 +196,14 @@ export function AdminShell<TNav extends string = string>({
                   <nav aria-label="Secções do painel" id={desktopNavId}>
                     {renderNavItems(handleSelectNav)}
                   </nav>
+                  <div className={styles.sidebarFooter}>
+                    <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
+                      Branding
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleLogout}>
+                      Terminar sessão
+                    </Button>
+                  </div>
                 </Stack>
               </Card>
             </div>

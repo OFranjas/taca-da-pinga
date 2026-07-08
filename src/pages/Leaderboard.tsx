@@ -28,8 +28,8 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_STEP = 260;
-const DISPLAY_SCROLL_INTERVAL_MS = 4200;
+const DISPLAY_SCROLL_STEP = 112;
+const DISPLAY_SCROLL_INTERVAL_MS = 2600;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 

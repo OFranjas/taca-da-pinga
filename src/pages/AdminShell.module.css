@@ -105,7 +105,7 @@
 }
 
 .layout {
-  min-height: calc(100dvh - var(--ui-header-height) - var(--ui-space-xl));
+  min-height: auto;
 }
 
 .sidebarDesktop {
@@ -426,8 +426,13 @@
 }
 
 @media (min-width: 1024px) {
+  .heroSection {
+    display: none;
+  }
+
   .layout {
     align-items: start;
+    gap: var(--ui-space-md);
   }
 
   .heroActionsDesktop {
@@ -436,11 +441,11 @@
 
   .sidebarDesktop {
     display: block;
-    grid-column: span 4;
+    grid-column: span 3;
   }
 
   .main {
-    grid-column: span 8;
+    grid-column: span 9;
   }
 
   .mobileTabRail {
