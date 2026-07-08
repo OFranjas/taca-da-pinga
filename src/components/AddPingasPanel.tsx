@@ -7,11 +7,30 @@ import styles from './AddPingasPanel.module.css';
 
 const MIN_PINGAS = 1;
 const MAX_PINGAS = 50;
+const INVALID_AMOUNT_MESSAGE = `A quantidade tem de estar entre ${MIN_PINGAS} e ${MAX_PINGAS}.`;
 
 type TeamOption = {
   id: string;
   name: string;
   pingas: number;
+};
+
+const getSubmitErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : '';
+  const lowerMessage = message.toLowerCase();
+
+  if (message === 'Delta must be an integer between 1 and 50') {
+    return INVALID_AMOUNT_MESSAGE;
+  }
+
+  if (
+    lowerMessage.includes('missing or insufficient permissions') ||
+    lowerMessage.includes('permission-denied')
+  ) {
+    return 'Sem permissões para registar este valor. Confirma que as regras publicadas aceitam pingas até 50.';
+  }
+
+  return message || 'Não foi possível adicionar pingas';
 };
 
 export default function AddPingasPanel() {
@@ -56,8 +75,13 @@ export default function AddPingasPanel() {
 
   // Add pingas
   const handleAdd = async () => {
-    if (!selectedTeam || amount < MIN_PINGAS || amount > MAX_PINGAS) {
-      toast.error('Seleciona uma equipa e define um valor válido');
+    if (!selectedTeam) {
+      toast.error('Seleciona uma equipa.');
+      return;
+    }
+
+    if (amount < MIN_PINGAS || amount > MAX_PINGAS) {
+      toast.error(INVALID_AMOUNT_MESSAGE);
       return;
     }
     setIsSubmitting(true);
@@ -68,8 +92,7 @@ export default function AddPingasPanel() {
       setSelectedTeam(null);
       setAmount(1);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Não foi possível adicionar pingas';
-      toast.error(message);
+      toast.error(getSubmitErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }

@@ -28,8 +28,7 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_STEP = 112;
-const DISPLAY_SCROLL_INTERVAL_MS = 2600;
+const DISPLAY_SCROLL_INTERVAL_MS = 2200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
@@ -55,6 +54,16 @@ const observeLeaderboardTyped = observeLeaderboard as ObserveLeaderboard;
 
 type LeaderboardProps = {
   displayMode?: boolean;
+};
+
+const getDisplayScrollStep = (container: HTMLElement) => {
+  const row = container.querySelector<HTMLElement>('[data-testid="leaderboard-row"]');
+  const scrollableList = container.querySelector<HTMLElement>(`.${styles.fullList}`);
+  const rowGap = scrollableList ? Number.parseFloat(getComputedStyle(scrollableList).rowGap) : 0;
+  const rowHeight = row?.getBoundingClientRect().height ?? 0;
+  const measuredStep = rowHeight + (Number.isFinite(rowGap) ? rowGap : 0);
+
+  return measuredStep > 0 ? measuredStep : ROW_STRIDE;
 };
 
 const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
@@ -175,10 +184,11 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
         displayScrollDirectionRef.current = 1;
       }
 
+      const scrollStep = getDisplayScrollStep(container);
       const nextScrollTop =
         displayScrollDirectionRef.current === 1
-          ? Math.min(maxScrollTop, container.scrollTop + DISPLAY_SCROLL_STEP)
-          : Math.max(0, container.scrollTop - DISPLAY_SCROLL_STEP);
+          ? Math.min(maxScrollTop, container.scrollTop + scrollStep)
+          : Math.max(0, container.scrollTop - scrollStep);
 
       container.scrollTo({ top: nextScrollTop, behavior: 'smooth' });
     }, DISPLAY_SCROLL_INTERVAL_MS);

@@ -87,7 +87,7 @@ describe('AdminShell', () => {
       </AdminShell>
     );
 
-    await user.click(screen.getByRole('button', { name: /Mais/i }));
+    await user.click(screen.getByRole('button', { name: /Menu/i }));
 
     const addNav = screen.getByRole('button', { name: /Adicionar Pingas/i });
     const manageNav = screen.getByRole('button', { name: /Gerir Equipas/i });
@@ -121,12 +121,12 @@ describe('AdminShell', () => {
     expect(screen.getByRole('navigation', { name: /Breadcrumbs/i })).toHaveTextContent('Início');
     expect(screen.getByText('Admin')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /Mais/i }));
+    await user.click(screen.getByRole('button', { name: /Menu/i }));
 
     await user.click(screen.getByRole('button', { name: /Branding/i }));
     expect(onNavigateBranding).toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: /Mais/i }));
+    await user.click(screen.getByRole('button', { name: /Menu/i }));
     await user.click(screen.getByRole('button', { name: /Terminar sessão/i }));
     expect(onLogout).toHaveBeenCalled();
   });

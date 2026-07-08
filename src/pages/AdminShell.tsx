@@ -110,30 +110,8 @@ export function AdminShell<TNav extends string = string>({
     </ul>
   );
 
-  const renderMobileTabs = () => (
+  const renderMobileMenuBar = () => (
     <div className={styles.mobileTabRail}>
-      <div className={styles.mobileTabs} role="tablist" aria-label="Secções do painel">
-        {navItems.map((item) => {
-          const isActive = item.id === activeNav;
-          const className = isActive
-            ? `${styles.mobileTab} ${styles.mobileTabActive}`
-            : styles.mobileTab;
-
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-label={item.label}
-              aria-selected={isActive}
-              onClick={() => handleSelectNav(item.id)}
-              className={className}
-            >
-              {item.mobileLabel ?? item.label}
-            </button>
-          );
-        })}
-      </div>
       <Button
         variant="secondary"
         size="sm"
@@ -143,8 +121,11 @@ export function AdminShell<TNav extends string = string>({
         aria-haspopup="dialog"
         className={styles.mobileMoreButton}
       >
-        Mais
+        Menu
       </Button>
+      <Text as="span" variant="label" className={styles.mobileActiveLabel}>
+        {activeNavLabel || 'Painel Admin'}
+      </Text>
     </div>
   );
 
@@ -208,7 +189,7 @@ export function AdminShell<TNav extends string = string>({
               </Card>
             </div>
             <div className={styles.main}>
-              {renderMobileTabs()}
+              {renderMobileMenuBar()}
               <Card variant="elevated" padding="xl" className={styles.contentCard} fullHeight>
                 <Stack gap="md" className={styles.contentHeader}>
                   <Stack gap="sm">

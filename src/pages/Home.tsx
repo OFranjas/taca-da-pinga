@@ -74,7 +74,6 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [branding, setBranding] = useState<BrandingState | null>(null);
   const isMountedRef = useRef(false);
-  const sponsorCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const fetchSponsors = useCallback(async () => {
     if (!isMountedRef.current) {
@@ -138,61 +137,34 @@ export default function Home() {
     return branding.mainLogo ?? branding.icon ?? defaultBrandImage;
   }, [branding]);
 
-  useEffect(() => {
-    if (status !== 'success' || sponsors.length <= 1) {
-      return;
-    }
-
-    const carousel = sponsorCarouselRef.current;
-    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      const maxScrollLeft = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
-      if (maxScrollLeft <= 0) {
-        return;
-      }
-
-      const cards = Array.from(carousel.querySelectorAll<HTMLElement>(`.${styles.sponsorCard}`));
-      const currentLeft = carousel.scrollLeft;
-      const nextCard = cards.find((card) => card.offsetLeft > currentLeft + 8);
-      const nextLeft = nextCard ? nextCard.offsetLeft : 0;
-
-      carousel.scrollTo({
-        left: Math.min(nextLeft, maxScrollLeft),
-        behavior: 'smooth',
-      });
-    }, 4200);
-
-    return () => window.clearInterval(intervalId);
-  }, [sponsors.length, status]);
-
   const renderSponsorsGrid = (items: Sponsor[]) => {
+    const shouldLoop = items.length > 1;
+    const renderedItems = shouldLoop ? [...items, ...items] : items;
+    const trackClassName = shouldLoop
+      ? `${styles.sponsorTrack} ${styles.sponsorTrackAnimated}`
+      : styles.sponsorTrack;
+
     return (
-      <div
-        className={styles.sponsorCarousel}
-        role="list"
-        aria-label="Patrocinadores"
-        ref={sponsorCarouselRef}
-      >
-        <div className={styles.sponsorTrack}>
-          {items.map((sponsor) => {
+      <div className={styles.sponsorCarousel} role="list" aria-label="Patrocinadores">
+        <div className={trackClassName}>
+          {renderedItems.map((sponsor, index) => {
             const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
+            const isDuplicate = shouldLoop && index >= items.length;
             return (
               <Card
-                key={sponsor.id}
+                key={`${isDuplicate ? 'duplicate' : 'sponsor'}-${sponsor.id}-${index}`}
                 variant="muted"
                 padding="lg"
-                className={styles.sponsorCard}
+                className={`${styles.sponsorCard} ${isDuplicate ? styles.duplicateSponsorCard : ''}`}
                 fullHeight
-                role="listitem"
+                role={isDuplicate ? undefined : 'listitem'}
+                aria-hidden={isDuplicate ? 'true' : undefined}
               >
                 <Stack align="center" gap="md" className={styles.sponsorCardContent}>
                   <div className={styles.sponsorImageFrame}>
                     <img
                       src={sponsor.imageDataUrl}
-                      alt={sponsor.name}
+                      alt={isDuplicate ? '' : sponsor.name}
                       loading="lazy"
                       className={styles.sponsorImage}
                     />

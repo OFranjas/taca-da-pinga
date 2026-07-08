@@ -58,7 +58,7 @@
 }
 
 .introHeader {
-  max-width: 620px;
+  max-width: 38.75rem;
 }
 
 .statStrip {
@@ -93,19 +93,21 @@
 
 .totalBadge {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--ui-space-xs);
-  padding: 7px 12px;
+  padding: 0.45rem 0.75rem;
   border-radius: var(--ui-radius-sm);
   background: rgba(34, 197, 94, 0.04);
   border: 1px solid rgba(34, 197, 94, 0.1);
   box-shadow: none;
-  max-width: 240px;
+  max-width: 15rem;
+  line-height: 1;
 }
 
 .totalValue {
   white-space: nowrap;
   font-size: clamp(1rem, 0.75vw + 0.55rem, 1.28rem);
+  line-height: 1;
 }
 
 .feedback {
@@ -131,7 +133,7 @@
     clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem)
   );
   align-items: center;
-  min-height: var(--leaderboard-row-height, 80px);
+  min-height: var(--leaderboard-row-height, 5rem);
   padding: var(--ui-space-sm) var(--ui-space-md);
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: var(--ui-radius-sm);
@@ -171,8 +173,8 @@
 
 .tableSurface {
   --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem);
-  --leaderboard-row-height: 80px;
-  --leaderboard-row-gap: 12px;
+  --leaderboard-row-height: 5rem;
+  --leaderboard-row-gap: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-sm);
@@ -184,7 +186,7 @@
   position: relative;
   width: 100%;
   min-width: 0;
-  max-height: min(72vh, 760px);
+  max-height: min(72vh, 47.5rem);
   overflow-y: auto;
   padding: var(--ui-space-2xs);
   margin: calc(-1 * var(--ui-space-2xs));
@@ -245,7 +247,7 @@
 .virtualInner {
   display: flex;
   flex-direction: column;
-  gap: var(--leaderboard-row-gap, 12px);
+  gap: var(--leaderboard-row-gap, 0.75rem);
   transform: translateY(0);
   will-change: transform;
 }
@@ -253,21 +255,21 @@
 .fullList {
   display: flex;
   flex-direction: column;
-  gap: var(--leaderboard-row-gap, 12px);
+  gap: var(--leaderboard-row-gap, 0.75rem);
 }
 
 .displayPinnedList {
   display: flex;
   flex-direction: column;
-  gap: var(--leaderboard-row-gap, 12px);
+  gap: var(--leaderboard-row-gap, 0.75rem);
 }
 
 .visuallyHidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 0.0625rem;
+  height: 0.0625rem;
   padding: 0;
-  margin: -1px;
+  margin: -0.0625rem;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -288,9 +290,9 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 64rem) {
   .layout {
-    grid-template-columns: minmax(0, 240px) minmax(0, 1fr) minmax(0, 240px);
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 15rem);
     grid-template-areas: 'left content right';
     align-items: start;
   }
@@ -312,7 +314,7 @@
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 63.9375rem) {
   .leftRail,
   .rightRail {
     display: none;
@@ -332,8 +334,8 @@
 
 .displayPage .tableSurface {
   --leaderboard-grid-template: 4.5rem minmax(0, 1fr) 8rem;
-  --leaderboard-row-height: 48px;
-  --leaderboard-row-gap: 5px;
+  --leaderboard-row-height: 3rem;
+  --leaderboard-row-gap: 0.3125rem;
 }
 
 .displayPage .scrollRegion {
@@ -343,9 +345,9 @@
 
 .displayPage .displayPinnedList {
   position: sticky;
-  top: 45px;
+  top: 2.8125rem;
   z-index: 1;
-  padding-bottom: var(--leaderboard-row-gap, 5px);
+  padding-bottom: var(--leaderboard-row-gap, 0.3125rem);
   background: var(--ui-color-surface-muted);
 }
 
@@ -372,10 +374,10 @@
 
 .displayPage .totalBadge {
   gap: var(--ui-space-sm);
-  padding: 8px 14px;
+  padding: 0.5rem 0.875rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
   .page {
     padding: var(--ui-space-sm);
   }
@@ -386,7 +388,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .layout {
     gap: var(--ui-space-md);
   }
@@ -427,8 +429,8 @@
 
   .tableSurface {
     --leaderboard-grid-template: 2.75rem minmax(0, 1fr) minmax(4.25rem, 4.75rem);
-    --leaderboard-row-height: 64px;
-    --leaderboard-row-gap: 7px;
+    --leaderboard-row-height: 4rem;
+    --leaderboard-row-gap: 0.4375rem;
   }
 
   .heroStatCard {
@@ -443,8 +445,8 @@
   }
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 90rem) {
   .displayPage .layout {
-    grid-template-columns: minmax(0, 220px) minmax(0, 1fr) minmax(0, 220px);
+    grid-template-columns: minmax(0, 13.75rem) minmax(0, 1fr) minmax(0, 13.75rem);
   }
 }

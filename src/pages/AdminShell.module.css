@@ -41,7 +41,7 @@
 
 .titleGroup {
   gap: var(--ui-space-2xs);
-  max-width: 900px;
+  max-width: 56.25rem;
 }
 
 .title {
@@ -175,7 +175,7 @@
 }
 
 .navButton:hover {
-  transform: translateY(-1px);
+  transform: translateY(-0.0625rem);
   background: var(--ui-color-surface-muted);
   border-color: rgba(148, 163, 184, 0.4);
 }
@@ -189,11 +189,11 @@
 
 .navButton:focus-visible {
   outline: 2px solid var(--ui-color-accent);
-  outline-offset: 2px;
+  outline-offset: 0.125rem;
 }
 
 .navDot {
-  width: 3px;
+  width: 0.1875rem;
   align-self: stretch;
   border-radius: var(--ui-radius-full);
   background: transparent;
@@ -239,62 +239,35 @@
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: var(--ui-space-xs);
+  gap: var(--ui-space-sm);
   width: 100%;
-  padding: var(--ui-space-xs);
+  padding: var(--ui-space-xs) var(--ui-space-sm);
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: var(--ui-radius-lg);
   box-shadow: var(--ui-shadow-soft);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(0.75rem);
 }
 
 .mobileTabRail > * {
   box-shadow: none;
 }
 
-.mobileTabs {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: var(--ui-space-xs);
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.mobileTabs::-webkit-scrollbar {
-  display: none;
-}
-
-.mobileTab {
-  min-height: 2.35rem;
-  min-width: 4.75rem;
-  max-width: 9rem;
-  padding: 0 var(--ui-space-sm);
-  border-radius: var(--ui-radius-full);
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--ui-color-text-secondary);
-  font-weight: var(--ui-font-weight-bold);
-  cursor: pointer;
-  scroll-snap-align: start;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mobileTabActive {
-  border-color: rgba(34, 197, 94, 0.55);
-  background: linear-gradient(120deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.9));
-  color: var(--ui-color-text-inverted);
-}
-
 .mobileMoreButton {
   flex: 0 0 auto;
+}
+
+.mobileActiveLabel {
+  flex: 1;
+  min-width: 0;
+  color: var(--ui-color-text-primary);
+  font-size: var(--ui-text-size-base);
+  font-weight: var(--ui-font-weight-extrabold);
+  line-height: 1.15;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .contentCard {
@@ -314,7 +287,7 @@
 
 .sectionSubtitle {
   color: var(--ui-color-text-secondary);
-  max-width: 760px;
+  max-width: 47.5rem;
   font-size: var(--ui-text-size-base);
 }
 
@@ -329,14 +302,14 @@
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(0.125rem);
   display: flex;
   justify-content: flex-end;
   z-index: 50;
 }
 
 .mobileSidebar {
-  width: min(420px, 90vw);
+  width: min(26.25rem, 90vw);
   max-height: 90vh;
   margin: auto var(--ui-space-md);
   padding: var(--ui-space-md);
@@ -393,7 +366,7 @@
   display: inline-flex;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 40rem) {
   .heroSection {
     display: none;
   }
@@ -419,13 +392,13 @@
   }
 }
 
-@media (min-width: 640px) {
+@media (min-width: 40rem) {
   .heroSection {
     margin-bottom: var(--ui-space-lg);
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 64rem) {
   .heroSection {
     display: none;
   }
@@ -461,7 +434,7 @@
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 80rem) {
   .layout {
     gap: var(--ui-space-xl);
   }
