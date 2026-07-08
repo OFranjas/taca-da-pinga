@@ -22,8 +22,8 @@ export function AdminLoginCard({
   onSubmit,
   error,
   isSubmitting = false,
-  title = 'Admin Login',
-  submitLabel = 'Login',
+  title = 'Entrar no admin',
+  submitLabel = 'Entrar',
 }: AdminLoginCardProps) {
   return (
     <div className={styles.root}>

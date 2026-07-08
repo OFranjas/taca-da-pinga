@@ -9,6 +9,15 @@ const mockDoc = vi.fn((db, col, id) => ({ col, id }));
 const mockUpdateDoc = vi.fn();
 const mockIncrement = vi.fn((n) => ({ __op: 'increment', n }));
 const mockLimit = vi.fn((n) => ({ __op: 'limit', n }));
+const mockServerTimestamp = vi.fn(() => 'server-ts');
+const mockBatchUpdate = vi.fn();
+const mockBatchSet = vi.fn();
+const mockBatchCommit = vi.fn();
+const mockWriteBatch = vi.fn(() => ({
+  update: mockBatchUpdate,
+  set: mockBatchSet,
+  commit: mockBatchCommit,
+}));
 
 vi.mock('firebase/firestore', () => ({
   collection: (...args) => mockCollection(...args),
@@ -20,11 +29,14 @@ vi.mock('firebase/firestore', () => ({
   updateDoc: (...args) => mockUpdateDoc(...args),
   increment: (...args) => mockIncrement(...args),
   limit: (...args) => mockLimit(...args),
+  serverTimestamp: (...args) => mockServerTimestamp(...args),
+  writeBatch: (...args) => mockWriteBatch(...args),
 }));
 
 describe('services/leaderboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockBatchCommit.mockResolvedValue(undefined);
   });
 
   test('getLeaderboard returns mapped teams', async () => {
@@ -67,14 +79,32 @@ describe('services/leaderboard', () => {
     const { addPinga } = await import('../leaderboard');
     await addPinga('team1', 3, 'u1');
     expect(mockDoc).toHaveBeenCalledWith({}, 'teams', 'team1');
+    expect(mockCollection).toHaveBeenCalledWith({}, 'events');
     expect(mockIncrement).toHaveBeenCalledWith(3);
-    expect(mockUpdateDoc).toHaveBeenCalledTimes(1);
+    expect(mockWriteBatch).toHaveBeenCalledWith({});
+    expect(mockBatchUpdate).toHaveBeenCalledWith(
+      { col: 'teams', id: 'team1' },
+      { pingas: { __op: 'increment', n: 3 } }
+    );
+    expect(mockBatchSet).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        actorUid: 'u1',
+        delta: 3,
+        teamId: 'team1',
+        ts: 'server-ts',
+        type: 'add-pinga',
+      })
+    );
+    expect(mockBatchCommit).toHaveBeenCalledTimes(1);
   });
 
   test('addPinga throws on invalid delta', async () => {
     const { addPinga } = await import('../leaderboard');
-    await expect(addPinga('team1', 0)).rejects.toThrow('Delta must be an integer between 1 and 5');
-    await expect(addPinga('team1', 6)).rejects.toThrow('Delta must be an integer between 1 and 5');
+    await expect(addPinga('team1', 0)).rejects.toThrow('Delta must be an integer between 1 and 50');
+    await expect(addPinga('team1', 51)).rejects.toThrow(
+      'Delta must be an integer between 1 and 50'
+    );
   });
 
   test('listEvents applies ordering and limit and maps docs', async () => {

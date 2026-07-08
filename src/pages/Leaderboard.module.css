@@ -1,16 +1,27 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--ui-space-xl);
+  gap: var(--ui-space-lg);
   width: 100%;
+}
+
+.displayRoot {
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  padding: var(--ui-space-md);
+}
+
+.displayPage {
+  min-height: calc(100dvh - (var(--ui-space-md) * 2));
 }
 
 .layout {
   display: grid;
   gap: var(--ui-space-xl);
   grid-template-areas:
-    'top'
     'content'
+    'top'
     'bottom';
 }
 
@@ -30,7 +41,7 @@
   grid-area: content;
   display: flex;
   flex-direction: column;
-  gap: var(--ui-space-xl);
+  gap: var(--ui-space-lg);
 }
 
 .introSection {
@@ -48,7 +59,9 @@
 }
 
 .tableCard {
-  gap: var(--ui-space-lg);
+  gap: var(--ui-space-md);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: none;
 }
 
 .tableHeaderMeta {
@@ -63,7 +76,7 @@
 .tableBadges {
   display: inline-flex;
   align-items: center;
-  gap: var(--ui-space-xs);
+  gap: var(--ui-space-sm);
   row-gap: var(--ui-space-2xs);
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -75,10 +88,10 @@
   align-items: baseline;
   gap: var(--ui-space-3xs);
   padding: 6px 10px;
-  border-radius: var(--ui-radius-full);
+  border-radius: var(--ui-radius-sm);
   background: rgba(34, 197, 94, 0.04);
   border: 1px solid rgba(34, 197, 94, 0.1);
-  box-shadow: 0 10px 20px rgba(34, 197, 94, 0.08);
+  box-shadow: none;
   max-width: 240px;
 }
 
@@ -98,7 +111,7 @@
 }
 
 .tableSurface {
-  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(6rem, 14vw, 8rem);
+  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem);
   --leaderboard-row-height: 80px;
   --leaderboard-row-gap: 12px;
   display: flex;
@@ -108,13 +121,13 @@
 
 .scrollRegion {
   position: relative;
-  max-height: min(70vh, 720px);
+  max-height: min(72vh, 760px);
   overflow-y: auto;
-  padding: var(--ui-space-xs);
-  margin: calc(-1 * var(--ui-space-xs));
+  padding: var(--ui-space-2xs);
+  margin: calc(-1 * var(--ui-space-2xs));
   margin-top: 0;
-  border-radius: calc(var(--ui-radius-lg) - 4px);
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(248, 250, 252, 0.6));
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface-muted);
   scrollbar-gutter: stable both-edges;
 }
 
@@ -134,9 +147,9 @@
   grid-template-columns: var(--leaderboard-grid-template);
   align-items: center;
   padding: var(--ui-space-xs) var(--ui-space-md);
-  border-radius: calc(var(--ui-radius-lg) - 2px);
+  border-radius: var(--ui-radius-sm);
   background: var(--ui-color-surface);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+  box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.22);
 }
 
@@ -178,6 +191,12 @@
   gap: var(--leaderboard-row-gap, 12px);
 }
 
+.displayPinnedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--leaderboard-row-gap, 12px);
+}
+
 @media (min-width: 1024px) {
   .layout {
     grid-template-columns: minmax(0, 220px) minmax(0, 1fr) minmax(0, 220px);
@@ -198,23 +217,98 @@
   }
 }
 
+.displayPage .layout {
+  min-height: calc(100dvh - (var(--ui-space-md) * 2));
+  gap: var(--ui-space-lg);
+}
+
+.displayPage .tableCard {
+  padding: var(--ui-space-lg);
+  gap: var(--ui-space-sm);
+  border-radius: var(--ui-radius-md);
+}
+
+.displayPage .tableSurface {
+  --leaderboard-grid-template: 4.5rem minmax(0, 1fr) 8rem;
+  --leaderboard-row-height: 48px;
+  --leaderboard-row-gap: 5px;
+}
+
+.displayPage .scrollRegion {
+  max-height: calc(100dvh - 10rem);
+  background: transparent;
+}
+
+.displayPage .displayPinnedList {
+  position: sticky;
+  top: 45px;
+  z-index: 1;
+  padding-bottom: var(--leaderboard-row-gap, 5px);
+  background: var(--ui-color-surface-muted);
+}
+
+.displayPage .introSection {
+  display: none;
+}
+
+.displayPage .tableHeaderMeta {
+  align-items: center;
+}
+
+.displayPage .tableBadges {
+  justify-content: flex-end;
+}
+
+.displayPage .tableHeaderMeta h2 {
+  font-size: clamp(2rem, 3.2vw, 3.8rem);
+  line-height: 1;
+}
+
+.displayPage .tableCount {
+  font-size: 1rem;
+}
+
+.displayPage .totalBadge {
+  padding: 8px 12px;
+}
+
 @media (max-width: 768px) {
   .page {
-    padding: var(--ui-space-md);
+    padding: var(--ui-space-sm);
   }
 
   .scrollRegion {
-    max-height: min(65vh, 640px);
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
 @media (max-width: 640px) {
   .layout {
-    gap: var(--ui-space-lg);
+    gap: var(--ui-space-md);
+  }
+
+  .introSection {
+    display: none;
+  }
+
+  .tableCard {
+    padding: var(--ui-space-md);
+    border-radius: var(--ui-radius-md);
   }
 
   .tableHeaderMeta {
     align-items: flex-start;
+    gap: var(--ui-space-xs);
+  }
+
+  .tableHeaderMeta h2 {
+    font-size: clamp(1.45rem, 9vw, 1.85rem);
+    line-height: 1.05;
+  }
+
+  .tableHeaderMeta p {
+    display: none;
   }
 
   .tableBadges {
@@ -229,7 +323,9 @@
   }
 
   .tableSurface {
-    --leaderboard-grid-template: clamp(3rem, 12vw, 3.6rem) minmax(0, 1fr) clamp(5.5rem, 20vw, 7rem);
+    --leaderboard-grid-template: 3rem minmax(0, 1fr) minmax(5.25rem, 5.75rem);
+    --leaderboard-row-height: 64px;
+    --leaderboard-row-gap: 7px;
   }
 
   .heroStatCard {
@@ -237,8 +333,15 @@
   }
 
   .scrollRegion {
-    padding: var(--ui-space-2xs);
-    margin: calc(-1 * var(--ui-space-2xs));
+    padding: 0;
+    margin: 0;
     margin-top: 0;
+    background: transparent;
+  }
+}
+
+@media (min-width: 1440px) {
+  .displayPage .layout {
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr) minmax(0, 180px);
   }
 }

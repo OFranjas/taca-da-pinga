@@ -126,7 +126,7 @@ export function AdminShell<TNav extends string = string>({
                         {title}
                       </Text>
                       <Text as="p" variant="subtitle" className={styles.subtitle}>
-                        Adiciona pingas, gere equipas e atualiza branding num painel único.
+                        Operação do torneio.
                       </Text>
                     </Stack>
                     <Stack direction="row" gap="xs" className={styles.heroActionsDesktop}>
@@ -137,14 +137,6 @@ export function AdminShell<TNav extends string = string>({
                         Terminar sessão
                       </Button>
                     </Stack>
-                  </Stack>
-                  <Stack direction="row" gap="xs" className={styles.heroActionsMobile}>
-                    <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
-                      Branding
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={handleLogout}>
-                      Terminar sessão
-                    </Button>
                   </Stack>
                 </Stack>
               </Stack>
@@ -159,7 +151,7 @@ export function AdminShell<TNav extends string = string>({
                 <Stack gap="md">
                   <div className={styles.sidebarHeader}>
                     <Text as="p" variant="label" tone="secondary" className={styles.sidebarTitle}>
-                      Navegação rápida
+                      Secções
                     </Text>
                   </div>
                   <nav aria-label="Secções do painel" id={desktopNavId}>
@@ -201,11 +193,7 @@ export function AdminShell<TNav extends string = string>({
                       <Text as="p" variant="subtitle" className={styles.sectionSubtitle}>
                         {activeNavDescription}
                       </Text>
-                    ) : (
-                      <Text as="p" variant="subtitle" className={styles.sectionSubtitle}>
-                        Usa os controlos abaixo para gerir rapidamente o evento.
-                      </Text>
-                    )}
+                    ) : null}
                   </Stack>
                   {breadcrumbs && breadcrumbs.length > 0 ? (
                     <nav aria-label="Breadcrumbs" className={styles.breadcrumbsInline}>
@@ -246,17 +234,11 @@ export function AdminShell<TNav extends string = string>({
                 <div>
                   <Text
                     as="p"
-                    variant="eyebrow"
+                    variant="heading"
                     className={styles.mobileEyebrow}
                     id={mobileTitleId}
                   >
                     Painel Admin
-                  </Text>
-                  <Text as="p" variant="heading" className={styles.mobileTitle}>
-                    Navegação
-                  </Text>
-                  <Text as="p" variant="subtitle" tone="secondary">
-                    Acede às secções rápidas ou termina sessão.
                   </Text>
                 </div>
                 <button

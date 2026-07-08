@@ -7,34 +7,26 @@
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(34, 197, 94, 0.14), transparent 45%),
-    radial-gradient(circle at 85% 0%, rgba(14, 165, 233, 0.16), transparent 45%);
-  opacity: 0.7;
+  background: linear-gradient(180deg, rgba(236, 253, 245, 0.45), rgba(241, 245, 249, 0));
+  opacity: 0.8;
   pointer-events: none;
   z-index: -1;
 }
 
 .heroSection {
-  margin-bottom: var(--ui-space-md);
+  margin-bottom: var(--ui-space-sm);
 }
 
 .heroCard {
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(120deg, rgba(34, 197, 94, 0.08), rgba(14, 165, 233, 0.08)),
-    var(--ui-color-surface);
-  border: 1px solid rgba(45, 212, 191, 0.28);
+  background: var(--ui-color-surface);
+  border: 1px solid var(--ui-color-border-subtle);
+  box-shadow: none;
 }
 
 .heroCard::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 80% 40%, rgba(34, 197, 94, 0.2), transparent 50%);
-  opacity: 0.25;
-  pointer-events: none;
+  content: none;
 }
 
 .heroHeading {
@@ -44,7 +36,7 @@
 }
 
 .eyebrow {
-  letter-spacing: 0.16em;
+  display: none;
 }
 
 .titleGroup {
@@ -54,11 +46,13 @@
 
 .title {
   text-wrap: balance;
+  font-size: clamp(1.85rem, 3vw, 2.75rem);
 }
 
 .subtitle {
   text-wrap: balance;
   color: var(--ui-color-text-secondary);
+  font-size: var(--ui-text-size-base);
 }
 
 .heroActions {
@@ -68,11 +62,6 @@
 .heroActionsDesktop {
   display: none;
   margin-left: auto;
-}
-
-.heroActionsMobile {
-  display: flex;
-  gap: var(--ui-space-xs);
 }
 
 .pill {
@@ -129,8 +118,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-lg);
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), var(--ui-color-surface-muted));
-  backdrop-filter: blur(6px);
+  background: var(--ui-color-surface);
+  box-shadow: none;
 }
 
 .sidebarHeader {
@@ -170,9 +159,9 @@
   width: 100%;
   gap: var(--ui-space-sm);
   padding: var(--ui-space-sm) var(--ui-space-md);
-  border-radius: var(--ui-radius-lg);
+  border-radius: var(--ui-radius-sm);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--ui-color-surface);
   color: var(--ui-color-text-secondary);
   font-weight: var(--ui-font-weight-medium);
   transition:
@@ -193,7 +182,7 @@
 
 .navButtonActive {
   border-color: rgba(34, 197, 94, 0.55);
-  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.18);
+  box-shadow: none;
   background: rgba(34, 197, 94, 0.08);
   color: var(--ui-color-text-primary);
 }
@@ -204,12 +193,16 @@
 }
 
 .navDot {
-  width: 10px;
-  height: 10px;
+  width: 3px;
+  align-self: stretch;
   border-radius: var(--ui-radius-full);
-  background: rgba(34, 197, 94, 0.3);
-  border: 1px solid rgba(34, 197, 94, 0.5);
+  background: transparent;
+  border: none;
   flex-shrink: 0;
+}
+
+.navButtonActive .navDot {
+  background: var(--ui-color-accent);
 }
 
 .navCopy {
@@ -226,16 +219,11 @@
 }
 
 .navDescription {
-  color: var(--ui-color-text-muted);
+  display: none;
 }
 
 .navGlow {
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.22), transparent 55%);
-  filter: blur(20px);
-  opacity: 0.9;
-  z-index: -1;
+  display: none;
 }
 
 .main {
@@ -269,7 +257,8 @@
 
 .contentCard {
   background: var(--ui-color-surface);
-  box-shadow: var(--ui-shadow-card);
+  box-shadow: none;
+  border-color: var(--ui-color-border-subtle);
 }
 
 .contentHeader {
@@ -284,6 +273,7 @@
 .sectionSubtitle {
   color: var(--ui-color-text-secondary);
   max-width: 760px;
+  font-size: var(--ui-text-size-base);
 }
 
 .content {
@@ -331,8 +321,8 @@
 }
 
 .mobileEyebrow {
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .mobileTitle {
@@ -363,19 +353,23 @@
 
 @media (max-width: 640px) {
   .heroSection {
-    margin-bottom: var(--ui-space-md);
+    display: none;
   }
 
   .heroCard {
-    padding: var(--ui-space-lg);
+    padding: var(--ui-space-md);
   }
 
   .title {
-    font-size: var(--ui-text-size-2xl);
+    font-size: var(--ui-text-size-xl);
   }
 
   .heroMeta {
     gap: var(--ui-space-2xs);
+  }
+
+  .contentCard {
+    padding: var(--ui-space-lg);
   }
 }
 
@@ -392,10 +386,6 @@
 
   .heroActionsDesktop {
     display: flex;
-  }
-
-  .heroActionsMobile {
-    display: none;
   }
 
   .sidebarDesktop {

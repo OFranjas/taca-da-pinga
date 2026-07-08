@@ -1,0 +1,199 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-lg);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.8fr) auto;
+  gap: var(--ui-space-md);
+  align-items: end;
+  padding: var(--ui-space-md);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+}
+
+.field label {
+  color: var(--ui-color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: var(--ui-font-weight-semibold);
+}
+
+.field input:not([type='file']) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-color-surface-muted);
+  color: var(--ui-color-text-primary);
+  font: inherit;
+}
+
+.field input:not([type='file']):focus {
+  outline: none;
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+  background: var(--ui-color-surface);
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-md);
+  border-radius: var(--ui-radius-sm);
+  border: 1px dashed rgba(34, 197, 94, 0.42);
+  background: rgba(34, 197, 94, 0.07);
+  color: var(--ui-color-accent-strong);
+  font-weight: var(--ui-font-weight-bold);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.uploadButton span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton {
+  border-radius: var(--ui-radius-full);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: var(--ui-font-weight-extrabold);
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-md);
+}
+
+.primaryButton {
+  background: var(--ui-color-accent-strong);
+  color: var(--ui-color-text-inverted);
+  box-shadow: none;
+}
+
+.secondaryButton {
+  background: var(--ui-color-accent-soft);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: var(--ui-color-accent);
+}
+
+.dangerButton {
+  background: var(--ui-color-danger-soft);
+  border-color: rgba(239, 68, 68, 0.55);
+  color: var(--ui-color-danger);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.summary {
+  color: var(--ui-color-text-secondary);
+  font-size: 0.95rem;
+  padding: 0 var(--ui-space-2xs);
+}
+
+.summary strong {
+  color: var(--ui-color-text-primary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  gap: var(--ui-space-md);
+  align-items: center;
+  padding: var(--ui-space-sm);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-surface);
+}
+
+.logoFrame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4rem;
+  border-radius: calc(var(--ui-radius-lg) - 4px);
+  background: var(--ui-color-surface-muted);
+  overflow: hidden;
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  max-height: 3.5rem;
+  object-fit: contain;
+}
+
+.itemCopy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3xs);
+  min-width: 0;
+}
+
+.itemCopy strong,
+.itemCopy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemCopy span {
+  color: var(--ui-color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: inline-flex;
+  gap: var(--ui-space-xs);
+}
+
+@media (max-width: 760px) {
+  .form,
+  .item {
+    grid-template-columns: 1fr;
+  }
+
+  .form {
+    padding: var(--ui-space-sm);
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

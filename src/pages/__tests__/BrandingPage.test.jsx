@@ -59,8 +59,8 @@ describe('Branding admin page', () => {
 
     renderWithRouter();
 
-    expect(await screen.findByAltText('Main logo preview')).toBeInTheDocument();
-    expect(screen.getByAltText('Icon preview')).toHaveAttribute(
+    expect(await screen.findByAltText('Prévia do logotipo principal')).toBeInTheDocument();
+    expect(screen.getByAltText('Prévia do ícone')).toHaveAttribute(
       'src',
       'data:image/png;base64,icon'
     );
@@ -77,8 +77,8 @@ describe('Branding admin page', () => {
 
     renderWithRouter();
 
-    const mainInput = await screen.findByLabelText(/Main logo/i, { selector: 'input' });
-    const iconInput = screen.getByLabelText(/Icon/i, { selector: 'input' });
+    const mainInput = await screen.findByLabelText(/Logotipo principal/i, { selector: 'input' });
+    const iconInput = screen.getByLabelText(/Ícone/i, { selector: 'input' });
 
     const mainFile = new File(['main'], 'main.png', { type: 'image/png' });
     const iconFile = new File(['icon'], 'icon.png', { type: 'image/png' });
@@ -86,7 +86,7 @@ describe('Branding admin page', () => {
     await user.upload(mainInput, mainFile);
     await user.upload(iconInput, iconFile);
 
-    await user.click(screen.getByRole('button', { name: /Save branding/i }));
+    await user.click(screen.getByRole('button', { name: /Guardar branding/i }));
 
     await waitFor(() => {
       expect(updateBrandingMock).toHaveBeenCalledWith({
@@ -97,7 +97,7 @@ describe('Branding admin page', () => {
       });
     });
 
-    expect(screen.getByRole('status')).toHaveTextContent('Branding saved successfully.');
+    expect(screen.getByRole('status')).toHaveTextContent('Branding guardado.');
   });
 
   test('shows inline error when compression fails', async () => {
@@ -113,11 +113,11 @@ describe('Branding admin page', () => {
 
     renderWithRouter();
 
-    const mainInput = await screen.findByLabelText(/Main logo/i, { selector: 'input' });
+    const mainInput = await screen.findByLabelText(/Logotipo principal/i, { selector: 'input' });
     const file = new File(['main'], 'main.png', { type: 'image/png' });
     await user.upload(mainInput, file);
 
-    await user.click(screen.getByRole('button', { name: /Save branding/i }));
+    await user.click(screen.getByRole('button', { name: /Guardar branding/i }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Unable to compress image below 180k characters'
@@ -138,12 +138,12 @@ describe('Branding admin page', () => {
 
     renderWithRouter();
 
-    const [removeMain] = await screen.findAllByRole('button', { name: /Remove/i });
+    const [removeMain] = await screen.findAllByRole('button', { name: /Remover/i });
     await user.click(removeMain);
-    const removeIcon = await screen.findByRole('button', { name: /Remove/i });
+    const removeIcon = await screen.findByRole('button', { name: /Remover/i });
     await user.click(removeIcon);
 
-    await user.click(screen.getByRole('button', { name: /Save branding/i }));
+    await user.click(screen.getByRole('button', { name: /Guardar branding/i }));
 
     await waitFor(() => {
       expect(updateBrandingMock).toHaveBeenCalledWith({
@@ -169,22 +169,22 @@ describe('Branding admin page', () => {
 
     renderWithRouter();
 
-    const mainInput = await screen.findByLabelText(/Main logo/i, { selector: 'input' });
+    const mainInput = await screen.findByLabelText(/Logotipo principal/i, { selector: 'input' });
     const pendingFile = new File(['override'], 'override.png', { type: 'image/png' });
 
     await user.upload(mainInput, pendingFile);
 
-    const [removeMain] = await screen.findAllByRole('button', { name: /Remove/i });
+    const [removeMain] = await screen.findAllByRole('button', { name: /Remover/i });
     await user.click(removeMain);
 
     await waitFor(() => {
-      expect(screen.getByAltText('Main logo preview')).toHaveAttribute(
+      expect(screen.getByAltText('Prévia do logotipo principal')).toHaveAttribute(
         'src',
         'data:image/png;base64,main'
       );
     });
 
-    await user.click(screen.getByRole('button', { name: /Save branding/i }));
+    await user.click(screen.getByRole('button', { name: /Guardar branding/i }));
 
     await waitFor(() => {
       expect(updateBrandingMock).toHaveBeenCalledWith({

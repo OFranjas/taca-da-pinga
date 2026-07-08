@@ -6,6 +6,17 @@ vi.mock('../../services/leaderboard', () => ({
   observeLeaderboard: vi.fn(),
 }));
 
+vi.mock('../../services/sponsors.service', () => ({
+  observeSponsors: vi.fn((_callback) => vi.fn()),
+}));
+
+vi.mock('../../services/branding.service', () => ({
+  observeBranding: vi.fn((callback) => {
+    callback({});
+    return vi.fn();
+  }),
+}));
+
 const { observeLeaderboard } = await import('../../services/leaderboard');
 const { default: LeaderboardPage, MAX_RENDERED_ROWS } = await import('../Leaderboard');
 

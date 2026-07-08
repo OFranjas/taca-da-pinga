@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import AddPingasPanel from '../components/AddPingasPanel';
 import Header from '../components/Header';
 import ManageTeamsPanel from '../components/ManageTeamsPanel';
+import SponsorsAdminPanel from '../components/SponsorsAdminPanel';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import { AdminGuard } from './AdminGuard';
 import { AdminShell, type AdminShellNavItem } from './AdminShell';
@@ -11,6 +12,7 @@ import { AdminShell, type AdminShellNavItem } from './AdminShell';
 const ADMIN_SECTIONS = {
   Add: 'add',
   Manage: 'manage',
+  Sponsors: 'sponsors',
 } as const;
 
 type AdminSection = (typeof ADMIN_SECTIONS)[keyof typeof ADMIN_SECTIONS];
@@ -18,13 +20,15 @@ type AdminSection = (typeof ADMIN_SECTIONS)[keyof typeof ADMIN_SECTIONS];
 const NAV_ITEMS: AdminShellNavItem<AdminSection>[] = [
   {
     id: ADMIN_SECTIONS.Add,
-    label: 'Adicionar Pingas',
-    description: 'Atualiza pontuações',
+    label: 'Registar pingas',
   },
   {
     id: ADMIN_SECTIONS.Manage,
-    label: 'Gerir Equipas',
-    description: 'Organiza equipas',
+    label: 'Equipas',
+  },
+  {
+    id: ADMIN_SECTIONS.Sponsors,
+    label: 'Patrocinadores',
   },
 ];
 
@@ -69,7 +73,7 @@ export default function Admin() {
         error={loginError}
       >
         <AdminShell
-          title="Painel Admin"
+          title="Admin"
           navItems={NAV_ITEMS}
           activeNav={activeSection}
           onSelectNav={(section) => {
@@ -80,7 +84,9 @@ export default function Admin() {
             void handleLogout();
           }}
         >
-          {activeSection === ADMIN_SECTIONS.Add ? <AddPingasPanel /> : <ManageTeamsPanel />}
+          {activeSection === ADMIN_SECTIONS.Add ? <AddPingasPanel /> : null}
+          {activeSection === ADMIN_SECTIONS.Manage ? <ManageTeamsPanel /> : null}
+          {activeSection === ADMIN_SECTIONS.Sponsors ? <SponsorsAdminPanel /> : null}
         </AdminShell>
       </AdminGuard>
     </>

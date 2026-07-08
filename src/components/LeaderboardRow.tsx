@@ -131,7 +131,9 @@ export function LeaderboardRow({
       </div>
       <div role="cell" className={styles.scoreCell}>
         <span className={styles.scoreValue}>{scoreText}</span>
-        <span className={styles.scoreLabel}>pingas</span>
+        <span className={styles.scoreLabel} aria-hidden="true">
+          pts
+        </span>
       </div>
     </div>
   );

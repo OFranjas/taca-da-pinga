@@ -16,9 +16,9 @@
 .slot {
   background: var(--bg-card);
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: var(--ui-radius-sm);
   padding: 12px;
-  box-shadow: 0 3px 10px rgba(17, 24, 39, 0.1);
+  box-shadow: none;
 }
 
 .logo {
@@ -46,14 +46,18 @@
 
 /* Mobile: 2 x 2 grid with bigger tiles */
 @media (max-width: 640px) {
+  .rail {
+    margin-top: 0;
+  }
+
   .stack {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
   }
   .slot {
-    padding: 12px;
+    padding: 8px;
   }
   .logo {
-    aspect-ratio: 2.2 / 1;
+    aspect-ratio: 2 / 1;
   }
 }

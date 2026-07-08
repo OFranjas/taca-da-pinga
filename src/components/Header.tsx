@@ -9,7 +9,7 @@ import defaultIcon from '../assets/beer.svg';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
-  { label: 'Leaderboard', to: '/leaderboard' },
+  { label: 'Classificação', to: '/leaderboard' },
   { label: 'Admin', to: '/admin' },
 ] as const;
 
@@ -101,7 +101,7 @@ export function Header() {
           </Text>
         </Link>
 
-        <nav aria-label="Main" className={styles.nav} data-testid="header-nav-grid">
+        <nav aria-label="Navegação principal" className={styles.nav} data-testid="header-nav-grid">
           <Grid
             className={styles.navGrid}
             columns={{ base: 2, md: 3, tv: 4 }}

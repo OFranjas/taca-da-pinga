@@ -11,6 +11,7 @@ const mockDoc = vi.fn(() => ({}));
 const mockUpdateDoc = vi.fn();
 const mockDeleteDoc = vi.fn();
 const mockLimit = vi.fn(() => ({}));
+const mockOnSnapshot = vi.fn();
 const batchUpdate = vi.fn();
 const batchCommit = vi.fn();
 const mockWriteBatch = vi.fn(() => ({ update: batchUpdate, commit: batchCommit }));
@@ -31,6 +32,7 @@ vi.mock('firebase/firestore', () => ({
   updateDoc: mockUpdateDoc,
   deleteDoc: mockDeleteDoc,
   limit: mockLimit,
+  onSnapshot: mockOnSnapshot,
   writeBatch: mockWriteBatch,
   serverTimestamp: mockServerTimestamp,
   where: mockWhere,
@@ -76,17 +78,12 @@ describe('sponsors.service', () => {
       ],
     });
     const { listSponsors } = await import('../sponsors.service');
-    mockWhere.mockReturnValueOnce({ field: 'active', op: '==', value: true });
     const sponsors = await listSponsors({ activeOnly: true });
     expect(mockQuery).toHaveBeenCalledWith(
       {},
-      expect.objectContaining({ field: 'order', dir: 'asc' }),
-      expect.objectContaining({ field: 'active', op: '==', value: true })
+      expect.objectContaining({ field: 'order', dir: 'asc' })
     );
-    expect(sponsors).toEqual([
-      { id: 'a', order: 0, name: 'A', active: true },
-      { id: 'b', order: 1, name: 'B', active: false },
-    ]);
+    expect(sponsors).toEqual([{ id: 'a', order: 0, name: 'A', active: true }]);
   });
 
   test('createSponsor compresses image, assigns order and timestamps', async () => {

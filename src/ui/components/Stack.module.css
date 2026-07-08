@@ -44,6 +44,10 @@
   justify-content: flex-end;
 }
 
+.gapXs {
+  gap: var(--ui-space-xs);
+}
+
 .gapSm {
   gap: var(--ui-space-sm);
 }

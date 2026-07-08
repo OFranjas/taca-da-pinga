@@ -11,6 +11,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/display" element={<Leaderboard displayMode />} />
+        <Route path="/tv" element={<Leaderboard displayMode />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/branding" element={<Branding />} />
         <Route path="*" element={<Navigate to="/" />} />

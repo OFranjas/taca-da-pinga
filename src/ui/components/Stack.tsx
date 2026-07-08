@@ -3,7 +3,7 @@ import styles from './Stack.module.css';
 import { mergeClasses } from './utils';
 
 type StackDirection = 'row' | 'column';
-type StackGap = 'sm' | 'md' | 'lg' | 'xl';
+type StackGap = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 type StackJustify = 'start' | 'center' | 'between' | 'end';
 type StackAlign = 'start' | 'center' | 'stretch';
 type StackSwitchBreakpoint = 'sm' | 'md' | 'lg' | 'xl' | 'tv';
@@ -28,6 +28,7 @@ const directionClassMap: Record<StackDirection, string> = {
 };
 
 const gapClassMap: Record<StackGap, string> = {
+  xs: styles.gapXs,
   sm: styles.gapSm,
   md: styles.gapMd,
   lg: styles.gapLg,

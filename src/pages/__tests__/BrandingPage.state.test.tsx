@@ -152,7 +152,7 @@ describe('Branding administrative page state handling', () => {
       expect(screen.getByTestId('branding-snapshot')).toHaveTextContent('updated-logo');
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /Logout/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Terminar sessão/i }));
     expect(logoutMock).toHaveBeenCalledTimes(1);
   });
 
@@ -168,10 +168,12 @@ describe('Branding administrative page state handling', () => {
       logout: vi.fn(),
     });
 
-    mockGetBranding.mockRejectedValueOnce(new Error('Failed to load branding'));
+    mockGetBranding.mockRejectedValueOnce(new Error('Não foi possível carregar branding'));
 
     renderBranding();
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Failed to load branding');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Não foi possível carregar branding'
+    );
   });
 });

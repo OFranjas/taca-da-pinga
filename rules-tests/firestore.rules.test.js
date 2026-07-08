@@ -75,15 +75,15 @@ describe('Firestore security rules', () => {
     // Name update without pingas change allowed
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
 
-    // Allowed increments 1..5
+    // Allowed increments 1..50
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 1 })); // 0 -> 1
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 8 })); // 3 -> 8 (+5)
+    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
 
-    // Out-of-range increments denied (>5)
+    // Out-of-range increments denied (>50)
     const { db: ownerDb } = makeDb('owner');
     await setDoc(doc(ownerDb, 'teams/b1'), { name: 'B', pingas: 0 });
-    await assertFails(updateDoc(doc(adminDb, 'teams/b1'), { pingas: 6 })); // 0 -> 6 (+6)
+    await assertFails(updateDoc(doc(adminDb, 'teams/b1'), { pingas: 51 })); // 0 -> 51 (+51)
 
     // Negative increments denied; totals never negative
     await setDoc(doc(ownerDb, 'teams/c1'), { name: 'C', pingas: 2 });
@@ -166,6 +166,8 @@ describe('Firestore security rules', () => {
 
       const { db: userDb } = makeDb({ sub: 'user3', user_id: 'user3', admin: false });
       await assertFails(setDoc(doc(userDb, 'sponsors/s2'), baseSponsor));
+      await assertFails(deleteDoc(doc(userDb, 'sponsors/s1')));
+      await assertSucceeds(deleteDoc(doc(adminDb, 'sponsors/s1')));
     });
 
     test('rejects invalid sponsor payloads', async () => {

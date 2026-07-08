@@ -130,9 +130,9 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
       setIconRemoved(false);
       revokeObjectUrl(mainObjectUrlRef);
       revokeObjectUrl(iconObjectUrlRef);
-      setStatusMessage('Branding saved successfully.');
+      setStatusMessage('Branding guardado.');
     } catch (err) {
-      setErrorMessage(err?.message || 'Failed to save branding.');
+      setErrorMessage(err?.message || 'Não foi possível guardar branding.');
     } finally {
       setSaving(false);
     }
@@ -143,29 +143,33 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <fieldset className={styles.fieldset} disabled={disableForm}>
-        <legend className={styles.legend}>Branding assets</legend>
+        <legend className={styles.legend}>Logotipos</legend>
         <div className={styles.assetsGrid}>
           <div className={styles.assetCard}>
             <div className={styles.assetHeader}>
               <div>
                 <label htmlFor="mainLogo" className={styles.assetTitle}>
-                  Main logo
+                  Logotipo principal
                 </label>
-                <p className={styles.assetHint}>Displayed on scoreboards and landing page</p>
+                <p className={styles.assetHint}>Usado na página inicial e na classificação</p>
               </div>
               {mainPreview ? (
                 <button type="button" className={styles.clearButton} onClick={handleRemoveMainLogo}>
-                  Remove
+                  Remover
                 </button>
               ) : null}
             </div>
-            <p className={styles.constraints}>JPEG/PNG up to 600×600px (auto-compressed)</p>
+            <p className={styles.constraints}>JPEG/PNG até 600x600px</p>
             <div className={styles.previewFrameWide}>
               {mainPreview ? (
-                <img src={mainPreview} alt="Main logo preview" className={styles.previewImage} />
+                <img
+                  src={mainPreview}
+                  alt="Prévia do logotipo principal"
+                  className={styles.previewImage}
+                />
               ) : (
                 <div className={styles.previewPlaceholder}>
-                  <span>Upload a logo to preview</span>
+                  <span>Escolhe um logotipo</span>
                 </div>
               )}
             </div>
@@ -179,7 +183,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 onChange={handleMainLogoChange}
               />
               <label htmlFor="mainLogo" className={styles.uploadButton}>
-                Choose image
+                Escolher imagem
               </label>
               {mainLogoFile ? <span className={styles.fileName}>{mainLogoFile.name}</span> : null}
             </div>
@@ -189,23 +193,23 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
             <div className={styles.assetHeader}>
               <div>
                 <label htmlFor="icon" className={styles.assetTitle}>
-                  Icon
+                  Ícone
                 </label>
-                <p className={styles.assetHint}>Used for favicons &amp; mobile shortcuts</p>
+                <p className={styles.assetHint}>Usado no cabeçalho e nos atalhos</p>
               </div>
               {iconPreview ? (
                 <button type="button" className={styles.clearButton} onClick={handleRemoveIcon}>
-                  Remove
+                  Remover
                 </button>
               ) : null}
             </div>
-            <p className={styles.constraints}>Square images look best (auto-resized)</p>
+            <p className={styles.constraints}>Imagens quadradas funcionam melhor</p>
             <div className={styles.previewFrameSquare}>
               {iconPreview ? (
-                <img src={iconPreview} alt="Icon preview" className={styles.previewImageSmall} />
+                <img src={iconPreview} alt="Prévia do ícone" className={styles.previewImageSmall} />
               ) : (
                 <div className={styles.previewPlaceholder}>
-                  <span>Upload an icon to preview</span>
+                  <span>Escolhe um ícone</span>
                 </div>
               )}
             </div>
@@ -219,7 +223,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 onChange={handleIconChange}
               />
               <label htmlFor="icon" className={styles.uploadButton}>
-                Choose image
+                Escolher imagem
               </label>
               {iconFile ? <span className={styles.fileName}>{iconFile.name}</span> : null}
             </div>
@@ -240,7 +244,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
 
       <div className={styles.actions}>
         <button type="submit" className={styles.saveButton} disabled={disableForm}>
-          {saving ? 'Saving…' : 'Save branding'}
+          {saving ? 'A guardar...' : 'Guardar branding'}
         </button>
       </div>
     </form>

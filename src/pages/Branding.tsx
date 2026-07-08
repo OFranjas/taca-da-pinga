@@ -39,7 +39,8 @@ export default function Branding() {
       })
       .catch((error: unknown) => {
         if (mounted) {
-          const message = error instanceof Error ? error.message : 'Failed to load branding';
+          const message =
+            error instanceof Error ? error.message : 'Não foi possível carregar branding';
           setLoadError(message);
         }
       })
@@ -62,7 +63,7 @@ export default function Branding() {
       try {
         await login();
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Failed to login';
+        const message = error instanceof Error ? error.message : 'Não foi possível iniciar sessão';
         setLoginError(message);
       } finally {
         setIsLoggingIn(false);
@@ -80,7 +81,8 @@ export default function Branding() {
         setLoadError(null);
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Failed to load branding';
+        const message =
+          error instanceof Error ? error.message : 'Não foi possível carregar branding';
         setLoadError(message);
         toast.error('Não foi possível atualizar a prévia do branding. Recarregue a página.');
       });
@@ -147,14 +149,13 @@ export default function Branding() {
             <Grid columns={{ base: 1, lg: 2 }} gap="lg" className={styles.heroGrid} align="start">
               <Stack gap="sm">
                 <Text as="span" variant="eyebrow">
-                  Admin · Branding
+                  Admin
                 </Text>
                 <Text as="h1" variant="hero">
-                  Customize the Taça da Pinga visuals
+                  Branding
                 </Text>
                 <Text as="p" variant="subtitle">
-                  Update the logos that appear on the live app. Uploads are compressed and validated
-                  locally.
+                  Atualiza os logotipos usados na app.
                 </Text>
               </Stack>
               <Stack
@@ -166,7 +167,7 @@ export default function Branding() {
                 switchTo="row"
               >
                 <Button type="button" variant="secondary" onClick={() => navigate('/admin')}>
-                  ← Voltar ao painel
+                  Voltar ao painel
                 </Button>
                 <Button
                   type="button"
@@ -175,7 +176,7 @@ export default function Branding() {
                     void logout();
                   }}
                 >
-                  Logout
+                  Terminar sessão
                 </Button>
               </Stack>
             </Grid>

@@ -15,6 +15,7 @@ export default function ManageTeamsPanel() {
   const [newName, setNewName] = useState('');
   const [filter, setFilter] = useState('');
   const [toDelete, setToDelete] = useState<Team | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const unsubscribe = observeTeamsOrderedByName((nextTeams: Team[]) => {
@@ -50,9 +51,17 @@ export default function ManageTeamsPanel() {
     if (!toDelete) {
       return;
     }
-    await deleteTeam(toDelete.id);
-    toast.info(`"${toDelete.name}" deleted`);
-    setToDelete(null);
+    setIsDeleting(true);
+    try {
+      await deleteTeam(toDelete.id);
+      toast.info(`"${toDelete.name}" eliminada`);
+      setToDelete(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível eliminar a equipa';
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const visible = useMemo(
@@ -64,20 +73,24 @@ export default function ManageTeamsPanel() {
     <div className={styles.panel}>
       <div className={styles.top}>
         <input
+          id="new-team-name"
           type="text"
           placeholder="Nova equipa..."
+          aria-label="Nova equipa"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           className={styles.input}
         />
-        <button onClick={createTeam} className={styles.createBtn}>
+        <button type="button" onClick={createTeam} className={styles.createBtn}>
           Criar
         </button>
       </div>
       <div className={styles.filterWrapper}>
         <input
+          id="team-filter"
           type="text"
           placeholder="Filtrar equipas..."
+          aria-label="Filtrar equipas"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className={styles.input}
@@ -94,6 +107,7 @@ export default function ManageTeamsPanel() {
             <div className={styles.right}>
               <span className={styles.countPill}>{team.pingas}</span>
               <button
+                type="button"
                 onClick={() => setToDelete(team)}
                 className={styles.deleteBtn}
                 aria-label={`Delete ${team.name}`}
@@ -111,6 +125,7 @@ export default function ManageTeamsPanel() {
         message={`Tem a certeza de que deseja eliminar "${toDelete?.name}"?`}
         onCancel={() => setToDelete(null)}
         onConfirm={confirmDelete}
+        confirmLabel={isDeleting ? 'A eliminar...' : 'Eliminar'}
       />
     </div>
   );

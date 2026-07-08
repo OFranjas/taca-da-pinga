@@ -99,7 +99,7 @@ describe('AdminShell', () => {
     expect(onSelectNav).toHaveBeenCalledWith('manage');
   });
 
-  it('renders topbar actions and breadcrumbs', async () => {
+  it('renders menu actions and breadcrumbs', async () => {
     const user = createUser();
     const onNavigateBranding = vi.fn();
     const onLogout = vi.fn();
@@ -121,10 +121,13 @@ describe('AdminShell', () => {
     expect(screen.getByRole('navigation', { name: /Breadcrumbs/i })).toHaveTextContent('Início');
     expect(screen.getByText('Admin')).toBeInTheDocument();
 
+    await user.click(screen.getByRole('button', { name: /Menu/i }));
+
     await user.click(screen.getByRole('button', { name: /Branding/i }));
     expect(onNavigateBranding).toHaveBeenCalled();
 
-    await user.click(screen.getAllByRole('button', { name: /Terminar sessão/i })[0]);
+    await user.click(screen.getByRole('button', { name: /Menu/i }));
+    await user.click(screen.getByRole('button', { name: /Terminar sessão/i }));
     expect(onLogout).toHaveBeenCalled();
   });
 });
