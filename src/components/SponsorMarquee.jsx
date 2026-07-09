@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from './SponsorMarquee.module.css';
 
 const AUTO_SCROLL_SPEED = 46;
-const RESUME_DELAY_MS = 3500;
+const RESUME_DELAY_MS = 1400;
 const LOOP_SEGMENTS = 3;
 
 export default function SponsorMarquee({
@@ -11,11 +11,12 @@ export default function SponsorMarquee({
   compact = false,
   ariaLabel = 'Patrocinadores',
 }) {
-  const [isPaused, setPaused] = useState(false);
   const rowRefs = useRef([]);
   const scrollPositionsRef = useRef([]);
-  const resumeTimeoutRef = useRef(0);
-  const isWrappingRef = useRef(false);
+  const pausedUntilRef = useRef([]);
+  const isInteractingRef = useRef([]);
+  const isProgrammaticScrollRef = useRef([]);
+  const isWrappingRef = useRef([]);
   const safeRows = Math.max(1, rows);
 
   const rowsData = useMemo(() => {
@@ -26,11 +27,16 @@ export default function SponsorMarquee({
     return buckets.filter((bucket) => bucket.length > 0);
   }, [safeRows, sponsors]);
 
+  const rowKeys = useMemo(
+    () => rowsData.map((rowSponsors) => rowSponsors.map((sponsor) => sponsor.id).join('|')),
+    [rowsData]
+  );
+
   const getSegmentWidth = useCallback((row) => row.scrollWidth / LOOP_SEGMENTS, []);
 
   const wrapRow = useCallback(
-    (row) => {
-      if (!row || isWrappingRef.current) {
+    (row, rowIndex) => {
+      if (!row || isWrappingRef.current[rowIndex]) {
         return;
       }
 
@@ -49,41 +55,47 @@ export default function SponsorMarquee({
       }
 
       if (nextScrollLeft !== row.scrollLeft) {
-        isWrappingRef.current = true;
+        isWrappingRef.current[rowIndex] = true;
+        isProgrammaticScrollRef.current[rowIndex] = true;
         row.scrollLeft = nextScrollLeft;
-        const rowIndex = Number(row.dataset.rowIndex ?? -1);
-        if (rowIndex >= 0) {
-          scrollPositionsRef.current[rowIndex] = nextScrollLeft;
-        }
+        scrollPositionsRef.current[rowIndex] = nextScrollLeft;
         window.requestAnimationFrame(() => {
-          isWrappingRef.current = false;
+          isWrappingRef.current[rowIndex] = false;
+          isProgrammaticScrollRef.current[rowIndex] = false;
         });
       }
     },
     [getSegmentWidth]
   );
 
-  const syncRowPosition = useCallback((row) => {
-    if (row) {
-      const rowIndex = Number(row.dataset.rowIndex ?? -1);
-      if (rowIndex >= 0) {
-        scrollPositionsRef.current[rowIndex] = row.scrollLeft;
-      }
+  const getRowIndex = (row) => Number(row?.dataset.rowIndex ?? -1);
+
+  const syncRowPosition = useCallback((row, rowIndex = getRowIndex(row)) => {
+    if (row && rowIndex >= 0) {
+      scrollPositionsRef.current[rowIndex] = row.scrollLeft;
     }
   }, []);
 
-  const scheduleResume = useCallback(() => {
-    window.clearTimeout(resumeTimeoutRef.current);
-    resumeTimeoutRef.current = window.setTimeout(() => {
-      setPaused(false);
-    }, RESUME_DELAY_MS);
-  }, []);
+  const scheduleResume = useCallback(
+    (row) => {
+      const rowIndex = getRowIndex(row);
+      if (rowIndex >= 0) {
+        syncRowPosition(row, rowIndex);
+        isInteractingRef.current[rowIndex] = false;
+        pausedUntilRef.current[rowIndex] = performance.now() + RESUME_DELAY_MS;
+      }
+    },
+    [syncRowPosition]
+  );
 
   const pauseInteraction = useCallback(
     (row) => {
-      syncRowPosition(row);
-      window.clearTimeout(resumeTimeoutRef.current);
-      setPaused(true);
+      const rowIndex = getRowIndex(row);
+      if (rowIndex >= 0) {
+        syncRowPosition(row, rowIndex);
+        isInteractingRef.current[rowIndex] = true;
+        pausedUntilRef.current[rowIndex] = Number.POSITIVE_INFINITY;
+      }
     },
     [syncRowPosition]
   );
@@ -98,37 +110,42 @@ export default function SponsorMarquee({
 
   const handleRowScroll = useCallback(
     (row) => {
-      wrapRow(row);
-      if (isPaused) {
-        syncRowPosition(row);
+      const rowIndex = getRowIndex(row);
+      if (rowIndex < 0) {
+        return;
+      }
+
+      wrapRow(row, rowIndex);
+
+      if (!isProgrammaticScrollRef.current[rowIndex]) {
+        syncRowPosition(row, rowIndex);
+        if (!isInteractingRef.current[rowIndex]) {
+          pausedUntilRef.current[rowIndex] = performance.now() + RESUME_DELAY_MS;
+        }
       }
     },
-    [isPaused, syncRowPosition, wrapRow]
+    [syncRowPosition, wrapRow]
   );
 
   useEffect(() => {
     rowRefs.current.forEach((row, index) => {
-      if (!row || row.dataset.loopReady === 'true') {
+      if (!row) {
         return;
       }
 
       const segmentWidth = getSegmentWidth(row);
-      if (segmentWidth > row.clientWidth) {
+      const loopKey = rowKeys[index] ?? '';
+      if (segmentWidth > row.clientWidth && row.dataset.loopKey !== loopKey) {
         row.scrollLeft = segmentWidth;
         scrollPositionsRef.current[index] = segmentWidth;
-        row.dataset.loopReady = 'true';
+        pausedUntilRef.current[index] = 0;
+        row.dataset.loopKey = loopKey;
       }
     });
-  }, [getSegmentWidth, rowsData]);
+  }, [getSegmentWidth, rowKeys, rowsData]);
 
   useEffect(() => {
-    return () => {
-      window.clearTimeout(resumeTimeoutRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isPaused || sponsors.length <= 1) {
+    if (sponsors.length <= 1) {
       return undefined;
     }
 
@@ -152,11 +169,19 @@ export default function SponsorMarquee({
           return;
         }
 
+        if ((pausedUntilRef.current[index] ?? 0) > timestamp) {
+          return;
+        }
+
         const currentPosition = scrollPositionsRef.current[index] ?? row.scrollLeft;
         const nextPosition = currentPosition + AUTO_SCROLL_SPEED * deltaSeconds;
         scrollPositionsRef.current[index] = nextPosition;
+        isProgrammaticScrollRef.current[index] = true;
         row.scrollLeft = nextPosition;
-        wrapRow(row);
+        wrapRow(row, index);
+        window.requestAnimationFrame(() => {
+          isProgrammaticScrollRef.current[index] = false;
+        });
       });
 
       frameId = window.requestAnimationFrame(step);
@@ -164,7 +189,7 @@ export default function SponsorMarquee({
 
     frameId = window.requestAnimationFrame(step);
     return () => window.cancelAnimationFrame(frameId);
-  }, [getSegmentWidth, isPaused, rowsData, sponsors.length, wrapRow]);
+  }, [getSegmentWidth, rowsData, sponsors.length, wrapRow]);
 
   if (rowsData.length === 0) {
     return null;
@@ -189,11 +214,11 @@ export default function SponsorMarquee({
             }}
             data-row-index={rowIndex}
             onPointerDown={(event) => pauseInteraction(event.currentTarget)}
-            onPointerUp={scheduleResume}
-            onPointerCancel={scheduleResume}
+            onPointerUp={(event) => scheduleResume(event.currentTarget)}
+            onPointerCancel={(event) => scheduleResume(event.currentTarget)}
             onTouchStart={(event) => pauseInteraction(event.currentTarget)}
-            onTouchEnd={scheduleResume}
-            onTouchCancel={scheduleResume}
+            onTouchEnd={(event) => scheduleResume(event.currentTarget)}
+            onTouchCancel={(event) => scheduleResume(event.currentTarget)}
             onWheel={(event) => pauseTemporarily(event.currentTarget)}
             onScroll={(event) => handleRowScroll(event.currentTarget)}
             tabIndex={0}

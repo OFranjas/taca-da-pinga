@@ -324,6 +324,7 @@
   display: grid;
   gap: var(--ui-space-xs);
   justify-content: flex-end;
+  justify-items: end;
   align-items: center;
 }
 
@@ -335,6 +336,16 @@
   width: 2.75rem;
   min-width: 2.75rem;
   padding: 0;
+}
+
+.iconButton svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .iconActionGroup,
@@ -350,6 +361,7 @@
 
 .siteActionGroup {
   grid-template-columns: repeat(2, minmax(5.25rem, auto));
+  justify-content: end;
 }
 
 @media (max-width: 760px) {
@@ -365,6 +377,7 @@
   .actions {
     width: 100%;
     justify-content: stretch;
+    justify-items: stretch;
   }
 
   .editActions {

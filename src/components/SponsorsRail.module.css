@@ -28,18 +28,6 @@
   min-width: 0;
 }
 
-.stackAnimated {
-  animation: railMarquee 34s linear infinite;
-}
-
-.stackAnimated:hover {
-  animation-play-state: paused;
-}
-
-.stackPaused {
-  animation: none;
-}
-
 .slot {
   display: flex;
   flex-direction: column;
@@ -107,10 +95,6 @@
     max-width: 100%;
   }
 
-  .stackAnimated {
-    animation: none;
-  }
-
   .slot {
     width: 100%;
   }
@@ -145,21 +129,5 @@
 
   .name {
     font-size: 0.9rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stackAnimated {
-    animation: none;
-  }
-}
-
-@keyframes railMarquee {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(calc(-50% - 0.4375rem));
   }
 }

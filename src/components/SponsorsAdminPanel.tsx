@@ -21,6 +21,25 @@ const initialForm: SponsorFormState = {
   imageFile: null,
 };
 
+const ChevronUpIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M7 14.5 12 9l5 5.5" />
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="m7 9.5 5 5.5 5-5.5" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M4.5 19.5h4.25L18.5 9.75a2.2 2.2 0 0 0-3.1-3.1L5.65 16.4 4.5 19.5Z" />
+    <path d="m13.75 8.25 2 2" />
+  </svg>
+);
+
 export default function SponsorsAdminPanel() {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [form, setForm] = useState<SponsorFormState>(initialForm);
@@ -306,7 +325,7 @@ export default function SponsorsAdminPanel() {
                           disabled={isBusy || index === 0}
                           aria-label={`Mover ${sponsor.name} para cima`}
                         >
-                          ↑
+                          <ChevronUpIcon />
                         </button>
                         <button
                           type="button"
@@ -317,7 +336,7 @@ export default function SponsorsAdminPanel() {
                           disabled={isBusy || index === sponsors.length - 1}
                           aria-label={`Mover ${sponsor.name} para baixo`}
                         >
-                          ↓
+                          <ChevronDownIcon />
                         </button>
                         <button
                           type="button"
@@ -327,7 +346,7 @@ export default function SponsorsAdminPanel() {
                           aria-label={`Editar ${sponsor.name}`}
                           title="Editar"
                         >
-                          ✎
+                          <EditIcon />
                         </button>
                       </div>
                       <div className={styles.siteActionGroup}>

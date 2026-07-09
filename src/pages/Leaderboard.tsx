@@ -29,8 +29,8 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_SPEED = 24;
-const DISPLAY_SCROLL_PAUSE_MS = 2200;
+const DISPLAY_SCROLL_PX_PER_SECOND = 42;
+const DISPLAY_SCROLL_PAUSE_MS = 1200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
@@ -163,50 +163,50 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
 
     let frameId = 0;
     let pauseTimeoutId = 0;
-    let lastFrame = 0;
     let direction: 1 | -1 = 1;
 
-    const scheduleAfterPause = () => {
-      pauseTimeoutId = window.setTimeout(() => {
-        lastFrame = 0;
-        frameId = window.requestAnimationFrame(step);
-      }, DISPLAY_SCROLL_PAUSE_MS);
-    };
+    const easeInOut = (progress: number) =>
+      progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-    const step = (timestamp: number) => {
-      if (!lastFrame) {
-        lastFrame = timestamp;
-      }
+    const animateTo = (targetScrollTop: number) => {
+      const startScrollTop = container.scrollTop;
+      const distance = Math.abs(targetScrollTop - startScrollTop);
+      const duration = Math.max(2600, (distance / DISPLAY_SCROLL_PX_PER_SECOND) * 1000);
+      let startTime = 0;
 
-      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
-      if (maxScrollTop <= 0) {
-        frameId = window.requestAnimationFrame(step);
-        return;
-      }
+      const step = (timestamp: number) => {
+        if (!startTime) {
+          startTime = timestamp;
+        }
 
-      const deltaSeconds = (timestamp - lastFrame) / 1000;
-      lastFrame = timestamp;
-      const nextScrollTop = container.scrollTop + direction * DISPLAY_SCROLL_SPEED * deltaSeconds;
+        const progress = Math.min(1, (timestamp - startTime) / duration);
+        const easedProgress = easeInOut(progress);
+        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * easedProgress;
 
-      if (direction === 1 && nextScrollTop >= maxScrollTop) {
-        container.scrollTop = maxScrollTop;
-        direction = -1;
-        scheduleAfterPause();
-        return;
-      }
+        if (progress < 1) {
+          frameId = window.requestAnimationFrame(step);
+          return;
+        }
 
-      if (direction === -1 && nextScrollTop <= 0) {
-        container.scrollTop = 0;
-        direction = 1;
-        scheduleAfterPause();
-        return;
-      }
+        container.scrollTop = targetScrollTop;
+        direction = direction === 1 ? -1 : 1;
+        pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+      };
 
-      container.scrollTop = nextScrollTop;
       frameId = window.requestAnimationFrame(step);
     };
 
-    scheduleAfterPause();
+    const scheduleNextScroll = () => {
+      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+      if (maxScrollTop <= 0) {
+        pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+        return;
+      }
+
+      animateTo(direction === 1 ? maxScrollTop : 0);
+    };
+
+    pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
 
     return () => {
       window.cancelAnimationFrame(frameId);
