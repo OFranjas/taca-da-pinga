@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+  type FormEvent,
+} from 'react';
 import {
   createSponsor,
   deleteSponsor,
@@ -30,6 +38,7 @@ export default function SponsorsAdminPanel() {
   const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [draggingSponsorId, setDraggingSponsorId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -160,15 +169,7 @@ export default function SponsorsAdminPanel() {
     }
   };
 
-  const moveSponsor = async (sponsorIndex: number, direction: -1 | 1) => {
-    const nextIndex = sponsorIndex + direction;
-    if (nextIndex < 0 || nextIndex >= sponsors.length) {
-      return;
-    }
-
-    const reorderedSponsors = [...sponsors];
-    const [movedSponsor] = reorderedSponsors.splice(sponsorIndex, 1);
-    reorderedSponsors.splice(nextIndex, 0, movedSponsor);
+  const saveSponsorOrder = async (reorderedSponsors: Sponsor[], movedSponsor: Sponsor) => {
     setBusySponsorId(movedSponsor.id);
 
     try {
@@ -180,6 +181,40 @@ export default function SponsorsAdminPanel() {
     } finally {
       setBusySponsorId(null);
     }
+  };
+
+  const moveSponsor = async (sponsorIndex: number, direction: -1 | 1) => {
+    const nextIndex = sponsorIndex + direction;
+    if (nextIndex < 0 || nextIndex >= sponsors.length) {
+      return;
+    }
+
+    const reorderedSponsors = [...sponsors];
+    const [movedSponsor] = reorderedSponsors.splice(sponsorIndex, 1);
+    reorderedSponsors.splice(nextIndex, 0, movedSponsor);
+    await saveSponsorOrder(reorderedSponsors, movedSponsor);
+  };
+
+  const handleSponsorDragStart = (event: DragEvent<HTMLLIElement>, sponsor: Sponsor) => {
+    setDraggingSponsorId(sponsor.id);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', sponsor.id);
+  };
+
+  const handleSponsorDrop = async (event: DragEvent<HTMLLIElement>, targetIndex: number) => {
+    event.preventDefault();
+    const sourceSponsorId = draggingSponsorId ?? event.dataTransfer.getData('text/plain');
+    setDraggingSponsorId(null);
+
+    const sourceIndex = sponsors.findIndex((sponsor) => sponsor.id === sourceSponsorId);
+    if (sourceIndex < 0 || sourceIndex === targetIndex) {
+      return;
+    }
+
+    const reorderedSponsors = [...sponsors];
+    const [movedSponsor] = reorderedSponsors.splice(sourceIndex, 1);
+    reorderedSponsors.splice(targetIndex, 0, movedSponsor);
+    await saveSponsorOrder(reorderedSponsors, movedSponsor);
   };
 
   return (
@@ -237,7 +272,22 @@ export default function SponsorsAdminPanel() {
             const isBusy = busySponsorId === sponsor.id;
             const isEditing = editingSponsorId === sponsor.id;
             return (
-              <li key={sponsor.id} className={styles.item}>
+              <li
+                key={sponsor.id}
+                className={`${styles.item} ${
+                  draggingSponsorId === sponsor.id ? styles.itemDragging : ''
+                }`}
+                draggable={!isEditing && !isBusy}
+                onDragStart={(event) => handleSponsorDragStart(event, sponsor)}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = 'move';
+                }}
+                onDrop={(event) => {
+                  void handleSponsorDrop(event, index);
+                }}
+                onDragEnd={() => setDraggingSponsorId(null)}
+              >
                 <div className={styles.logoFrame}>
                   <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
                 </div>
@@ -268,7 +318,7 @@ export default function SponsorsAdminPanel() {
                     <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
                   </div>
                 )}
-                <div className={styles.actions}>
+                <div className={`${styles.actions} ${isEditing ? styles.editActions : ''}`}>
                   {isEditing ? (
                     <>
                       <button
@@ -292,9 +342,12 @@ export default function SponsorsAdminPanel() {
                     </>
                   ) : (
                     <>
+                      <span className={styles.dragHandle} aria-hidden="true">
+                        ⋮⋮
+                      </span>
                       <button
                         type="button"
-                        className={styles.orderButton}
+                        className={`${styles.orderButton} ${styles.iconButton}`}
                         onClick={() => {
                           void moveSponsor(index, -1);
                         }}
@@ -305,7 +358,7 @@ export default function SponsorsAdminPanel() {
                       </button>
                       <button
                         type="button"
-                        className={styles.orderButton}
+                        className={`${styles.orderButton} ${styles.iconButton}`}
                         onClick={() => {
                           void moveSponsor(index, 1);
                         }}
@@ -316,11 +369,13 @@ export default function SponsorsAdminPanel() {
                       </button>
                       <button
                         type="button"
-                        className={styles.neutralButton}
+                        className={`${styles.neutralButton} ${styles.iconButton}`}
                         onClick={() => startEditingSponsor(sponsor)}
                         disabled={isBusy}
+                        aria-label={`Editar ${sponsor.name}`}
+                        title="Editar"
                       >
-                        Editar
+                        ✎
                       </button>
                       <button
                         type="button"

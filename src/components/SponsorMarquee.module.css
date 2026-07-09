@@ -17,8 +17,12 @@
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   touch-action: pan-x;
-  scroll-behavior: smooth;
+  cursor: grab;
   padding: 0 var(--ui-space-2xs) var(--ui-space-xs);
+}
+
+.row:active {
+  cursor: grabbing;
 }
 
 .row::-webkit-scrollbar {

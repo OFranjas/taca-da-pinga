@@ -237,7 +237,8 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: var(--ui-space-sm);
   width: 100%;
@@ -254,25 +255,21 @@
 }
 
 .mobileTabRail::after {
-  content: '';
-  flex: 0 0 5.5rem;
+  content: none;
 }
 
 .mobileMoreButton {
-  flex: 0 0 5.5rem;
+  min-width: 5.5rem;
 }
 
 .mobileActiveLabel {
-  flex: 1;
   min-width: 0;
   color: var(--ui-color-text-primary);
-  font-size: var(--ui-text-size-base);
+  font-size: clamp(1rem, 4vw, var(--ui-text-size-base));
   font-weight: var(--ui-font-weight-extrabold);
-  line-height: 1.15;
+  line-height: 1.18;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .contentCard {

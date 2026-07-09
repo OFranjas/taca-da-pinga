@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from './SponsorMarquee.module.css';
 
-const AUTO_SCROLL_SPEED = 28;
+const AUTO_SCROLL_SPEED = 46;
+const RESUME_DELAY_MS = 3500;
+const LOOP_SEGMENTS = 3;
 
 export default function SponsorMarquee({
   sponsors = [],
@@ -11,6 +13,8 @@ export default function SponsorMarquee({
 }) {
   const [isPaused, setPaused] = useState(false);
   const rowRefs = useRef([]);
+  const resumeTimeoutRef = useRef(0);
+  const isWrappingRef = useRef(false);
   const safeRows = Math.max(1, rows);
 
   const rowsData = useMemo(() => {
@@ -20,6 +24,67 @@ export default function SponsorMarquee({
     });
     return buckets.filter((bucket) => bucket.length > 0);
   }, [safeRows, sponsors]);
+
+  const getSegmentWidth = useCallback((row) => row.scrollWidth / LOOP_SEGMENTS, []);
+
+  const wrapRow = useCallback(
+    (row) => {
+      if (!row || isWrappingRef.current) {
+        return;
+      }
+
+      const segmentWidth = getSegmentWidth(row);
+      if (segmentWidth <= row.clientWidth) {
+        return;
+      }
+
+      let nextScrollLeft = row.scrollLeft;
+      if (row.scrollLeft >= segmentWidth * 2) {
+        nextScrollLeft = row.scrollLeft - segmentWidth;
+      }
+
+      if (row.scrollLeft <= 0) {
+        nextScrollLeft = row.scrollLeft + segmentWidth;
+      }
+
+      if (nextScrollLeft !== row.scrollLeft) {
+        isWrappingRef.current = true;
+        row.scrollLeft = nextScrollLeft;
+        window.requestAnimationFrame(() => {
+          isWrappingRef.current = false;
+        });
+      }
+    },
+    [getSegmentWidth]
+  );
+
+  const pauseTemporarily = useCallback(() => {
+    window.clearTimeout(resumeTimeoutRef.current);
+    setPaused(true);
+    resumeTimeoutRef.current = window.setTimeout(() => {
+      setPaused(false);
+    }, RESUME_DELAY_MS);
+  }, []);
+
+  useEffect(() => {
+    rowRefs.current.forEach((row) => {
+      if (!row || row.dataset.loopReady === 'true') {
+        return;
+      }
+
+      const segmentWidth = getSegmentWidth(row);
+      if (segmentWidth > row.clientWidth) {
+        row.scrollLeft = segmentWidth;
+        row.dataset.loopReady = 'true';
+      }
+    });
+  }, [getSegmentWidth, rowsData]);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(resumeTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (isPaused || sponsors.length <= 1) {
@@ -36,53 +101,40 @@ export default function SponsorMarquee({
       const deltaSeconds = (timestamp - lastFrame) / 1000;
       lastFrame = timestamp;
 
-      rowRefs.current.forEach((row, index) => {
+      rowRefs.current.forEach((row) => {
         if (!row) {
           return;
         }
 
-        const loopWidth = row.scrollWidth / 2;
-        if (loopWidth <= row.clientWidth) {
+        const segmentWidth = getSegmentWidth(row);
+        if (segmentWidth <= row.clientWidth) {
           return;
         }
 
-        const direction = index % 2 === 0 ? 1 : -1;
-        row.scrollLeft += direction * AUTO_SCROLL_SPEED * deltaSeconds;
-
-        if (direction === 1 && row.scrollLeft >= loopWidth) {
-          row.scrollLeft -= loopWidth;
-        }
-
-        if (direction === -1 && row.scrollLeft <= 0) {
-          row.scrollLeft += loopWidth;
-        }
+        row.scrollLeft += AUTO_SCROLL_SPEED * deltaSeconds;
+        wrapRow(row);
       });
 
       frameId = window.requestAnimationFrame(step);
     };
 
-    rowRefs.current.forEach((row, index) => {
-      if (row && index % 2 === 1 && row.scrollLeft === 0) {
-        row.scrollLeft = row.scrollWidth / 2;
-      }
-    });
-
     frameId = window.requestAnimationFrame(step);
     return () => window.cancelAnimationFrame(frameId);
-  }, [isPaused, sponsors.length]);
+  }, [getSegmentWidth, isPaused, rowsData, sponsors.length, wrapRow]);
 
   if (rowsData.length === 0) {
     return null;
   }
 
-  const pause = () => setPaused(true);
   const rootClassName = compact ? `${styles.root} ${styles.compact}` : styles.root;
 
   return (
     <div className={rootClassName} role="list" aria-label={ariaLabel}>
       {rowsData.map((rowSponsors, rowIndex) => {
         const renderedSponsors =
-          rowSponsors.length > 1 ? [...rowSponsors, ...rowSponsors] : rowSponsors;
+          rowSponsors.length > 1
+            ? Array.from({ length: LOOP_SEGMENTS }, () => rowSponsors).flat()
+            : rowSponsors;
 
         return (
           <div
@@ -91,13 +143,15 @@ export default function SponsorMarquee({
             ref={(node) => {
               rowRefs.current[rowIndex] = node;
             }}
-            onPointerDown={pause}
-            onTouchStart={pause}
-            onWheel={pause}
+            onPointerDown={pauseTemporarily}
+            onTouchStart={pauseTemporarily}
+            onWheel={pauseTemporarily}
+            onScroll={(event) => wrapRow(event.currentTarget)}
             tabIndex={0}
           >
             {renderedSponsors.map((sponsor, index) => {
-              const isDuplicate = rowSponsors.length > 1 && index >= rowSponsors.length;
+              const segmentIndex = Math.floor(index / rowSponsors.length);
+              const isDuplicate = rowSponsors.length > 1 && segmentIndex !== 1;
               const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
               const content = (
                 <>
