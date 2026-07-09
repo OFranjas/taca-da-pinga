@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type UIEvent } from 'react';
 import Header from '../components/Header';
+import SponsorMarquee from '../components/SponsorMarquee';
 import SponsorsRail from '../components/SponsorsRail';
 import { observeLeaderboard } from '../services/leaderboard';
 import { observeSponsors, type Sponsor } from '../services/sponsors.service';
@@ -28,7 +29,8 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_INTERVAL_MS = 2200;
+const DISPLAY_SCROLL_SPEED = 24;
+const DISPLAY_SCROLL_PAUSE_MS = 2200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
@@ -54,16 +56,6 @@ const observeLeaderboardTyped = observeLeaderboard as ObserveLeaderboard;
 
 type LeaderboardProps = {
   displayMode?: boolean;
-};
-
-const getDisplayScrollStep = (container: HTMLElement) => {
-  const row = container.querySelector<HTMLElement>('[data-testid="leaderboard-row"]');
-  const scrollableList = container.querySelector<HTMLElement>(`.${styles.fullList}`);
-  const rowGap = scrollableList ? Number.parseFloat(getComputedStyle(scrollableList).rowGap) : 0;
-  const rowHeight = row?.getBoundingClientRect().height ?? 0;
-  const measuredStep = rowHeight + (Number.isFinite(rowGap) ? rowGap : 0);
-
-  return measuredStep > 0 ? measuredStep : ROW_STRIDE;
 };
 
 const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
@@ -101,7 +93,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const displayScrollDirectionRef = useRef<1 | -1>(1);
   const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
@@ -170,31 +161,56 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       return;
     }
 
-    const intervalId = window.setInterval(() => {
+    let frameId = 0;
+    let pauseTimeoutId = 0;
+    let lastFrame = 0;
+    let direction: 1 | -1 = 1;
+
+    const scheduleAfterPause = () => {
+      pauseTimeoutId = window.setTimeout(() => {
+        lastFrame = 0;
+        frameId = window.requestAnimationFrame(step);
+      }, DISPLAY_SCROLL_PAUSE_MS);
+    };
+
+    const step = (timestamp: number) => {
+      if (!lastFrame) {
+        lastFrame = timestamp;
+      }
+
       const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
       if (maxScrollTop <= 0) {
+        frameId = window.requestAnimationFrame(step);
         return;
       }
 
-      const atBottom = container.scrollTop >= maxScrollTop - 2;
-      const atTop = container.scrollTop <= 2;
-      if (atBottom) {
-        displayScrollDirectionRef.current = -1;
-      } else if (atTop) {
-        displayScrollDirectionRef.current = 1;
+      const deltaSeconds = (timestamp - lastFrame) / 1000;
+      lastFrame = timestamp;
+      const nextScrollTop = container.scrollTop + direction * DISPLAY_SCROLL_SPEED * deltaSeconds;
+
+      if (direction === 1 && nextScrollTop >= maxScrollTop) {
+        container.scrollTop = maxScrollTop;
+        direction = -1;
+        scheduleAfterPause();
+        return;
       }
 
-      const scrollStep = getDisplayScrollStep(container);
-      const nextScrollTop =
-        displayScrollDirectionRef.current === 1
-          ? Math.min(maxScrollTop, container.scrollTop + scrollStep)
-          : Math.max(0, container.scrollTop - scrollStep);
+      if (direction === -1 && nextScrollTop <= 0) {
+        container.scrollTop = 0;
+        direction = 1;
+        scheduleAfterPause();
+        return;
+      }
 
-      container.scrollTo({ top: nextScrollTop, behavior: 'smooth' });
-    }, DISPLAY_SCROLL_INTERVAL_MS);
+      container.scrollTop = nextScrollTop;
+      frameId = window.requestAnimationFrame(step);
+    };
+
+    scheduleAfterPause();
 
     return () => {
-      window.clearInterval(intervalId);
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(pauseTimeoutId);
     };
   }, [displayMode, teams.length]);
 
@@ -271,13 +287,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
           </div>
 
           <div className={styles.content}>
-            <Section padding="none" className={styles.introSection}>
-              <Stack gap="sm" className={styles.introHeader}>
-                <Text as="span" variant="eyebrow" tone="secondary">
-                  Taça da Pinga
-                </Text>
-              </Stack>
-            </Section>
+            {!displayMode ? (
+              <div className={`${styles.mobileSponsors} ${styles.mobileSponsorsTop}`}>
+                <SponsorMarquee
+                  sponsors={sponsorColumns[0]}
+                  compact
+                  ariaLabel="Patrocinadores em destaque"
+                />
+              </div>
+            ) : null}
 
             <Section padding="none">
               <Card variant="muted" padding="lg" className={styles.tableCard}>
@@ -438,9 +456,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
               </Card>
             </Section>
 
-            <div className={styles.mobileSponsors}>
-              <SponsorsRail sponsors={leaderboardSponsors} side="left" />
-            </div>
+            {!displayMode ? (
+              <div className={styles.mobileSponsors}>
+                <SponsorMarquee
+                  sponsors={sponsorColumns[1].length ? sponsorColumns[1] : leaderboardSponsors}
+                  compact
+                  ariaLabel="Mais patrocinadores"
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className={`${styles.railSlot} ${styles.rightRail}`}>

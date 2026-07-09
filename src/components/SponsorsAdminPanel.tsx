@@ -3,6 +3,7 @@ import {
   createSponsor,
   deleteSponsor,
   observeSponsors,
+  reorderSponsors,
   updateSponsor,
   type Sponsor,
 } from '../services/sponsors.service';
@@ -26,6 +27,9 @@ export default function SponsorsAdminPanel() {
   const [isSaving, setIsSaving] = useState(false);
   const [busySponsorId, setBusySponsorId] = useState<string | null>(null);
   const [sponsorToDelete, setSponsorToDelete] = useState<Sponsor | null>(null);
+  const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -120,6 +124,64 @@ export default function SponsorsAdminPanel() {
     }
   }, [sponsorToDelete]);
 
+  const startEditingSponsor = (sponsor: Sponsor) => {
+    setEditingSponsorId(sponsor.id);
+    setEditName(sponsor.name);
+    setEditImageFile(null);
+  };
+
+  const cancelEditingSponsor = () => {
+    setEditingSponsorId(null);
+    setEditName('');
+    setEditImageFile(null);
+  };
+
+  const saveSponsorEdit = async (sponsor: Sponsor) => {
+    const name = editName.trim();
+    if (!name) {
+      toast.error('Indica o nome do patrocinador');
+      return;
+    }
+
+    setBusySponsorId(sponsor.id);
+    try {
+      await updateSponsor(sponsor.id, {
+        name,
+        imageFile: editImageFile,
+      });
+      toast.success('Patrocinador atualizado');
+      cancelEditingSponsor();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Não foi possível atualizar patrocinador';
+      toast.error(message);
+    } finally {
+      setBusySponsorId(null);
+    }
+  };
+
+  const moveSponsor = async (sponsorIndex: number, direction: -1 | 1) => {
+    const nextIndex = sponsorIndex + direction;
+    if (nextIndex < 0 || nextIndex >= sponsors.length) {
+      return;
+    }
+
+    const reorderedSponsors = [...sponsors];
+    const [movedSponsor] = reorderedSponsors.splice(sponsorIndex, 1);
+    reorderedSponsors.splice(nextIndex, 0, movedSponsor);
+    setBusySponsorId(movedSponsor.id);
+
+    try {
+      await reorderSponsors(reorderedSponsors.map((sponsor) => sponsor.id));
+      toast.success('Ordem atualizada');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível atualizar a ordem';
+      toast.error(message);
+    } finally {
+      setBusySponsorId(null);
+    }
+  };
+
   return (
     <div className={styles.panel}>
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -171,38 +233,117 @@ export default function SponsorsAdminPanel() {
         </div>
       ) : (
         <ul className={styles.list}>
-          {sponsors.map((sponsor) => {
+          {sponsors.map((sponsor, index) => {
             const isBusy = busySponsorId === sponsor.id;
+            const isEditing = editingSponsorId === sponsor.id;
             return (
               <li key={sponsor.id} className={styles.item}>
                 <div className={styles.logoFrame}>
                   <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
                 </div>
-                <div className={styles.itemCopy}>
-                  <strong>{sponsor.name}</strong>
-                  <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
-                </div>
+                {isEditing ? (
+                  <div className={styles.editFields}>
+                    <label>
+                      <span>Nome</span>
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(event) => setEditName(event.target.value)}
+                        disabled={isBusy}
+                      />
+                    </label>
+                    <label className={styles.replaceLogoButton}>
+                      <span>{editImageFile ? editImageFile.name : 'Substituir logotipo'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => setEditImageFile(event.target.files?.[0] ?? null)}
+                        disabled={isBusy}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className={styles.itemCopy}>
+                    <strong>{sponsor.name}</strong>
+                    <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
+                  </div>
+                )}
                 <div className={styles.actions}>
-                  <button
-                    type="button"
-                    className={styles.secondaryButton}
-                    onClick={() => {
-                      void toggleSponsor(sponsor);
-                    }}
-                    disabled={isBusy}
-                  >
-                    {sponsor.active ? 'Ocultar' : 'Mostrar'}
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.dangerButton}
-                    onClick={() => {
-                      setSponsorToDelete(sponsor);
-                    }}
-                    disabled={isBusy}
-                  >
-                    Eliminar
-                  </button>
+                  {isEditing ? (
+                    <>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => {
+                          void saveSponsorEdit(sponsor);
+                        }}
+                        disabled={isBusy}
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.neutralButton}
+                        onClick={cancelEditingSponsor}
+                        disabled={isBusy}
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className={styles.orderButton}
+                        onClick={() => {
+                          void moveSponsor(index, -1);
+                        }}
+                        disabled={isBusy || index === 0}
+                        aria-label={`Mover ${sponsor.name} para cima`}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.orderButton}
+                        onClick={() => {
+                          void moveSponsor(index, 1);
+                        }}
+                        disabled={isBusy || index === sponsors.length - 1}
+                        aria-label={`Mover ${sponsor.name} para baixo`}
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.neutralButton}
+                        onClick={() => startEditingSponsor(sponsor)}
+                        disabled={isBusy}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        onClick={() => {
+                          void toggleSponsor(sponsor);
+                        }}
+                        disabled={isBusy}
+                      >
+                        {sponsor.active ? 'Ocultar' : 'Mostrar'}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.dangerButton}
+                        onClick={() => {
+                          setSponsorToDelete(sponsor);
+                        }}
+                        disabled={isBusy}
+                      >
+                        Eliminar
+                      </button>
+                    </>
+                  )}
                 </div>
               </li>
             );

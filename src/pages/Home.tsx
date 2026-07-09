@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import SponsorMarquee from '../components/SponsorMarquee';
 import defaultBrandImage from '../assets/beer.svg';
 import { listSponsors, type Sponsor } from '../services/sponsors.service';
 import { observeBranding } from '../services/branding.service';
@@ -138,61 +139,7 @@ export default function Home() {
   }, [branding]);
 
   const renderSponsorsGrid = (items: Sponsor[]) => {
-    const shouldLoop = items.length > 1;
-    const renderedItems = shouldLoop ? [...items, ...items] : items;
-    const trackClassName = shouldLoop
-      ? `${styles.sponsorTrack} ${styles.sponsorTrackAnimated}`
-      : styles.sponsorTrack;
-
-    return (
-      <div className={styles.sponsorCarousel} role="list" aria-label="Patrocinadores">
-        <div className={trackClassName}>
-          {renderedItems.map((sponsor, index) => {
-            const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
-            const isDuplicate = shouldLoop && index >= items.length;
-            return (
-              <Card
-                key={`${isDuplicate ? 'duplicate' : 'sponsor'}-${sponsor.id}-${index}`}
-                variant="muted"
-                padding="lg"
-                className={`${styles.sponsorCard} ${isDuplicate ? styles.duplicateSponsorCard : ''}`}
-                fullHeight
-                role={isDuplicate ? undefined : 'listitem'}
-                aria-hidden={isDuplicate ? 'true' : undefined}
-              >
-                <Stack align="center" gap="md" className={styles.sponsorCardContent}>
-                  <div className={styles.sponsorImageFrame}>
-                    <img
-                      src={sponsor.imageDataUrl}
-                      alt={isDuplicate ? '' : sponsor.name}
-                      loading="lazy"
-                      className={styles.sponsorImage}
-                    />
-                  </div>
-                  <Text as="strong" variant="label" className={styles.sponsorName}>
-                    {sponsor.name}
-                  </Text>
-                  {hasLink ? (
-                    <Button
-                      as="a"
-                      href={sponsor.link ?? '#'}
-                      target="_blank"
-                      rel="noreferrer"
-                      variant="secondary"
-                      size="sm"
-                      className={styles.sponsorLink}
-                      aria-label={`Abrir o site de ${sponsor.name} em uma nova aba`}
-                    >
-                      Visitar site
-                    </Button>
-                  ) : null}
-                </Stack>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-    );
+    return <SponsorMarquee sponsors={items} rows={2} ariaLabel="Patrocinadores" />;
   };
 
   const renderSponsorsContent = () => {

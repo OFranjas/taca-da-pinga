@@ -27,7 +27,7 @@ const getSubmitErrorMessage = (error: unknown) => {
     lowerMessage.includes('missing or insufficient permissions') ||
     lowerMessage.includes('permission-denied')
   ) {
-    return 'Sem permissões para registar este valor. Confirma que as regras publicadas aceitam pingas até 50.';
+    return 'Sem permissões para adicionar este valor. Confirma que as regras publicadas aceitam pingas até 50.';
   }
 
   return message || 'Não foi possível adicionar pingas';
@@ -208,7 +208,7 @@ export default function AddPingasPanel() {
         className={styles.addButton}
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'A guardar...' : 'Registar'}
+        {isSubmitting ? 'A guardar...' : 'Adicionar'}
       </button>
     </div>
   );

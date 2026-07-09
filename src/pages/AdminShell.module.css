@@ -235,7 +235,7 @@
 
 .mobileTabRail {
   position: sticky;
-  top: calc(var(--ui-header-height) + var(--ui-space-xs));
+  top: 0;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -253,8 +253,13 @@
   box-shadow: none;
 }
 
+.mobileTabRail::after {
+  content: '';
+  flex: 0 0 5.5rem;
+}
+
 .mobileMoreButton {
-  flex: 0 0 auto;
+  flex: 0 0 5.5rem;
 }
 
 .mobileActiveLabel {
@@ -264,7 +269,7 @@
   font-size: var(--ui-text-size-base);
   font-weight: var(--ui-font-weight-extrabold);
   line-height: 1.15;
-  text-align: right;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

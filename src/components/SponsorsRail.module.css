@@ -11,8 +11,14 @@
 .viewport {
   width: 100%;
   max-height: calc(100dvh - 6rem);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
   border-radius: var(--ui-radius-sm);
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
 }
 
 .stack {
@@ -28,6 +34,10 @@
 
 .stackAnimated:hover {
   animation-play-state: paused;
+}
+
+.stackPaused {
+  animation: none;
 }
 
 .slot {

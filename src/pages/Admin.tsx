@@ -20,7 +20,7 @@ type AdminSection = (typeof ADMIN_SECTIONS)[keyof typeof ADMIN_SECTIONS];
 const NAV_ITEMS: AdminShellNavItem<AdminSection>[] = [
   {
     id: ADMIN_SECTIONS.Add,
-    label: 'Registar pingas',
+    label: 'Adicionar pingas',
     mobileLabel: 'Pingas',
   },
   {

@@ -78,6 +78,8 @@
 
 .primaryButton,
 .secondaryButton,
+.neutralButton,
+.orderButton,
 .dangerButton {
   border-radius: var(--ui-radius-full);
   border: 1px solid transparent;
@@ -112,6 +114,18 @@
   color: var(--ui-color-accent);
 }
 
+.neutralButton,
+.orderButton {
+  background: var(--ui-color-surface-muted);
+  border-color: var(--ui-color-border-subtle);
+  color: var(--ui-color-text-primary);
+}
+
+.orderButton {
+  min-width: 2.75rem;
+  padding: 0 var(--ui-space-xs);
+}
+
 .dangerButton {
   background: var(--ui-color-danger-soft);
   border-color: rgba(239, 68, 68, 0.55);
@@ -120,6 +134,8 @@
 
 .primaryButton:disabled,
 .secondaryButton:disabled,
+.neutralButton:disabled,
+.orderButton:disabled,
 .dangerButton:disabled {
   cursor: not-allowed;
   opacity: 0.55;
@@ -245,9 +261,70 @@
   font-size: 0.9rem;
 }
 
+.editFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 0.7fr);
+  gap: var(--ui-space-sm);
+  min-width: 0;
+}
+
+.editFields label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  min-width: 0;
+  color: var(--ui-color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: var(--ui-font-weight-bold);
+}
+
+.editFields input[type='text'] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-sm);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-color-surface-muted);
+  color: var(--ui-color-text-primary);
+  font: inherit;
+}
+
+.replaceLogoButton {
+  justify-content: end;
+  min-height: 100%;
+  cursor: pointer;
+}
+
+.replaceLogoButton > span:last-of-type,
+.replaceLogoButton > span:only-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-sm);
+  border: 1px dashed rgba(34, 197, 94, 0.42);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(34, 197, 94, 0.07);
+  color: var(--ui-color-accent-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replaceLogoButton input {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .actions {
   display: inline-flex;
   gap: var(--ui-space-xs);
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 760px) {
@@ -262,7 +339,11 @@
 
   .actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .editFields {
+    grid-template-columns: 1fr;
   }
 
   .logoFrame {

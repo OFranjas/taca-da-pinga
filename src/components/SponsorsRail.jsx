@@ -4,6 +4,7 @@ import styles from './SponsorsRail.module.css';
  * @param {{ images?: string[]; sponsors?: Array<{ imageDataUrl: string, name?: string }>; side?: 'left' | 'right' }} props
  */
 export default function SponsorsRail({ images = [], sponsors = [], side = 'left' }) {
+  const [isPaused, setPaused] = React.useState(false);
   const items = sponsors.length
     ? sponsors.map((sponsor, index) => ({
         src: sponsor.imageDataUrl,
@@ -13,7 +14,11 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
 
   if (!items.length) return null;
   const shouldLoop = items.length > 3;
-  const stackClassName = shouldLoop ? `${styles.stack} ${styles.stackAnimated}` : styles.stack;
+  const stackClassName =
+    shouldLoop && !isPaused
+      ? `${styles.stack} ${styles.stackAnimated}`
+      : `${styles.stack} ${isPaused ? styles.stackPaused : ''}`;
+  const pause = () => setPaused(true);
 
   const renderItem = (item, i, isDuplicate = false) => (
     <div
@@ -30,7 +35,7 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
 
   return (
     <aside className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}>
-      <div className={styles.viewport}>
+      <div className={styles.viewport} onPointerDown={pause} onTouchStart={pause} onWheel={pause}>
         <div className={stackClassName}>
           {items.map((item, i) => renderItem(item, i))}
           {shouldLoop ? items.map((item, i) => renderItem(item, i, true)) : null}

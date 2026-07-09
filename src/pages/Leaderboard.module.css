@@ -43,6 +43,10 @@
   display: block;
 }
 
+.mobileSponsorsTop {
+  margin-bottom: calc(-1 * var(--ui-space-xs));
+}
+
 .content {
   grid-area: content;
   display: flex;
@@ -341,6 +345,12 @@
 .displayPage .scrollRegion {
   max-height: calc(100dvh - 10rem);
   background: transparent;
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+
+.displayPage .scrollRegion::-webkit-scrollbar {
+  display: none;
 }
 
 .displayPage .displayPinnedList {
