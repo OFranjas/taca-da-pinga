@@ -76,7 +76,6 @@ describe('AdminShell', () => {
 
     render(
       <AdminShell
-        title="Painel Admin"
         navItems={navItems}
         activeNav="add"
         onSelectNav={onSelectNav}
@@ -99,6 +98,24 @@ describe('AdminShell', () => {
     expect(onSelectNav).toHaveBeenCalledWith('manage');
   });
 
+  it('uses the active section as the only admin context label', () => {
+    render(
+      <AdminShell
+        navItems={navItems}
+        activeNav="add"
+        onSelectNav={vi.fn()}
+        onNavigateBranding={vi.fn()}
+        onLogout={vi.fn()}
+      >
+        <div>Admin content</div>
+      </AdminShell>
+    );
+
+    expect(screen.getByRole('heading', { name: 'Adicionar Pingas' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Painel Admin' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Operação do torneio.')).not.toBeInTheDocument();
+  });
+
   it('renders menu actions and breadcrumbs', async () => {
     const user = createUser();
     const onNavigateBranding = vi.fn();
@@ -106,7 +123,6 @@ describe('AdminShell', () => {
 
     render(
       <AdminShell
-        title="Painel Admin"
         navItems={navItems}
         activeNav="manage"
         onSelectNav={vi.fn()}

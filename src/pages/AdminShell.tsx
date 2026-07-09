@@ -15,7 +15,6 @@ export type AdminShellBreadcrumb = {
 };
 
 type AdminShellProps<TNav extends string = string> = {
-  title: string;
   navItems: AdminShellNavItem<TNav>[];
   activeNav: TNav;
   onSelectNav: (id: TNav) => void;
@@ -26,7 +25,6 @@ type AdminShellProps<TNav extends string = string> = {
 };
 
 export function AdminShell<TNav extends string = string>({
-  title,
   navItems,
   activeNav,
   onSelectNav,
@@ -132,38 +130,6 @@ export function AdminShell<TNav extends string = string>({
   return (
     <>
       <Page tone="frost" width="page" padding="md" className={styles.page}>
-        <Section padding="none" className={styles.heroSection}>
-          <Card variant="highlight" padding="lg" className={styles.heroCard}>
-            <Stack gap="md">
-              <Stack gap="sm" className={styles.heroHeading}>
-                <Text as="span" variant="eyebrow" className={styles.eyebrow}>
-                  Painel
-                </Text>
-                <Stack gap="sm">
-                  <Stack direction="row" align="center" justify="between" gap="md" wrap>
-                    <Stack gap="sm" className={styles.titleGroup}>
-                      <Text as="h1" variant="hero" className={styles.title}>
-                        {title}
-                      </Text>
-                      <Text as="p" variant="subtitle" className={styles.subtitle}>
-                        Operação do torneio.
-                      </Text>
-                    </Stack>
-                    <Stack direction="row" gap="xs" className={styles.heroActionsDesktop}>
-                      <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
-                        Branding
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={handleLogout}>
-                        Terminar sessão
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Stack>
-              </Stack>
-            </Stack>
-          </Card>
-        </Section>
-
         <Section padding="none" className={styles.shellSection}>
           <Grid columns={{ base: 1, lg: 12 }} gap="lg" className={styles.layout} align="start">
             <div className={styles.sidebarDesktop}>

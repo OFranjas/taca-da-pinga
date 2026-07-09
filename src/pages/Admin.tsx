@@ -76,7 +76,6 @@ export default function Admin() {
         error={loginError}
       >
         <AdminShell
-          title="Admin"
           navItems={NAV_ITEMS}
           activeNav={activeSection}
           onSelectNav={(section) => {
