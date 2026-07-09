@@ -1,12 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type ChangeEvent,
-  type DragEvent,
-  type FormEvent,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   createSponsor,
   deleteSponsor,
@@ -38,7 +30,6 @@ export default function SponsorsAdminPanel() {
   const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
-  const [draggingSponsorId, setDraggingSponsorId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -195,28 +186,6 @@ export default function SponsorsAdminPanel() {
     await saveSponsorOrder(reorderedSponsors, movedSponsor);
   };
 
-  const handleSponsorDragStart = (event: DragEvent<HTMLLIElement>, sponsor: Sponsor) => {
-    setDraggingSponsorId(sponsor.id);
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', sponsor.id);
-  };
-
-  const handleSponsorDrop = async (event: DragEvent<HTMLLIElement>, targetIndex: number) => {
-    event.preventDefault();
-    const sourceSponsorId = draggingSponsorId ?? event.dataTransfer.getData('text/plain');
-    setDraggingSponsorId(null);
-
-    const sourceIndex = sponsors.findIndex((sponsor) => sponsor.id === sourceSponsorId);
-    if (sourceIndex < 0 || sourceIndex === targetIndex) {
-      return;
-    }
-
-    const reorderedSponsors = [...sponsors];
-    const [movedSponsor] = reorderedSponsors.splice(sourceIndex, 1);
-    reorderedSponsors.splice(targetIndex, 0, movedSponsor);
-    await saveSponsorOrder(reorderedSponsors, movedSponsor);
-  };
-
   return (
     <div className={styles.panel}>
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -272,22 +241,7 @@ export default function SponsorsAdminPanel() {
             const isBusy = busySponsorId === sponsor.id;
             const isEditing = editingSponsorId === sponsor.id;
             return (
-              <li
-                key={sponsor.id}
-                className={`${styles.item} ${
-                  draggingSponsorId === sponsor.id ? styles.itemDragging : ''
-                }`}
-                draggable={!isEditing && !isBusy}
-                onDragStart={(event) => handleSponsorDragStart(event, sponsor)}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  event.dataTransfer.dropEffect = 'move';
-                }}
-                onDrop={(event) => {
-                  void handleSponsorDrop(event, index);
-                }}
-                onDragEnd={() => setDraggingSponsorId(null)}
-              >
+              <li key={sponsor.id} className={styles.item}>
                 <div className={styles.logoFrame}>
                   <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
                 </div>
@@ -342,61 +296,62 @@ export default function SponsorsAdminPanel() {
                     </>
                   ) : (
                     <>
-                      <span className={styles.dragHandle} aria-hidden="true">
-                        ⋮⋮
-                      </span>
-                      <button
-                        type="button"
-                        className={`${styles.orderButton} ${styles.iconButton}`}
-                        onClick={() => {
-                          void moveSponsor(index, -1);
-                        }}
-                        disabled={isBusy || index === 0}
-                        aria-label={`Mover ${sponsor.name} para cima`}
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.orderButton} ${styles.iconButton}`}
-                        onClick={() => {
-                          void moveSponsor(index, 1);
-                        }}
-                        disabled={isBusy || index === sponsors.length - 1}
-                        aria-label={`Mover ${sponsor.name} para baixo`}
-                      >
-                        ↓
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.neutralButton} ${styles.iconButton}`}
-                        onClick={() => startEditingSponsor(sponsor)}
-                        disabled={isBusy}
-                        aria-label={`Editar ${sponsor.name}`}
-                        title="Editar"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.secondaryButton}
-                        onClick={() => {
-                          void toggleSponsor(sponsor);
-                        }}
-                        disabled={isBusy}
-                      >
-                        {sponsor.active ? 'Ocultar' : 'Mostrar'}
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.dangerButton}
-                        onClick={() => {
-                          setSponsorToDelete(sponsor);
-                        }}
-                        disabled={isBusy}
-                      >
-                        Eliminar
-                      </button>
+                      <div className={styles.iconActionGroup}>
+                        <button
+                          type="button"
+                          className={`${styles.orderButton} ${styles.iconButton}`}
+                          onClick={() => {
+                            void moveSponsor(index, -1);
+                          }}
+                          disabled={isBusy || index === 0}
+                          aria-label={`Mover ${sponsor.name} para cima`}
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.orderButton} ${styles.iconButton}`}
+                          onClick={() => {
+                            void moveSponsor(index, 1);
+                          }}
+                          disabled={isBusy || index === sponsors.length - 1}
+                          aria-label={`Mover ${sponsor.name} para baixo`}
+                        >
+                          ↓
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.neutralButton} ${styles.iconButton}`}
+                          onClick={() => startEditingSponsor(sponsor)}
+                          disabled={isBusy}
+                          aria-label={`Editar ${sponsor.name}`}
+                          title="Editar"
+                        >
+                          ✎
+                        </button>
+                      </div>
+                      <div className={styles.siteActionGroup}>
+                        <button
+                          type="button"
+                          className={styles.secondaryButton}
+                          onClick={() => {
+                            void toggleSponsor(sponsor);
+                          }}
+                          disabled={isBusy}
+                        >
+                          {sponsor.active ? 'Ocultar' : 'Mostrar'}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.dangerButton}
+                          onClick={() => {
+                            setSponsorToDelete(sponsor);
+                          }}
+                          disabled={isBusy}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>
