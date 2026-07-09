@@ -156,7 +156,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       return;
     }
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
     if (reduceMotion) {
       return;
     }
@@ -168,7 +168,10 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     const easeInOut = (progress: number) =>
       progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
+    const getMaxScrollTop = () => Math.max(0, container.scrollHeight - container.clientHeight);
+
     const animateTo = (targetScrollTop: number) => {
+      window.cancelAnimationFrame(frameId);
       const startScrollTop = container.scrollTop;
       const distance = Math.abs(targetScrollTop - startScrollTop);
       const duration = Math.max(2600, (distance / DISPLAY_SCROLL_PX_PER_SECOND) * 1000);
@@ -197,7 +200,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     };
 
     const scheduleNextScroll = () => {
-      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+      const maxScrollTop = getMaxScrollTop();
       if (maxScrollTop <= 0) {
         pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
         return;
@@ -206,7 +209,10 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       animateTo(direction === 1 ? maxScrollTop : 0);
     };
 
-    pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+    container.scrollTop = 0;
+    frameId = window.requestAnimationFrame(() => {
+      pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+    });
 
     return () => {
       window.cancelAnimationFrame(frameId);

@@ -81,6 +81,9 @@
 .neutralButton,
 .orderButton,
 .dangerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--ui-radius-full);
   border: 1px solid transparent;
   cursor: pointer;
@@ -333,17 +336,21 @@
 }
 
 .iconButton {
-  width: 2.75rem;
-  min-width: 2.75rem;
+  width: 3rem;
+  min-width: 3rem;
+  height: 3rem;
+  min-height: 3rem;
   padding: 0;
+  border-radius: var(--ui-radius-md);
 }
 
 .iconButton svg {
-  width: 1.1rem;
-  height: 1.1rem;
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -355,7 +362,7 @@
 }
 
 .iconActionGroup {
-  grid-template-columns: repeat(3, 2.75rem);
+  grid-template-columns: repeat(3, 3rem);
   justify-content: end;
 }
 
@@ -386,8 +393,12 @@
 
   .iconActionGroup,
   .siteActionGroup {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
+  }
+
+  .iconActionGroup {
+    grid-template-columns: repeat(3, 3.5rem);
+    justify-content: start;
   }
 
   .siteActionGroup {
@@ -395,8 +406,10 @@
   }
 
   .iconButton {
-    width: 100%;
-    min-width: 0;
+    width: 3.5rem;
+    min-width: 3.5rem;
+    height: 3.5rem;
+    min-height: 3.5rem;
   }
 
   .editFields {

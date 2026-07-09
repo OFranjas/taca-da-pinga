@@ -343,8 +343,10 @@
 }
 
 .displayPage .scrollRegion {
+  height: min(54rem, calc(100dvh - 13rem));
   max-height: calc(100dvh - 10rem);
   background: transparent;
+  overflow-y: hidden;
   scrollbar-width: none;
   scrollbar-gutter: auto;
 }
