@@ -318,6 +318,10 @@
 }
 
 @media (max-width: 40rem) {
+  .mobileTabRail {
+    top: 7.25rem;
+  }
+
   .contentCard {
     padding: var(--ui-space-lg);
   }
