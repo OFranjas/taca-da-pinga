@@ -331,6 +331,12 @@
   }
 }
 
+@media (min-width: 40.0625rem) and (max-width: 63.9375rem) {
+  .mobileTabRail {
+    top: 5.25rem;
+  }
+}
+
 @media (min-width: 64rem) {
   .layout {
     align-items: start;
