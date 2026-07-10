@@ -91,7 +91,9 @@ const getRowsetHeight = (length: number) => {
 export default function Leaderboard({ displayMode = false }: LeaderboardProps = {}) {
   const [teams, setTeams] = useState<LeaderboardTeam[]>([]);
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [sponsorStatus, setSponsorStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -107,16 +109,42 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   }, []);
 
   useEffect(() => {
-    const unsubscribe = observeSponsors(setSponsors, { activeOnly: true }, () => {
-      setSponsors([]);
-    });
+    const unsubscribe = observeSponsors(
+      (nextSponsors) => {
+        setSponsors(nextSponsors);
+        setSponsorStatus('loaded');
+      },
+      { activeOnly: true },
+      () => {
+        setSponsorStatus('error');
+      }
+    );
 
     return () => {
       unsubscribe?.();
     };
   }, []);
 
-  const shouldVirtualize = !displayMode && teams.length > VIRTUALIZE_THRESHOLD;
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(max-width: 40rem)');
+    if (!mediaQuery) {
+      return;
+    }
+
+    const handleViewportChange = () => {
+      setIsCompactViewport(mediaQuery.matches);
+    };
+
+    handleViewportChange();
+    mediaQuery.addEventListener?.('change', handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', handleViewportChange);
+    };
+  }, []);
+
+  const shouldVirtualize =
+    !displayMode && !isCompactViewport && teams.length > VIRTUALIZE_THRESHOLD;
 
   useEffect(() => {
     if (!shouldVirtualize && scrollRef.current) {
@@ -262,8 +290,8 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       order: index,
     }));
 
-    return sponsors.length > 0 ? sponsors : fallbackSponsors;
-  }, [sponsors]);
+    return sponsorStatus === 'loaded' ? sponsors : fallbackSponsors;
+  }, [sponsorStatus, sponsors]);
 
   const sponsorColumns = useMemo(() => {
     return leaderboardSponsors.reduce(
