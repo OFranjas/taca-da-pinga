@@ -70,20 +70,39 @@ describe('sponsors.service', () => {
     ]);
   });
 
-  test('listSponsors with activeOnly filters', async () => {
+  test('listSponsors with activeOnly queries only active sponsors', async () => {
     mockGetDocs.mockResolvedValue({
-      docs: [
-        { id: 'a', data: () => ({ order: 0, name: 'A', active: true }) },
-        { id: 'b', data: () => ({ order: 1, name: 'B', active: false }) },
-      ],
+      docs: [{ id: 'a', data: () => ({ order: 0, name: 'A', active: true }) }],
     });
     const { listSponsors } = await import('../sponsors.service');
     const sponsors = await listSponsors({ activeOnly: true });
     expect(mockQuery).toHaveBeenCalledWith(
       {},
+      expect.objectContaining({ field: 'active', op: '==', value: true }),
       expect.objectContaining({ field: 'order', dir: 'asc' })
     );
+    expect(mockWhere).toHaveBeenCalledWith('active', '==', true);
     expect(sponsors).toEqual([{ id: 'a', order: 0, name: 'A', active: true }]);
+  });
+
+  test('observeSponsors with activeOnly queries only active sponsors', async () => {
+    mockOnSnapshot.mockImplementation((_query, callback) => {
+      callback({
+        docs: [{ id: 'a', data: () => ({ order: 0, name: 'A', active: true }) }],
+      });
+      return vi.fn();
+    });
+
+    const { observeSponsors } = await import('../sponsors.service');
+    const callback = vi.fn();
+    observeSponsors(callback, { activeOnly: true });
+
+    expect(mockQuery).toHaveBeenCalledWith(
+      {},
+      expect.objectContaining({ field: 'active', op: '==', value: true }),
+      expect.objectContaining({ field: 'order', dir: 'asc' })
+    );
+    expect(callback).toHaveBeenCalledWith([{ id: 'a', order: 0, name: 'A', active: true }]);
   });
 
   test('createSponsor compresses image, assigns order and timestamps', async () => {
