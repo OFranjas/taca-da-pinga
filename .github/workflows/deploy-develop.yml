@@ -97,7 +97,7 @@ jobs:
           echo "${FIREBASE_SERVICE_ACCOUNT}" > "${HOME}/firebaseServiceAccount.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=${HOME}/firebaseServiceAccount.json" >> "${GITHUB_ENV}"
 
-      - name: Deploy Firestore rules (if configured)
+      - name: Deploy Firestore rules and indexes (if configured)
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         run: |
@@ -109,8 +109,8 @@ jobs:
             PROJECT_ARG="--project ${FIREBASE_PROJECT_ID}"
           fi
 
-          if [ -f firestore.rules ]; then
-            ./node_modules/.bin/firebase deploy --only firestore:rules ${PROJECT_ARG}
+          if [ -f firestore.rules ] || [ -f firestore.indexes.json ]; then
+            ./node_modules/.bin/firebase deploy --only firestore ${PROJECT_ARG}
           else
             echo "No Firestore rules to deploy, skipping"
           fi
