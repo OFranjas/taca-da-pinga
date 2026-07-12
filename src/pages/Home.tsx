@@ -10,10 +10,11 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import SponsorMarquee from '../components/SponsorMarquee';
 import defaultBrandImage from '../assets/beer.svg';
 import { listSponsors, type Sponsor } from '../services/sponsors.service';
 import { observeBranding } from '../services/branding.service';
-import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
+import { Button, Card, Page, Section, Stack, Text } from '../ui';
 import styles from './Home.module.css';
 
 const DEFAULT_ERROR_MESSAGE = 'Não foi possível carregar os patrocinadores.';
@@ -137,50 +138,9 @@ export default function Home() {
     return branding.mainLogo ?? branding.icon ?? defaultBrandImage;
   }, [branding]);
 
-  const renderSponsorsGrid = (items: Sponsor[]) => (
-    <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid} role="list">
-      {items.map((sponsor) => {
-        const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
-        return (
-          <Card
-            key={sponsor.id}
-            variant="muted"
-            padding="lg"
-            className={styles.sponsorCard}
-            fullHeight
-            role="listitem"
-          >
-            <Stack align="center" gap="md" className={styles.sponsorCardContent}>
-              <img
-                src={sponsor.imageDataUrl}
-                alt={sponsor.name}
-                loading="lazy"
-                className={styles.sponsorImage}
-              />
-              {hasLink ? (
-                <Button
-                  as="a"
-                  href={sponsor.link ?? '#'}
-                  target="_blank"
-                  rel="noreferrer"
-                  variant="secondary"
-                  size="sm"
-                  className={styles.sponsorLink}
-                  aria-label={`Abrir o site de ${sponsor.name} em uma nova aba`}
-                >
-                  Visitar site
-                </Button>
-              ) : (
-                <Text as="span" variant="label" tone="secondary" align="center">
-                  Sem link disponível
-                </Text>
-              )}
-            </Stack>
-          </Card>
-        );
-      })}
-    </Grid>
-  );
+  const renderSponsorsGrid = (items: Sponsor[]) => {
+    return <SponsorMarquee sponsors={items} rows={2} ariaLabel="Patrocinadores" />;
+  };
 
   const renderSponsorsContent = () => {
     if (status === 'loading') {
@@ -189,20 +149,20 @@ export default function Home() {
           <Text as="span" role="status" className={styles.visuallyHidden}>
             Carregando patrocinadores...
           </Text>
-          <Grid columns={{ base: 1, sm: 2, lg: 4 }} gap="md" className={styles.sponsorGrid}>
-            {Array.from({ length: 4 }).map((_, index) => (
+          <div className={styles.skeletonGrid}>
+            {Array.from({ length: 3 }).map((_, index) => (
               <Card
                 key={index}
                 variant="muted"
                 padding="lg"
-                className={styles.sponsorCard}
+                className={styles.skeletonCard}
                 aria-hidden="true"
               >
                 <div className={styles.skeletonBlock} />
                 <div className={styles.skeletonLine} />
               </Card>
             ))}
-          </Grid>
+          </div>
         </div>
       );
     }
@@ -292,8 +252,7 @@ export default function Home() {
                   Taça da Pinga
                 </Text>
                 <Text as="p" variant="subtitle" tone="secondary" align="center">
-                  Acompanhe o campeonato, veja o ranking das equipas e mantenha tudo organizado com
-                  o painel administrativo.
+                  A classificação oficial do torneio, sempre pronta para jogadores, bancada e ecrã.
                 </Text>
               </Stack>
               <Stack
@@ -345,10 +304,6 @@ export default function Home() {
               </Text>
               <Text as="h2" variant="heading">
                 Quem torna a Taça da Pinga possível
-              </Text>
-              <Text as="p" tone="secondary">
-                Logos e links são atualizados automaticamente a partir do painel de administração.
-                Obrigado às marcas que apoiam o torneio.
               </Text>
             </Stack>
             {renderSponsorsContent()}

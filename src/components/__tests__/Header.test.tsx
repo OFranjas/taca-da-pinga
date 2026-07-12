@@ -78,7 +78,7 @@ describe('Header', () => {
     await user.tab(); // focus brand link
     await user.tab(); // focus first nav item
 
-    const leaderboardLink = screen.getByRole('link', { name: 'Leaderboard' });
+    const leaderboardLink = screen.getByRole('link', { name: 'Classificação' });
     expect(leaderboardLink).toHaveAttribute('data-focus-visible', 'true');
   });
 });

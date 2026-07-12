@@ -1,7 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './ConfirmModal.module.css';
 
-export default function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }) {
+export default function ConfirmModal({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  confirmLabel = 'Confirmar',
+}) {
   if (!isOpen) return null;
   return (
     <div className={styles.overlay}>
@@ -15,10 +23,19 @@ export default function ConfirmModal({ isOpen, title, message, onConfirm, onCanc
             Cancelar
           </button>
           <button className={styles.confirmBtn} onClick={onConfirm}>
-            Confirmar
+            {confirmLabel}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+ConfirmModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  confirmLabel: PropTypes.string,
+};

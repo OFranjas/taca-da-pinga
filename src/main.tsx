@@ -6,6 +6,7 @@ import './ui/theme.css';
 import 'react-toastify/dist/ReactToastify.css';
 import App from './App';
 import { ToastContainer } from 'react-toastify';
+import { registerServiceWorker } from './serviceWorkerRegistration';
 
 const rootElement = document.getElementById('root');
 
@@ -21,3 +22,5 @@ root.render(
     <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
   </React.StrictMode>
 );
+
+registerServiceWorker();

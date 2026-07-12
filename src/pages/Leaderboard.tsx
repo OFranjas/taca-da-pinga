@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type UIEvent } from 'react';
 import Header from '../components/Header';
+import SponsorMarquee from '../components/SponsorMarquee';
 import SponsorsRail from '../components/SponsorsRail';
 import { observeLeaderboard } from '../services/leaderboard';
+import { observeSponsors, type Sponsor } from '../services/sponsors.service';
 import { Card, Page, Section, Stack, Text } from '../ui';
 import styles from './Leaderboard.module.css';
 
@@ -26,11 +28,15 @@ const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
+const DISPLAY_PINNED_ROWS = 5;
+const DISPLAY_SCROLL_PX_PER_SECOND = 42;
+const DISPLAY_SCROLL_PAUSE_MS = 1200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
 const sponsorLeft = [s1, s3, s5, s7, s10, s11];
 const sponsorRight = [s2, s4, s6, s8, s9, s12];
+const skeletonRows = Array.from({ length: 8 }, (_, index) => index);
 
 type ServiceTeam = {
   id: string;
@@ -47,6 +53,10 @@ type LeaderboardTeam = {
 type ObserveLeaderboard = (callback: (teams: ServiceTeam[]) => void) => () => void;
 
 const observeLeaderboardTyped = observeLeaderboard as ObserveLeaderboard;
+
+type LeaderboardProps = {
+  displayMode?: boolean;
+};
 
 const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
   incoming
@@ -78,9 +88,12 @@ const getRowsetHeight = (length: number) => {
   return length * ROW_STRIDE - ROW_GAP;
 };
 
-export default function Leaderboard() {
+export default function Leaderboard({ displayMode = false }: LeaderboardProps = {}) {
   const [teams, setTeams] = useState<LeaderboardTeam[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [sponsorStatus, setSponsorStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -95,7 +108,43 @@ export default function Leaderboard() {
     };
   }, []);
 
-  const shouldVirtualize = teams.length > VIRTUALIZE_THRESHOLD;
+  useEffect(() => {
+    const unsubscribe = observeSponsors(
+      (nextSponsors) => {
+        setSponsors(nextSponsors);
+        setSponsorStatus('loaded');
+      },
+      { activeOnly: true },
+      () => {
+        setSponsorStatus('error');
+      }
+    );
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(max-width: 40rem)');
+    if (!mediaQuery) {
+      return;
+    }
+
+    const handleViewportChange = () => {
+      setIsCompactViewport(mediaQuery.matches);
+    };
+
+    handleViewportChange();
+    mediaQuery.addEventListener?.('change', handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', handleViewportChange);
+    };
+  }, []);
+
+  const shouldVirtualize =
+    !displayMode && !isCompactViewport && teams.length > VIRTUALIZE_THRESHOLD;
 
   useEffect(() => {
     if (!shouldVirtualize && scrollRef.current) {
@@ -124,6 +173,80 @@ export default function Leaderboard() {
   const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
     setScrollTop(event.currentTarget.scrollTop);
   }, []);
+
+  useEffect(() => {
+    if (!displayMode || teams.length <= DISPLAY_PINNED_ROWS) {
+      return;
+    }
+
+    const container = scrollRef.current;
+    if (!container) {
+      return;
+    }
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+    if (reduceMotion) {
+      return;
+    }
+
+    let frameId = 0;
+    let pauseTimeoutId = 0;
+    let direction: 1 | -1 = 1;
+
+    const easeInOut = (progress: number) =>
+      progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const getMaxScrollTop = () => Math.max(0, container.scrollHeight - container.clientHeight);
+
+    const animateTo = (targetScrollTop: number) => {
+      window.cancelAnimationFrame(frameId);
+      const startScrollTop = container.scrollTop;
+      const distance = Math.abs(targetScrollTop - startScrollTop);
+      const duration = Math.max(2600, (distance / DISPLAY_SCROLL_PX_PER_SECOND) * 1000);
+      let startTime = 0;
+
+      const step = (timestamp: number) => {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+
+        const progress = Math.min(1, (timestamp - startTime) / duration);
+        const easedProgress = easeInOut(progress);
+        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * easedProgress;
+
+        if (progress < 1) {
+          frameId = window.requestAnimationFrame(step);
+          return;
+        }
+
+        container.scrollTop = targetScrollTop;
+        direction = direction === 1 ? -1 : 1;
+        pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+      };
+
+      frameId = window.requestAnimationFrame(step);
+    };
+
+    const scheduleNextScroll = () => {
+      const maxScrollTop = getMaxScrollTop();
+      if (maxScrollTop <= 0) {
+        pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+        return;
+      }
+
+      animateTo(direction === 1 ? maxScrollTop : 0);
+    };
+
+    container.scrollTop = 0;
+    frameId = window.requestAnimationFrame(() => {
+      pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(pauseTimeoutId);
+    };
+  }, [displayMode, teams.length]);
 
   const virtualState = useMemo(() => {
     if (!shouldVirtualize) {
@@ -155,26 +278,58 @@ export default function Leaderboard() {
   );
 
   const totalPingas = useMemo(() => teams.reduce((total, team) => total + team.pingas, 0), [teams]);
+  const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
+  const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
+
+  const leaderboardSponsors = useMemo(() => {
+    const fallbackSponsors = [...sponsorLeft, ...sponsorRight].map((imageDataUrl, index) => ({
+      id: `fallback-${index}`,
+      name: `Patrocinador ${index + 1}`,
+      imageDataUrl,
+      active: true,
+      order: index,
+    }));
+
+    return sponsorStatus === 'loaded' ? sponsors : fallbackSponsors;
+  }, [sponsorStatus, sponsors]);
+
+  const sponsorColumns = useMemo(() => {
+    return leaderboardSponsors.reduce(
+      (columns, sponsor, index) => {
+        columns[index % 2 === 0 ? 0 : 1].push(sponsor);
+        return columns;
+      },
+      [[], []] as [Sponsor[], Sponsor[]]
+    );
+  }, [leaderboardSponsors]);
 
   const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
 
   return (
     <>
-      <Header />
-      <Page tone="default" width="page" padding="lg" innerClassName={styles.page}>
+      {displayMode ? null : <Header />}
+      <Page
+        tone="default"
+        width={displayMode ? 'fluid' : 'page'}
+        padding={displayMode ? 'none' : 'lg'}
+        className={displayMode ? styles.displayRoot : undefined}
+        innerClassName={`${styles.page} ${displayMode ? styles.displayPage : ''}`}
+      >
         <div className={styles.layout}>
           <div className={`${styles.railSlot} ${styles.leftRail}`}>
-            <SponsorsRail images={sponsorLeft} side="left" />
+            <SponsorsRail sponsors={sponsorColumns[0]} side="left" />
           </div>
 
           <div className={styles.content}>
-            <Section padding="none" className={styles.introSection}>
-              <Stack gap="sm" className={styles.introHeader}>
-                <Text as="span" variant="eyebrow" tone="secondary">
-                  Taça da Pinga · Painel oficial
-                </Text>
-              </Stack>
-            </Section>
+            {!displayMode ? (
+              <div className={`${styles.mobileSponsors} ${styles.mobileSponsorsTop}`}>
+                <SponsorMarquee
+                  sponsors={sponsorColumns[0]}
+                  compact
+                  ariaLabel="Patrocinadores em destaque"
+                />
+              </div>
+            ) : null}
 
             <Section padding="none">
               <Card variant="muted" padding="lg" className={styles.tableCard}>
@@ -186,10 +341,7 @@ export default function Leaderboard() {
                 >
                   <div>
                     <Text as="h2" variant="heading">
-                      Leaderboard das equipas
-                    </Text>
-                    <Text as="p" variant="body" tone="secondary">
-                      Atualiza automaticamente à medida que chegam novas pingas.
+                      Classificação
                     </Text>
                   </div>
                   <div className={styles.tableBadges}>
@@ -198,9 +350,9 @@ export default function Leaderboard() {
                         ? '1 equipa em prova'
                         : `${teams.length} equipas em prova`}
                     </Text>
-                    <div className={styles.totalBadge} aria-label="Pingas totais registadas">
+                    <div className={styles.totalBadge} aria-label="Total de pingas registadas">
                       <Text as="span" variant="label" tone="muted">
-                        Pingas totais
+                        Total de Pingas
                       </Text>
                       <Text as="span" variant="heading" weight="bold" className={styles.totalValue}>
                         {numberFormatter.format(totalPingas)}
@@ -210,8 +362,19 @@ export default function Leaderboard() {
                 </Stack>
 
                 {!isLoaded ? (
-                  <div role="status" className={styles.feedback}>
-                    A carregar a classificação…
+                  <div
+                    role="status"
+                    className={styles.tableSkeleton}
+                    aria-label="A carregar a classificação"
+                  >
+                    <span className={styles.visuallyHidden}>A carregar a classificação...</span>
+                    {skeletonRows.map((row) => (
+                      <div key={row} className={styles.skeletonRow}>
+                        <span className={styles.skeletonRank} />
+                        <span className={styles.skeletonName} />
+                        <span className={styles.skeletonValue} />
+                      </div>
+                    ))}
                   </div>
                 ) : teams.length === 0 ? (
                   <div role="status" className={styles.feedback}>
@@ -250,7 +413,38 @@ export default function Leaderboard() {
                       </div>
 
                       <div role="rowgroup" className={styles.bodyGroup}>
-                        {shouldVirtualize ? (
+                        {displayMode ? (
+                          <>
+                            <div className={styles.displayPinnedList} role="presentation">
+                              {displayPinnedTeams.map((team, index) => (
+                                <LeaderboardRow
+                                  key={team.id}
+                                  rank={index + 1}
+                                  teamName={team.name}
+                                  pingas={team.pingas}
+                                  maxPingas={maxPingas}
+                                  ariaRowIndex={index + 2}
+                                  numberFormatter={numberFormatter}
+                                />
+                              ))}
+                            </div>
+                            {displayScrollableTeams.length > 0 ? (
+                              <div className={styles.fullList} role="presentation">
+                                {displayScrollableTeams.map((team, index) => (
+                                  <LeaderboardRow
+                                    key={team.id}
+                                    rank={index + DISPLAY_PINNED_ROWS + 1}
+                                    teamName={team.name}
+                                    pingas={team.pingas}
+                                    maxPingas={maxPingas}
+                                    ariaRowIndex={index + DISPLAY_PINNED_ROWS + 2}
+                                    numberFormatter={numberFormatter}
+                                  />
+                                ))}
+                              </div>
+                            ) : null}
+                          </>
+                        ) : shouldVirtualize ? (
                           <div
                             className={styles.virtualRoot}
                             style={{ height: `${virtualState.totalHeight}px` }}
@@ -295,10 +489,20 @@ export default function Leaderboard() {
                 )}
               </Card>
             </Section>
+
+            {!displayMode ? (
+              <div className={styles.mobileSponsors}>
+                <SponsorMarquee
+                  sponsors={sponsorColumns[1].length ? sponsorColumns[1] : leaderboardSponsors}
+                  compact
+                  ariaLabel="Mais patrocinadores"
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className={`${styles.railSlot} ${styles.rightRail}`}>
-            <SponsorsRail images={sponsorRight} side="right" />
+            <SponsorsRail sponsors={sponsorColumns[1]} side="right" />
           </div>
         </div>
       </Page>

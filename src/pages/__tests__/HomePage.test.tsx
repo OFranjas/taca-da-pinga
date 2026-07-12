@@ -56,7 +56,7 @@ describe('Home page', () => {
 
     const skeleton = screen.getByTestId('home-sponsors-loading');
     expect(skeleton).toBeInTheDocument();
-    expect(skeleton.querySelectorAll('article')).toHaveLength(4);
+    expect(skeleton.querySelectorAll('article')).toHaveLength(3);
 
     await act(async () => {
       resolveSponsors([]);

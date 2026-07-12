@@ -37,7 +37,7 @@ service cloud.firestore {
 
 - Only admins can mutate (`teams`, `events`, `app_config`).
 - Public can read `teams` and `events`; `app_config` is not publicly readable.
-- “Add pinga” increments are positive and bounded (delta ∈ [1..5]).
+- “Add pinga” increments are positive and bounded (delta ∈ [1..50]).
 - Totals never negative.
 
 ## Logging & Audit

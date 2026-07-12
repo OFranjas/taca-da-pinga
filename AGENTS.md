@@ -111,7 +111,7 @@ src/
 
 - Admin-only WRITE to leaderboard/events/app_config.
 
-- “Add pinga” increments must be positive and bounded (e.g., 1..5).
+- “Add pinga” increments must be positive and bounded (e.g., 1..50).
 
 - Update or add Firestore rules only with emulator tests in the same PR.
 

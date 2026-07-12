@@ -12,6 +12,15 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      exclude: [
+        'public/**',
+        'dist/**',
+        'coverage/**',
+        'rules-tests/**',
+        'tools/**',
+        '*.config.*',
+        'src/types/**',
+      ],
     },
     exclude: [...configDefaults.exclude, 'rules-tests/**'],
   },

@@ -30,7 +30,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#854d0e',
         meterStart: '#facc15',
         meterEnd: '#f59e0b',
-        scoreColor: '#92400e',
+        scoreColor: '#ca8a04',
       };
     case 2:
       return {
@@ -39,7 +39,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#1f2937',
         meterStart: '#cbd5f5',
         meterEnd: '#94a3b8',
-        scoreColor: '#1e293b',
+        scoreColor: '#64748b',
       };
     case 3:
       return {
@@ -48,7 +48,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#7c2d12',
         meterStart: '#fb923c',
         meterEnd: '#f97316',
-        scoreColor: '#b45309',
+        scoreColor: '#c2410c',
       };
     default:
       return {
@@ -131,7 +131,9 @@ export function LeaderboardRow({
       </div>
       <div role="cell" className={styles.scoreCell}>
         <span className={styles.scoreValue}>{scoreText}</span>
-        <span className={styles.scoreLabel}>pingas</span>
+        <span className={styles.scoreLabel} aria-hidden="true">
+          pts
+        </span>
       </div>
     </div>
   );

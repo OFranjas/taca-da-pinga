@@ -41,7 +41,7 @@ service cloud.firestore {
           request.resource.data.pingas >= 0 &&
           request.resource.data.pingas > resource.data.pingas &&
           (request.resource.data.pingas - resource.data.pingas) >= 1 &&
-          (request.resource.data.pingas - resource.data.pingas) <= 5
+          (request.resource.data.pingas - resource.data.pingas) <= 50
         )
       );
 
@@ -83,7 +83,8 @@ service cloud.firestore {
     // Sponsors — public READ, admin WRITE with validated fields
     match /sponsors/{sponsorId} {
       allow read: if true;
-      allow write: if isAdmin() && isValidSponsorData(request.resource.data);
+      allow create, update: if isAdmin() && isValidSponsorData(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // Everything else denied

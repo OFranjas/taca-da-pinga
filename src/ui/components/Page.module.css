@@ -1,5 +1,6 @@
 .root {
   width: 100%;
+  min-width: 0;
   display: flex;
   justify-content: center;
   background: var(--ui-color-page);
@@ -20,6 +21,7 @@
   flex-direction: column;
   gap: var(--ui-space-xl);
   width: 100%;
+  min-width: 0;
 }
 
 .toneDefault {

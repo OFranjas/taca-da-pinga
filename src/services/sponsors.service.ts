@@ -5,12 +5,15 @@ import {
   doc,
   getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  where,
   updateDoc,
   writeBatch,
+  where,
+  type QueryConstraint,
+  type Unsubscribe,
 } from 'firebase/firestore';
 import { compressImage } from '../utils/image';
 import { db } from '../firebase';
@@ -34,13 +37,34 @@ interface ListSponsorsOptions {
 export async function listSponsors(options: ListSponsorsOptions = {}): Promise<Sponsor[]> {
   const { activeOnly = false } = options;
   const sponsorsRef = collection(db, SPONSORS_COLLECTION);
-  const constraints = [orderBy('order', 'asc')];
-  if (activeOnly) {
-    constraints.push(where('active', '==', true));
-  }
+  const constraints: QueryConstraint[] = activeOnly
+    ? [where('active', '==', true), orderBy('order', 'asc')]
+    : [orderBy('order', 'asc')];
   const snap = await getDocs(query(sponsorsRef, ...constraints));
   const mapped = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
   return mapped;
+}
+
+export function observeSponsors(
+  callback: (sponsors: Sponsor[]) => void,
+  options: ListSponsorsOptions = {},
+  onError?: (error: unknown) => void
+): Unsubscribe {
+  const { activeOnly = false } = options;
+  const sponsorsRef = collection(db, SPONSORS_COLLECTION);
+  const constraints: QueryConstraint[] = activeOnly
+    ? [where('active', '==', true), orderBy('order', 'asc')]
+    : [orderBy('order', 'asc')];
+  return onSnapshot(
+    query(sponsorsRef, ...constraints),
+    (snap) => {
+      const mapped = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Sponsor, 'id'>) }));
+      callback(mapped);
+    },
+    (error) => {
+      onError?.(error);
+    }
+  );
 }
 
 interface CreateSponsorParams {

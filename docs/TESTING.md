@@ -49,13 +49,13 @@ git grep "from 'firebase/firestore'" src/components src/pages
 - Allowed
   - Public READ for `teams` (leaderboard) and `events`.
   - Admin WRITE to `teams`, `events`, and `app_config`.
-  - Admin increments to `teams.pingas` with delta in [1..5].
+  - Admin increments to `teams.pingas` with delta in [1..50].
   - Public READ for `branding/current` and `sponsors`; admin writes must keep
     image data URLs ≤ 180 KB.
 
 - Denied
   - Non-admin writes anywhere.
-  - Increments > 5 or any decrement to `teams.pingas`.
+  - Increments > 50 or any decrement to `teams.pingas`.
   - Totals going negative.
   - Public READ of `app_config`.
   - Invalid branding payloads (non-image data URLs or oversized assets).
