@@ -243,7 +243,19 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
           className={styles.card}
           aria-hidden
         >
-          {content}
+          {hasLink ? (
+            <a
+              href={sponsor.link}
+              target="_blank"
+              rel="noreferrer"
+              tabIndex={-1}
+              className={styles.cardLink}
+            >
+              {content}
+            </a>
+          ) : (
+            content
+          )}
         </span>
       );
     }

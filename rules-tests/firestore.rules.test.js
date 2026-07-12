@@ -183,6 +183,11 @@ describe('Firestore security rules', () => {
         link: 'ftp://invalid',
       }));
 
+      await assertFails(setDoc(doc(adminDb, 'sponsors/s-http-link'), {
+        ...baseSponsor,
+        link: 'http://example.com',
+      }));
+
       await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-order'), {
         ...baseSponsor,
         order: 1000,

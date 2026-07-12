@@ -73,7 +73,7 @@ service cloud.firestore {
     function isValidSponsorData(data) {
       return (data.name is string) && (data.name.size() <= 80) &&
         ('link' in data) && (data.link is string) &&
-          (data.link.size() == 0 || data.link.matches('^https?://.+')) &&
+          (data.link.size() == 0 || data.link.matches('^https://.+')) &&
         ('imageDataUrl' in data) && isValidImageDataUrl(data.imageDataUrl) &&
         ('active' in data) && (data.active is bool) &&
         ('order' in data) && (data.order is int) &&

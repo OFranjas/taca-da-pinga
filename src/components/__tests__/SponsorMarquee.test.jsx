@@ -29,7 +29,9 @@ describe('SponsorMarquee', () => {
   });
 
   test('keeps one accessible, interactive copy of every looping sponsor', () => {
-    render(<SponsorMarquee sponsors={sponsors} autoScroll ariaLabel="Patrocinadores de teste" />);
+    const { container } = render(
+      <SponsorMarquee sponsors={sponsors} autoScroll ariaLabel="Patrocinadores de teste" />
+    );
 
     expect(screen.getByRole('list', { name: 'Patrocinadores de teste' })).toBeInTheDocument();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
@@ -42,6 +44,12 @@ describe('SponsorMarquee', () => {
       'target',
       '_blank'
     );
+    const duplicateLinks = container.querySelectorAll('[aria-hidden="true"] a');
+    expect(duplicateLinks).toHaveLength(2);
+    duplicateLinks.forEach((link) => {
+      expect(link).toHaveAttribute('href', 'https://example.com/one');
+      expect(link).toHaveAttribute('tabindex', '-1');
+    });
   });
 
   test('does not duplicate a single sponsor just to animate it', () => {
