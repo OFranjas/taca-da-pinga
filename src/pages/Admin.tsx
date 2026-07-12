@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AddPingasPanel from '../components/AddPingasPanel';
@@ -41,25 +41,6 @@ export default function Admin() {
   const [activeSection, setActiveSection] = useState<AdminSection>(ADMIN_SECTIONS.Add);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const wasSignedOutRef = useRef(false);
-
-  useEffect(() => {
-    if (auth.isCheckingAuth) {
-      return;
-    }
-
-    if (!auth.user) {
-      wasSignedOutRef.current = true;
-      return;
-    }
-
-    if (wasSignedOutRef.current) {
-      window.requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-      });
-      wasSignedOutRef.current = false;
-    }
-  }, [auth.isCheckingAuth, auth.user]);
 
   const handleLoginSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
