@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import SponsorMarquee from '../SponsorMarquee';
+import SponsorMarquee, { normalizeMobileLoopPosition } from '../SponsorMarquee';
 
 const sponsors = [
   {
@@ -16,6 +16,12 @@ const sponsors = [
 ];
 
 describe('SponsorMarquee', () => {
+  test('keeps mobile transform motion within the interactive middle segment', () => {
+    expect(normalizeMobileLoopPosition(0, 120)).toBe(120);
+    expect(normalizeMobileLoopPosition(179, 120)).toBe(179);
+    expect(normalizeMobileLoopPosition(240, 120)).toBe(120);
+  });
+
   test('does not render an empty sponsor list', () => {
     const { container } = render(<SponsorMarquee sponsors={[]} autoScroll />);
 

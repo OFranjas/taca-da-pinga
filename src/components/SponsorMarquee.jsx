@@ -8,6 +8,14 @@ const LOOP_SEGMENTS = 3;
 const usesMobileTransformAnimation = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(hover: none)').matches;
 
+export const normalizeMobileLoopPosition = (position, segmentWidth) => {
+  if (!segmentWidth) return 0;
+
+  return (
+    segmentWidth + ((((position - segmentWidth) % segmentWidth) + segmentWidth) % segmentWidth)
+  );
+};
+
 function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   const viewportRef = useRef(null);
   const trackRef = useRef(null);
@@ -24,9 +32,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
 
   const normalizeMobilePosition = useCallback((position) => {
     const segmentWidth = (trackRef.current?.scrollWidth ?? 0) / LOOP_SEGMENTS;
-    if (!segmentWidth) return 0;
-
-    return ((position % segmentWidth) + segmentWidth) % segmentWidth;
+    return normalizeMobileLoopPosition(position, segmentWidth);
   }, []);
 
   const applyMobilePosition = useCallback(
