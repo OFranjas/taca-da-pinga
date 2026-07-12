@@ -73,6 +73,23 @@ interface CreateSponsorParams {
   imageFile: File;
 }
 
+export function normalizeSponsorLink(link?: string | null): string {
+  const value = link?.trim() ?? '';
+  if (!value) {
+    return '';
+  }
+
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:') {
+      throw new Error('invalid protocol');
+    }
+    return url.href;
+  } catch {
+    throw new Error('Indica um URL HTTPS válido');
+  }
+}
+
 async function nextOrderValue(): Promise<number> {
   const sponsorsRef = collection(db, SPONSORS_COLLECTION);
   const snap = await getDocs(query(sponsorsRef, orderBy('order', 'desc'), limit(1)));
@@ -92,12 +109,13 @@ export async function createSponsor({
   link,
   imageFile,
 }: CreateSponsorParams): Promise<string> {
+  const normalizedLink = normalizeSponsorLink(link);
   const imageDataUrl = await compressImage(imageFile);
   const orderValue = await nextOrderValue();
   const timestamp = serverTimestamp();
   const docRef = await addDoc(collection(db, SPONSORS_COLLECTION), {
     name,
-    link: link ?? '',
+    link: normalizedLink,
     imageDataUrl,
     active: true,
     order: orderValue,
@@ -118,6 +136,7 @@ export async function updateSponsor(
   id: string,
   { name, link, imageFile, active }: UpdateSponsorParams
 ): Promise<void> {
+  const normalizedLink = typeof link === 'undefined' ? undefined : normalizeSponsorLink(link);
   const updates: Record<string, unknown> = {
     updatedAt: serverTimestamp(),
   };
@@ -126,7 +145,7 @@ export async function updateSponsor(
     updates.name = name;
   }
   if (typeof link !== 'undefined') {
-    updates.link = link ?? '';
+    updates.link = normalizedLink ?? '';
   }
   if (typeof active !== 'undefined') {
     updates.active = active;

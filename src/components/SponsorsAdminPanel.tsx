@@ -45,11 +45,13 @@ import styles from './SponsorsAdminPanel.module.css';
 
 type SponsorFormState = {
   name: string;
+  link: string;
   imageFile: File | null;
 };
 
 const initialForm: SponsorFormState = {
   name: '',
+  link: '',
   imageFile: null,
 };
 
@@ -136,6 +138,7 @@ export default function SponsorsAdminPanel() {
   const [sponsorToDelete, setSponsorToDelete] = useState<Sponsor | null>(null);
   const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [editLink, setEditLink] = useState('');
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [draggingSponsorId, setDraggingSponsorId] = useState<string | null>(null);
@@ -166,7 +169,7 @@ export default function SponsorsAdminPanel() {
 
   const activeSponsors = useMemo(() => sponsors.filter((sponsor) => sponsor.active), [sponsors]);
 
-  const handleTextChange = (field: 'name') => (event: ChangeEvent<HTMLInputElement>) => {
+  const handleTextChange = (field: 'name' | 'link') => (event: ChangeEvent<HTMLInputElement>) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
   };
 
@@ -191,6 +194,7 @@ export default function SponsorsAdminPanel() {
     try {
       await createSponsor({
         name,
+        link: form.link,
         imageFile: form.imageFile,
       });
       toast.success('Patrocinador criado');
@@ -241,12 +245,14 @@ export default function SponsorsAdminPanel() {
   const startEditingSponsor = (sponsor: Sponsor) => {
     setEditingSponsorId(sponsor.id);
     setEditName(sponsor.name);
+    setEditLink(sponsor.link ?? '');
     setEditImageFile(null);
   };
 
   const cancelEditingSponsor = () => {
     setEditingSponsorId(null);
     setEditName('');
+    setEditLink('');
     setEditImageFile(null);
   };
 
@@ -261,6 +267,7 @@ export default function SponsorsAdminPanel() {
     try {
       await updateSponsor(sponsor.id, {
         name,
+        link: editLink,
         imageFile: editImageFile,
       });
       toast.success('Patrocinador atualizado');
@@ -341,6 +348,17 @@ export default function SponsorsAdminPanel() {
             onChange={handleTextChange('name')}
             placeholder="Nome do patrocinador"
             autoComplete="organization"
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="sponsor-link">Site (opcional)</label>
+          <input
+            id="sponsor-link"
+            type="url"
+            value={form.link}
+            onChange={handleTextChange('link')}
+            placeholder="https://exemplo.pt"
+            inputMode="url"
           />
         </div>
         <div className={`${styles.field} ${styles.logoField}`}>
@@ -454,6 +472,17 @@ export default function SponsorsAdminPanel() {
                                 type="text"
                                 value={editName}
                                 onChange={(event) => setEditName(event.target.value)}
+                                disabled={isBusy}
+                              />
+                            </label>
+                            <label>
+                              <span>Site (opcional)</span>
+                              <input
+                                type="url"
+                                value={editLink}
+                                onChange={(event) => setEditLink(event.target.value)}
+                                placeholder="https://exemplo.pt"
+                                inputMode="url"
                                 disabled={isBusy}
                               />
                             </label>

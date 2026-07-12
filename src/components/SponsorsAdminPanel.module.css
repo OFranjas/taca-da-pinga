@@ -6,7 +6,7 @@
 
 .form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.8fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(14rem, 0.8fr) auto;
   gap: var(--ui-space-md);
   align-items: end;
   padding: var(--ui-space-md);
@@ -290,7 +290,8 @@
   font-weight: var(--ui-font-weight-bold);
 }
 
-.editFields input[type='text'] {
+.editFields input[type='text'],
+.editFields input[type='url'] {
   box-sizing: border-box;
   width: 100%;
   min-height: 2.75rem;
@@ -421,6 +422,15 @@
 }
 
 @media (max-width: 75rem) {
+  .form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form .primaryButton {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
   .item {
     grid-template-columns: 2.75rem 8.5rem minmax(0, 1fr);
   }
@@ -456,6 +466,10 @@
 
   .form {
     padding: var(--ui-space-sm);
+  }
+
+  .form .primaryButton {
+    width: 100%;
   }
 
   .actions {

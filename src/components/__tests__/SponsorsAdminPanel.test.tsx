@@ -29,16 +29,18 @@ const sponsors: Sponsor[] = [
 ];
 
 const sponsorServiceMocks = vi.hoisted(() => ({
+  createSponsor: vi.fn(),
   observeSponsors: vi.fn(),
   reorderSponsors: vi.fn(),
+  updateSponsor: vi.fn(),
 }));
 
 vi.mock('../../services/sponsors.service', () => ({
-  createSponsor: vi.fn(),
+  createSponsor: sponsorServiceMocks.createSponsor,
   deleteSponsor: vi.fn(),
   observeSponsors: sponsorServiceMocks.observeSponsors,
   reorderSponsors: sponsorServiceMocks.reorderSponsors,
-  updateSponsor: vi.fn(),
+  updateSponsor: sponsorServiceMocks.updateSponsor,
 }));
 
 vi.mock('react-toastify', () => ({
@@ -102,6 +104,8 @@ describe('SponsorsAdminPanel ordering controls', () => {
       }
     );
     sponsorServiceMocks.reorderSponsors.mockResolvedValue(undefined);
+    sponsorServiceMocks.createSponsor.mockResolvedValue('new-sponsor');
+    sponsorServiceMocks.updateSponsor.mockResolvedValue(undefined);
   });
 
   test('renders a dedicated drag handle without redundant arrow controls', async () => {
@@ -133,6 +137,39 @@ describe('SponsorsAdminPanel ordering controls', () => {
         ])
       );
       expect(screen.getAllByRole('listitem')[0]).toHaveTextContent('Primeiro');
+    });
+  });
+
+  test('passes the optional HTTPS site to sponsor creation and editing', async () => {
+    render(<SponsorsAdminPanel />);
+
+    fireEvent.change(screen.getByLabelText('Site (opcional)'), {
+      target: { value: 'https://example.com/new' },
+    });
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Novo patrocinador' } });
+    fireEvent.change(screen.getByLabelText('Logotipo'), {
+      target: { files: [new File(['logo'], 'logo.png', { type: 'image/png' })] },
+    });
+    fireEvent.submit(
+      screen.getByRole('button', { name: 'Adicionar patrocinador' }).closest('form')!
+    );
+
+    await waitFor(() => {
+      expect(sponsorServiceMocks.createSponsor).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Novo patrocinador', link: 'https://example.com/new' })
+      );
+    });
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Editar' })[0]);
+    const siteInputs = screen.getAllByLabelText('Site (opcional)');
+    fireEvent.change(siteInputs[1], { target: { value: 'https://example.com/updated' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    await waitFor(() => {
+      expect(sponsorServiceMocks.updateSponsor).toHaveBeenCalledWith(
+        'first',
+        expect.objectContaining({ link: 'https://example.com/updated' })
+      );
     });
   });
 });

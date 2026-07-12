@@ -38,6 +38,10 @@ describe('SponsorMarquee', () => {
       'href',
       'https://example.com/one'
     );
+    expect(screen.getByRole('link', { name: /Primeiro sponsor/i })).toHaveAttribute(
+      'target',
+      '_blank'
+    );
   });
 
   test('does not duplicate a single sponsor just to animate it', () => {

@@ -143,6 +143,17 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   useEffect(() => {
     const track = trackRef.current;
     if (!track || !shouldLoop || !usesMobileTransformAnimation()) return undefined;
+
+    const frameId = window.requestAnimationFrame(() => {
+      applyMobilePosition(mobilePositionRef.current);
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [applyMobilePosition, shouldLoop]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !shouldLoop || !usesMobileTransformAnimation()) return undefined;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     let frameId = 0;
