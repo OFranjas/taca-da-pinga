@@ -161,26 +161,11 @@
   .animatedRow {
     mask-image: none;
     overflow: hidden;
-    touch-action: auto;
+    touch-action: pan-y;
   }
 
   .animatedRow .track {
-    animation: mobileSponsorMarquee 28s linear infinite;
     will-change: transform;
-  }
-
-  .animatedRow:active .track {
-    animation-play-state: paused;
-  }
-
-  @keyframes mobileSponsorMarquee {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-
-    to {
-      transform: translate3d(-33.333333%, 0, 0);
-    }
   }
 }
 

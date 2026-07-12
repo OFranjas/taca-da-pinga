@@ -10,13 +10,35 @@ const usesMobileTransformAnimation = () =>
 
 function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   const viewportRef = useRef(null);
+  const trackRef = useRef(null);
   const scrollPositionRef = useRef(0);
+  const mobilePositionRef = useRef(0);
+  const mobileDragRef = useRef(null);
   const pausedUntilRef = useRef(0);
   const isInteractingRef = useRef(false);
+  const suppressClickRef = useRef(false);
   const loopKey = useMemo(() => sponsors.map((sponsor) => sponsor.id).join('|'), [sponsors]);
   const shouldLoop = autoScroll && sponsors.length > 1;
 
   const getSegmentWidth = useCallback((viewport) => viewport.scrollWidth / LOOP_SEGMENTS, []);
+
+  const normalizeMobilePosition = useCallback((position) => {
+    const segmentWidth = (trackRef.current?.scrollWidth ?? 0) / LOOP_SEGMENTS;
+    if (!segmentWidth) return 0;
+
+    return ((position % segmentWidth) + segmentWidth) % segmentWidth;
+  }, []);
+
+  const applyMobilePosition = useCallback(
+    (position) => {
+      const normalizedPosition = normalizeMobilePosition(position);
+      mobilePositionRef.current = normalizedPosition;
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(${-normalizedPosition}px, 0, 0)`;
+      }
+    },
+    [normalizeMobilePosition]
+  );
 
   const syncPosition = useCallback((viewport) => {
     if (viewport) {
@@ -112,6 +134,74 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
     return () => window.cancelAnimationFrame(frameId);
   }, [getSegmentWidth, shouldLoop, wrapViewport]);
 
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !shouldLoop || !usesMobileTransformAnimation()) return undefined;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let frameId = 0;
+    let lastFrame = 0;
+    const step = (timestamp) => {
+      if (!lastFrame) lastFrame = timestamp;
+      const deltaSeconds = (timestamp - lastFrame) / 1000;
+      lastFrame = timestamp;
+
+      if (pausedUntilRef.current <= timestamp) {
+        applyMobilePosition(mobilePositionRef.current + AUTO_SCROLL_SPEED * deltaSeconds);
+      }
+
+      frameId = window.requestAnimationFrame(step);
+    };
+
+    frameId = window.requestAnimationFrame(step);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      track.style.transform = '';
+    };
+  }, [applyMobilePosition, shouldLoop]);
+
+  const handlePointerDown = (event) => {
+    if (!usesMobileTransformAnimation()) {
+      pauseInteraction(event.currentTarget);
+      return;
+    }
+
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    mobileDragRef.current = {
+      pointerId: event.pointerId,
+      startPosition: mobilePositionRef.current,
+      startX: event.clientX,
+    };
+    isInteractingRef.current = true;
+    pausedUntilRef.current = Number.POSITIVE_INFINITY;
+    suppressClickRef.current = false;
+  };
+
+  const handlePointerMove = (event) => {
+    const drag = mobileDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 4) {
+      suppressClickRef.current = true;
+    }
+    applyMobilePosition(drag.startPosition - distance);
+    event.preventDefault();
+  };
+
+  const handlePointerEnd = (event) => {
+    const drag = mobileDragRef.current;
+    if (drag?.pointerId === event.pointerId) {
+      event.currentTarget.releasePointerCapture?.(event.pointerId);
+      mobileDragRef.current = null;
+      isInteractingRef.current = false;
+      pausedUntilRef.current = performance.now() + RESUME_DELAY_MS;
+      return;
+    }
+
+    scheduleResume(event.currentTarget);
+  };
+
   const renderSponsor = (sponsor, index, segmentIndex) => {
     const isDuplicate = shouldLoop && segmentIndex !== 1;
     const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
@@ -163,12 +253,17 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       ref={viewportRef}
       className={`${styles.row} ${autoScroll ? styles.animatedRow : ''}`}
       tabIndex={0}
-      onPointerDown={(event) => pauseInteraction(event.currentTarget)}
-      onPointerUp={(event) => scheduleResume(event.currentTarget)}
-      onPointerCancel={(event) => scheduleResume(event.currentTarget)}
-      onTouchStart={(event) => pauseInteraction(event.currentTarget)}
-      onTouchEnd={(event) => scheduleResume(event.currentTarget)}
-      onTouchCancel={(event) => scheduleResume(event.currentTarget)}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+      onClickCapture={(event) => {
+        if (suppressClickRef.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          suppressClickRef.current = false;
+        }
+      }}
       onWheel={(event) => scheduleResume(event.currentTarget)}
       onFocus={() => pauseInteraction(viewportRef.current)}
       onBlur={() => scheduleResume(viewportRef.current)}
@@ -176,7 +271,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       onMouseLeave={() => scheduleResume(viewportRef.current)}
       onScroll={handleScroll}
     >
-      <span className={styles.track}>
+      <span ref={trackRef} className={styles.track}>
         {Array.from({ length: shouldLoop ? LOOP_SEGMENTS : 1 }, (_, segmentIndex) => (
           <span key={segmentIndex} className={styles.segment}>
             {sponsors.map((sponsor, index) => renderSponsor(sponsor, index, segmentIndex))}
