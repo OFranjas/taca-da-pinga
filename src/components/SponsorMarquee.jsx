@@ -10,7 +10,6 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   const scrollPositionRef = useRef(0);
   const pausedUntilRef = useRef(0);
   const isInteractingRef = useRef(false);
-  const isProgrammaticScrollRef = useRef(false);
   const loopKey = useMemo(() => sponsors.map((sponsor) => sponsor.id).join('|'), [sponsors]);
   const shouldLoop = autoScroll && sponsors.length > 1;
 
@@ -34,12 +33,8 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       if (viewport.scrollLeft <= 0) nextScrollLeft += segmentWidth;
 
       if (nextScrollLeft !== viewport.scrollLeft) {
-        isProgrammaticScrollRef.current = true;
         viewport.scrollLeft = nextScrollLeft;
         scrollPositionRef.current = nextScrollLeft;
-        window.requestAnimationFrame(() => {
-          isProgrammaticScrollRef.current = false;
-        });
       }
     },
     [getSegmentWidth, shouldLoop]
@@ -67,10 +62,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
     (event) => {
       const viewport = event.currentTarget;
       wrapViewport(viewport);
-      if (!isProgrammaticScrollRef.current) {
-        syncPosition(viewport);
-        if (!isInteractingRef.current) pausedUntilRef.current = performance.now() + RESUME_DELAY_MS;
-      }
+      syncPosition(viewport);
     },
     [syncPosition, wrapViewport]
   );
@@ -107,12 +99,8 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       if (viewport.scrollWidth > viewport.clientWidth && pausedUntilRef.current <= timestamp) {
         const nextPosition = scrollPositionRef.current + AUTO_SCROLL_SPEED * deltaSeconds;
         scrollPositionRef.current = nextPosition;
-        isProgrammaticScrollRef.current = true;
         viewport.scrollLeft = nextPosition;
         wrapViewport(viewport);
-        window.requestAnimationFrame(() => {
-          isProgrammaticScrollRef.current = false;
-        });
       }
       frameId = window.requestAnimationFrame(step);
     };

@@ -493,14 +493,20 @@
   }
 
   .dragHandleSpacer {
+    display: none;
     width: 3.25rem;
     height: 3.25rem;
   }
 
-  .itemCopy,
-  .editFields {
+  .itemCopy {
     grid-column: 2;
     grid-row: 2;
+  }
+
+  .editFields {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
   }
 
   .skeletonItem {
