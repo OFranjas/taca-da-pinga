@@ -9,9 +9,8 @@ import styles from './Leaderboard.module.css';
 
 import { LeaderboardRow } from '../components/LeaderboardRow';
 
-const ROW_HEIGHT = 80;
-const ROW_GAP = 12; // matches --ui-space-sm at the base font size
-const ROW_STRIDE = ROW_HEIGHT + ROW_GAP;
+const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
+const LAPTOP_ROW_METRICS = { height: 64, gap: 8 };
 const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
@@ -90,12 +89,15 @@ function SponsorLoadingPlaceholder({ compact = false }: { compact?: boolean }) {
   );
 }
 
-const getRowsetHeight = (length: number) => {
+export const getVirtualRowMetrics = (isLaptopViewport: boolean) =>
+  isLaptopViewport ? LAPTOP_ROW_METRICS : DEFAULT_ROW_METRICS;
+
+export const getRowsetHeight = (length: number, rowHeight: number, rowGap: number) => {
   if (length <= 0) {
     return 0;
   }
 
-  return length * ROW_STRIDE - ROW_GAP;
+  return length * (rowHeight + rowGap) - rowGap;
 };
 
 export default function Leaderboard({ displayMode = false }: LeaderboardProps = {}) {
@@ -104,6 +106,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const [sponsorStatus, setSponsorStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
+  const [isLaptopViewport, setIsLaptopViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -117,6 +120,27 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       unsubscribe?.();
     };
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(min-width: 75rem) and (max-width: 89.9375rem)');
+    if (!mediaQuery) {
+      return;
+    }
+
+    const handleViewportChange = () => {
+      setIsLaptopViewport(mediaQuery.matches);
+    };
+
+    handleViewportChange();
+    mediaQuery.addEventListener?.('change', handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', handleViewportChange);
+    };
+  }, []);
+
+  const rowMetrics = getVirtualRowMetrics(isLaptopViewport);
+  const rowStride = rowMetrics.height + rowMetrics.gap;
 
   useEffect(() => {
     const unsubscribe = observeSponsors(
@@ -173,12 +197,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       return;
     }
 
-    const maxScrollTop = Math.max(0, getRowsetHeight(teams.length) - container.clientHeight);
+    const maxScrollTop = Math.max(
+      0,
+      getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap) - container.clientHeight
+    );
     if (scrollTop > maxScrollTop) {
       container.scrollTop = maxScrollTop;
       setScrollTop(maxScrollTop);
     }
-  }, [shouldVirtualize, scrollTop, teams.length]);
+  }, [rowMetrics.gap, rowMetrics.height, shouldVirtualize, scrollTop, teams.length]);
 
   const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
     setScrollTop(event.currentTarget.scrollTop);
@@ -264,23 +291,23 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
         startIndex: 0,
         items: teams,
         offset: 0,
-        totalHeight: getRowsetHeight(teams.length),
+        totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
       };
     }
 
     const safeScrollTop = Math.max(0, scrollTop);
-    const estimateIndex = Math.floor(safeScrollTop / ROW_STRIDE);
+    const estimateIndex = Math.floor(safeScrollTop / rowStride);
     const startIndex = Math.max(0, estimateIndex - BUFFER);
     const endIndex = Math.min(teams.length, startIndex + MAX_RENDERED_ROWS);
-    const offset = startIndex * ROW_STRIDE;
+    const offset = startIndex * rowStride;
 
     return {
       startIndex,
       items: teams.slice(startIndex, endIndex),
       offset,
-      totalHeight: getRowsetHeight(teams.length),
+      totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
     };
-  }, [scrollTop, shouldVirtualize, teams]);
+  }, [rowMetrics.gap, rowMetrics.height, rowStride, scrollTop, shouldVirtualize, teams]);
 
   const maxPingas = useMemo(
     () => teams.reduce((max, team) => (team.pingas > max ? team.pingas : max), 0),

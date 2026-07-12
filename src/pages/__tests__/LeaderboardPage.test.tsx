@@ -23,6 +23,8 @@ const { observeSponsors } = await import('../../services/sponsors.service');
 const {
   default: LeaderboardPage,
   MAX_RENDERED_ROWS,
+  getRowsetHeight,
+  getVirtualRowMetrics,
   splitSponsorsBalanced,
 } = await import('../Leaderboard');
 
@@ -73,6 +75,12 @@ describe('Leaderboard page', () => {
     expect([...left, ...right].map((sponsor) => sponsor.id).sort()).toEqual(
       sponsors.map((sponsor) => sponsor.id).sort()
     );
+  });
+
+  it('keeps virtual row measurements in sync with compact laptop rows', () => {
+    expect(getVirtualRowMetrics(false)).toEqual({ height: 80, gap: 12 });
+    expect(getVirtualRowMetrics(true)).toEqual({ height: 64, gap: 8 });
+    expect(getRowsetHeight(120, 64, 8)).toBe(8632);
   });
 
   it('orders teams by pingas (desc) and then name (asc)', async () => {
