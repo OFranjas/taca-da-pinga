@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FocusEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Grid, Text } from '../ui';
@@ -52,7 +52,6 @@ const handleBlur = (event: FocusEvent<HTMLElement>) => {
 export function Header() {
   const location = useLocation();
   const [branding, setBranding] = useState<BrandingState | null>(null);
-  const rootRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const unsubscribe = observeBranding(
@@ -65,25 +64,6 @@ export function Header() {
     );
 
     return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-
-    const updateHeaderHeight = () => {
-      document.documentElement.style.setProperty('--app-header-height', `${root.offsetHeight}px`);
-    };
-
-    updateHeaderHeight();
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', updateHeaderHeight);
-      return () => window.removeEventListener('resize', updateHeaderHeight);
-    }
-
-    const observer = new ResizeObserver(updateHeaderHeight);
-    observer.observe(root);
-    return () => observer.disconnect();
   }, []);
 
   const { brandImageSrc, brandVariant } = useMemo((): {
@@ -106,7 +86,7 @@ export function Header() {
     to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
 
   return (
-    <header ref={rootRef} className={styles.root} data-testid="app-header">
+    <header className={styles.root} data-testid="app-header">
       <div className={styles.inner}>
         <Link to="/" className={styles.brandLink} aria-label="Ir para a página inicial">
           <span className={styles.brandAvatar} data-logo-variant={brandVariant}>

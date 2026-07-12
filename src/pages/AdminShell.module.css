@@ -183,9 +183,8 @@
 }
 
 .mobileTabRail {
-  position: sticky;
-  top: var(--app-header-height, 0px);
-  z-index: 39;
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
