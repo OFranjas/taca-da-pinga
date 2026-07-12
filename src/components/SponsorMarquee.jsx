@@ -5,6 +5,9 @@ const AUTO_SCROLL_SPEED = 18;
 const RESUME_DELAY_MS = 1400;
 const LOOP_SEGMENTS = 3;
 
+const usesMobileTransformAnimation = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(hover: none)').matches;
+
 function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   const viewportRef = useRef(null);
   const scrollPositionRef = useRef(0);
@@ -69,7 +72,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || !shouldLoop) return undefined;
+    if (!viewport || !shouldLoop || usesMobileTransformAnimation()) return undefined;
 
     const positionInitialSegment = () => {
       const segmentWidth = getSegmentWidth(viewport);
@@ -87,7 +90,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || !shouldLoop) return undefined;
+    if (!viewport || !shouldLoop || usesMobileTransformAnimation()) return undefined;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
 
     let frameId = 0;
@@ -109,9 +112,51 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
     return () => window.cancelAnimationFrame(frameId);
   }, [getSegmentWidth, shouldLoop, wrapViewport]);
 
-  const renderedSponsors = shouldLoop
-    ? Array.from({ length: LOOP_SEGMENTS }, () => sponsors).flat()
-    : sponsors;
+  const renderSponsor = (sponsor, index, segmentIndex) => {
+    const isDuplicate = shouldLoop && segmentIndex !== 1;
+    const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
+    const content = (
+      <>
+        <span className={styles.imageFrame}>
+          <img
+            src={sponsor.imageDataUrl}
+            alt={isDuplicate ? '' : sponsor.name}
+            loading="lazy"
+            className={styles.logo}
+          />
+        </span>
+        <span className={styles.name}>{sponsor.name}</span>
+      </>
+    );
+
+    if (isDuplicate) {
+      return (
+        <span
+          key={`${sponsor.id}-duplicate-${rowIndex}-${index}`}
+          className={styles.card}
+          aria-hidden
+        >
+          {content}
+        </span>
+      );
+    }
+
+    if (hasLink) {
+      return (
+        <span key={`${sponsor.id}-${rowIndex}-${index}`} className={styles.card} role="listitem">
+          <a href={sponsor.link} target="_blank" rel="noreferrer" className={styles.cardLink}>
+            {content}
+          </a>
+        </span>
+      );
+    }
+
+    return (
+      <span key={`${sponsor.id}-${rowIndex}-${index}`} className={styles.card} role="listitem">
+        {content}
+      </span>
+    );
+  };
 
   return (
     <div
@@ -131,56 +176,13 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       onMouseLeave={() => scheduleResume(viewportRef.current)}
       onScroll={handleScroll}
     >
-      {renderedSponsors.map((sponsor, index) => {
-        const segmentIndex = shouldLoop ? Math.floor(index / sponsors.length) : 0;
-        const isDuplicate = shouldLoop && segmentIndex !== 1;
-        const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
-        const content = (
-          <>
-            <span className={styles.imageFrame}>
-              <img
-                src={sponsor.imageDataUrl}
-                alt={isDuplicate ? '' : sponsor.name}
-                loading="lazy"
-                className={styles.logo}
-              />
-            </span>
-            <span className={styles.name}>{sponsor.name}</span>
-          </>
-        );
-
-        if (isDuplicate) {
-          return (
-            <span
-              key={`${sponsor.id}-duplicate-${rowIndex}-${index}`}
-              className={styles.card}
-              aria-hidden="true"
-            >
-              {content}
-            </span>
-          );
-        }
-
-        if (hasLink) {
-          return (
-            <span
-              key={`${sponsor.id}-${rowIndex}-${index}`}
-              className={styles.card}
-              role="listitem"
-            >
-              <a href={sponsor.link} target="_blank" rel="noreferrer" className={styles.cardLink}>
-                {content}
-              </a>
-            </span>
-          );
-        }
-
-        return (
-          <span key={`${sponsor.id}-${rowIndex}-${index}`} className={styles.card} role="listitem">
-            {content}
+      <span className={styles.track}>
+        {Array.from({ length: shouldLoop ? LOOP_SEGMENTS : 1 }, (_, segmentIndex) => (
+          <span key={segmentIndex} className={styles.segment}>
+            {sponsors.map((sponsor, index) => renderSponsor(sponsor, index, segmentIndex))}
           </span>
-        );
-      })}
+        ))}
+      </span>
     </div>
   );
 }

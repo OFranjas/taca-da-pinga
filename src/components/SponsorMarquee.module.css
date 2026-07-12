@@ -8,8 +8,6 @@
 
 .row {
   --sponsor-card-width: min(20rem, calc(100vw - 5rem));
-  display: flex;
-  gap: var(--ui-space-md);
   width: 100%;
   min-width: 0;
   overflow-x: auto;
@@ -20,6 +18,21 @@
   cursor: grab;
   padding: 0 var(--ui-space-2xs) var(--ui-space-xs);
   scroll-behavior: auto;
+}
+
+.track,
+.segment {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--ui-space-md);
+}
+
+.track {
+  width: max-content;
+}
+
+.segment {
+  padding-right: var(--ui-space-md);
 }
 
 .row:active {
@@ -114,6 +127,15 @@
   padding-bottom: 0;
 }
 
+.compact .track,
+.compact .segment {
+  gap: var(--ui-space-xs);
+}
+
+.compact .segment {
+  padding-right: var(--ui-space-xs);
+}
+
 .compact .card {
   gap: var(--ui-space-2xs);
   padding: var(--ui-space-xs);
@@ -138,6 +160,27 @@
 @media (hover: none) {
   .animatedRow {
     mask-image: none;
+    overflow: hidden;
+    touch-action: auto;
+  }
+
+  .animatedRow .track {
+    animation: mobileSponsorMarquee 28s linear infinite;
+    will-change: transform;
+  }
+
+  .animatedRow:active .track {
+    animation-play-state: paused;
+  }
+
+  @keyframes mobileSponsorMarquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+
+    to {
+      transform: translate3d(-33.333333%, 0, 0);
+    }
   }
 }
 

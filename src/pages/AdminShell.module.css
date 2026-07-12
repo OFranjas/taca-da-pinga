@@ -184,8 +184,8 @@
 
 .mobileTabRail {
   position: sticky;
-  top: var(--ui-header-height);
-  z-index: 35;
+  top: 0;
+  z-index: 45;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
