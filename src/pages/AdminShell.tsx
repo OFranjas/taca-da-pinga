@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Button, Card, Grid, Page, Section, Stack, Text } from '../ui';
 import styles from './AdminShell.module.css';
 
@@ -34,6 +34,8 @@ export function AdminShell<TNav extends string = string>({
   children,
 }: AdminShellProps<TNav>) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const mobileDialogRef = useRef<HTMLDivElement | null>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const mobileNavId = useId();
   const desktopNavId = `${mobileNavId}-desktop`;
   const mobilePanelId = `${mobileNavId}-panel`;
@@ -41,18 +43,56 @@ export function AdminShell<TNav extends string = string>({
 
   useEffect(() => {
     if (!isSidebarOpen) {
+      previouslyFocusedElementRef.current?.focus();
+      previouslyFocusedElementRef.current = null;
       return;
     }
+
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusableElements = () =>
+      Array.from(mobileDialogRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? []);
+
+    const focusableElements = getFocusableElements();
+    focusableElements[0]?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setSidebarOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const currentFocusableElements = getFocusableElements();
+      const firstElement = currentFocusableElements[0];
+      const lastElement = currentFocusableElements.at(-1);
+      if (!firstElement || !lastElement) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isSidebarOpen]);
+
+  const openMobileMenu = () => {
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+    setSidebarOpen(true);
+  };
+
+  const closeMobileMenu = () => setSidebarOpen(false);
 
   const activeNavLabel = useMemo(() => {
     const activeItem = navItems.find((item) => item.id === activeNav);
@@ -66,11 +106,11 @@ export function AdminShell<TNav extends string = string>({
 
   const handleSelectNav = (id: TNav) => {
     onSelectNav(id);
-    setSidebarOpen(false);
+    closeMobileMenu();
   };
 
   const handleLogout = () => {
-    setSidebarOpen(false);
+    closeMobileMenu();
     onLogout();
   };
 
@@ -113,7 +153,7 @@ export function AdminShell<TNav extends string = string>({
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => setSidebarOpen(true)}
+        onClick={openMobileMenu}
         aria-expanded={isSidebarOpen}
         aria-controls={mobilePanelId}
         aria-haspopup="dialog"
@@ -199,7 +239,8 @@ export function AdminShell<TNav extends string = string>({
           role="dialog"
           aria-modal="true"
           aria-labelledby={mobileTitleId}
-          onClick={() => setSidebarOpen(false)}
+          ref={mobileDialogRef}
+          onClick={closeMobileMenu}
         >
           <div className={styles.mobileSidebar} onClick={(event) => event.stopPropagation()}>
             <Card variant="muted" padding="lg" className={styles.mobileSidebarCard}>
@@ -217,7 +258,7 @@ export function AdminShell<TNav extends string = string>({
                 <button
                   type="button"
                   className={styles.mobileClose}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={closeMobileMenu}
                   aria-label="Fechar menu"
                 >
                   ×
@@ -231,7 +272,7 @@ export function AdminShell<TNav extends string = string>({
                   variant="secondary"
                   size="sm"
                   onClick={() => {
-                    setSidebarOpen(false);
+                    closeMobileMenu();
                     onNavigateBranding();
                   }}
                 >

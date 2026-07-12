@@ -7,23 +7,10 @@ import { observeSponsors, type Sponsor } from '../services/sponsors.service';
 import { Card, Page, Section, Stack, Text } from '../ui';
 import styles from './Leaderboard.module.css';
 
-import s1 from '../assets/s1.png';
-import s2 from '../assets/s2.jpeg';
-import s3 from '../assets/s3.png';
-import s4 from '../assets/s4.png';
-import s5 from '../assets/s5.png';
-import s6 from '../assets/s6.png';
-import s7 from '../assets/s7.jpeg';
-import s8 from '../assets/s8.jpeg';
-import s9 from '../assets/s9.jpeg';
-import s10 from '../assets/s10.jpeg';
-import s11 from '../assets/s11.png';
-import s12 from '../assets/s12.png';
 import { LeaderboardRow } from '../components/LeaderboardRow';
 
-const ROW_HEIGHT = 80;
-const ROW_GAP = 12; // matches --ui-space-sm at the base font size
-const ROW_STRIDE = ROW_HEIGHT + ROW_GAP;
+const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
+const LAPTOP_ROW_METRICS = { height: 64, gap: 8 };
 const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
@@ -34,8 +21,6 @@ const DISPLAY_SCROLL_PAUSE_MS = 1200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
-const sponsorLeft = [s1, s3, s5, s7, s10, s11];
-const sponsorRight = [s2, s4, s6, s8, s9, s12];
 const skeletonRows = Array.from({ length: 8 }, (_, index) => index);
 
 type ServiceTeam = {
@@ -80,12 +65,39 @@ const sanitizeTeams = (incoming: ServiceTeam[]): LeaderboardTeam[] =>
       return a.name.localeCompare(b.name, 'pt-PT', { sensitivity: 'base' });
     });
 
-const getRowsetHeight = (length: number) => {
+export const splitSponsorsBalanced = (sponsors: Sponsor[]): [Sponsor[], Sponsor[]] =>
+  sponsors.reduce(
+    (columns, sponsor, index) => {
+      columns[index % 2].push(sponsor);
+      return columns;
+    },
+    [[], []] as [Sponsor[], Sponsor[]]
+  );
+
+function SponsorLoadingPlaceholder({ compact = false }: { compact?: boolean }) {
+  const className = compact
+    ? `${styles.sponsorLoading} ${styles.sponsorLoadingCompact}`
+    : styles.sponsorLoading;
+
+  return (
+    <div className={className} role="status" aria-label="A carregar patrocinadores">
+      <span className={styles.visuallyHidden}>A carregar patrocinadores...</span>
+      {Array.from({ length: compact ? 3 : 4 }, (_, index) => (
+        <span key={index} className={styles.sponsorLoadingCard} aria-hidden="true" />
+      ))}
+    </div>
+  );
+}
+
+export const getVirtualRowMetrics = (isLaptopViewport: boolean) =>
+  isLaptopViewport ? LAPTOP_ROW_METRICS : DEFAULT_ROW_METRICS;
+
+export const getRowsetHeight = (length: number, rowHeight: number, rowGap: number) => {
   if (length <= 0) {
     return 0;
   }
 
-  return length * ROW_STRIDE - ROW_GAP;
+  return length * (rowHeight + rowGap) - rowGap;
 };
 
 export default function Leaderboard({ displayMode = false }: LeaderboardProps = {}) {
@@ -94,6 +106,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const [sponsorStatus, setSponsorStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
+  const [isLaptopViewport, setIsLaptopViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -107,6 +120,27 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       unsubscribe?.();
     };
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(min-width: 75rem) and (max-width: 89.9375rem)');
+    if (!mediaQuery) {
+      return;
+    }
+
+    const handleViewportChange = () => {
+      setIsLaptopViewport(mediaQuery.matches);
+    };
+
+    handleViewportChange();
+    mediaQuery.addEventListener?.('change', handleViewportChange);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', handleViewportChange);
+    };
+  }, []);
+
+  const rowMetrics = getVirtualRowMetrics(isLaptopViewport);
+  const rowStride = rowMetrics.height + rowMetrics.gap;
 
   useEffect(() => {
     const unsubscribe = observeSponsors(
@@ -163,12 +197,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       return;
     }
 
-    const maxScrollTop = Math.max(0, getRowsetHeight(teams.length) - container.clientHeight);
+    const maxScrollTop = Math.max(
+      0,
+      getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap) - container.clientHeight
+    );
     if (scrollTop > maxScrollTop) {
       container.scrollTop = maxScrollTop;
       setScrollTop(maxScrollTop);
     }
-  }, [shouldVirtualize, scrollTop, teams.length]);
+  }, [rowMetrics.gap, rowMetrics.height, shouldVirtualize, scrollTop, teams.length]);
 
   const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
     setScrollTop(event.currentTarget.scrollTop);
@@ -254,23 +291,23 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
         startIndex: 0,
         items: teams,
         offset: 0,
-        totalHeight: getRowsetHeight(teams.length),
+        totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
       };
     }
 
     const safeScrollTop = Math.max(0, scrollTop);
-    const estimateIndex = Math.floor(safeScrollTop / ROW_STRIDE);
+    const estimateIndex = Math.floor(safeScrollTop / rowStride);
     const startIndex = Math.max(0, estimateIndex - BUFFER);
     const endIndex = Math.min(teams.length, startIndex + MAX_RENDERED_ROWS);
-    const offset = startIndex * ROW_STRIDE;
+    const offset = startIndex * rowStride;
 
     return {
       startIndex,
       items: teams.slice(startIndex, endIndex),
       offset,
-      totalHeight: getRowsetHeight(teams.length),
+      totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
     };
-  }, [scrollTop, shouldVirtualize, teams]);
+  }, [rowMetrics.gap, rowMetrics.height, rowStride, scrollTop, shouldVirtualize, teams]);
 
   const maxPingas = useMemo(
     () => teams.reduce((max, team) => (team.pingas > max ? team.pingas : max), 0),
@@ -281,27 +318,20 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
   const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
 
-  const leaderboardSponsors = useMemo(() => {
-    const fallbackSponsors = [...sponsorLeft, ...sponsorRight].map((imageDataUrl, index) => ({
-      id: `fallback-${index}`,
-      name: `Patrocinador ${index + 1}`,
-      imageDataUrl,
-      active: true,
-      order: index,
-    }));
+  const leaderboardSponsors = useMemo(
+    () => (sponsorStatus === 'loaded' ? sponsors : []),
+    [sponsorStatus, sponsors]
+  );
+  const isSponsorsLoading = sponsorStatus === 'loading';
 
-    return sponsorStatus === 'loaded' ? sponsors : fallbackSponsors;
-  }, [sponsorStatus, sponsors]);
-
-  const sponsorColumns = useMemo(() => {
-    return leaderboardSponsors.reduce(
-      (columns, sponsor, index) => {
-        columns[index % 2 === 0 ? 0 : 1].push(sponsor);
-        return columns;
-      },
-      [[], []] as [Sponsor[], Sponsor[]]
-    );
-  }, [leaderboardSponsors]);
+  const sponsorColumns = useMemo(
+    () => splitSponsorsBalanced(leaderboardSponsors),
+    [leaderboardSponsors]
+  );
+  const canAnimateSponsorRails = sponsorColumns.every((column) => column.length > 1);
+  const largestSponsorRail = Math.max(sponsorColumns[0].length, sponsorColumns[1].length);
+  const sponsorLoopItemTarget =
+    canAnimateSponsorRails && largestSponsorRail === 3 ? 4 : largestSponsorRail || undefined;
 
   const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
 
@@ -317,17 +347,31 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       >
         <div className={styles.layout}>
           <div className={`${styles.railSlot} ${styles.leftRail}`}>
-            <SponsorsRail sponsors={sponsorColumns[0]} side="left" />
+            {isSponsorsLoading ? (
+              <SponsorLoadingPlaceholder />
+            ) : (
+              <SponsorsRail
+                sponsors={sponsorColumns[0]}
+                side="left"
+                loopItemTarget={sponsorLoopItemTarget}
+                autoScroll={canAnimateSponsorRails}
+              />
+            )}
           </div>
 
           <div className={styles.content}>
             {!displayMode ? (
               <div className={`${styles.mobileSponsors} ${styles.mobileSponsorsTop}`}>
-                <SponsorMarquee
-                  sponsors={sponsorColumns[0]}
-                  compact
-                  ariaLabel="Patrocinadores em destaque"
-                />
+                {isSponsorsLoading ? (
+                  <SponsorLoadingPlaceholder compact />
+                ) : (
+                  <SponsorMarquee
+                    sponsors={leaderboardSponsors}
+                    compact
+                    autoScroll
+                    ariaLabel="Patrocinadores em destaque"
+                  />
+                )}
               </div>
             ) : null}
 
@@ -393,7 +437,8 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                       className={styles.scrollRegion}
                       onScroll={handleScroll}
                       ref={scrollRef}
-                      role="presentation"
+                      tabIndex={0}
+                      aria-label="Tabela de classificação; use as setas para navegar"
                     >
                       <div role="rowgroup" className={styles.headerGroup}>
                         <div role="row" className={styles.headerRow} aria-rowindex={1}>
@@ -489,20 +534,19 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                 )}
               </Card>
             </Section>
-
-            {!displayMode ? (
-              <div className={styles.mobileSponsors}>
-                <SponsorMarquee
-                  sponsors={sponsorColumns[1].length ? sponsorColumns[1] : leaderboardSponsors}
-                  compact
-                  ariaLabel="Mais patrocinadores"
-                />
-              </div>
-            ) : null}
           </div>
 
           <div className={`${styles.railSlot} ${styles.rightRail}`}>
-            <SponsorsRail sponsors={sponsorColumns[1]} side="right" />
+            {isSponsorsLoading ? (
+              <SponsorLoadingPlaceholder />
+            ) : (
+              <SponsorsRail
+                sponsors={sponsorColumns[1]}
+                side="right"
+                loopItemTarget={sponsorLoopItemTarget}
+                autoScroll={canAnimateSponsorRails}
+              />
+            )}
           </div>
         </div>
       </Page>

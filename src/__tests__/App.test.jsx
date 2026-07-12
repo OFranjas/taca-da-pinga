@@ -36,7 +36,7 @@ describe('App routing', () => {
   it('resets scroll when navigating between app sections', async () => {
     render(<App />);
 
-    await userEvent.click(screen.getByRole('link', { name: 'Ir para classificação' }));
+    await userEvent.click(await screen.findByRole('link', { name: 'Ir para classificação' }));
 
     expect(await screen.findByText('Classificação')).toBeInTheDocument();
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, left: 0, behavior: 'auto' });

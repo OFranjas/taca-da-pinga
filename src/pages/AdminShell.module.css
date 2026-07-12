@@ -184,8 +184,8 @@
 
 .mobileTabRail {
   position: sticky;
-  top: var(--ui-header-height);
-  z-index: 20;
+  top: 0;
+  z-index: 45;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
@@ -318,22 +318,12 @@
 }
 
 @media (max-width: 40rem) {
-  .mobileTabRail {
-    top: 7.25rem;
-  }
-
   .contentCard {
     padding: var(--ui-space-lg);
   }
 
   .contentHeader {
     display: none;
-  }
-}
-
-@media (min-width: 40.0625rem) and (max-width: 63.9375rem) {
-  .mobileTabRail {
-    top: 5.25rem;
   }
 }
 

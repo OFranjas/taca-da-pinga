@@ -131,6 +131,17 @@ describe('sponsors.service', () => {
     );
   });
 
+  test('normalizes optional HTTPS sponsor links and rejects unsafe URLs', async () => {
+    const { normalizeSponsorLink } = await import('../sponsors.service');
+
+    expect(normalizeSponsorLink(' https://example.com/sponsor ')).toBe(
+      'https://example.com/sponsor'
+    );
+    expect(normalizeSponsorLink('')).toBe('');
+    expect(() => normalizeSponsorLink('http://example.com')).toThrow('URL HTTPS válido');
+    expect(() => normalizeSponsorLink('not a URL')).toThrow('URL HTTPS válido');
+  });
+
   test('createSponsor throws when max order reached', async () => {
     mockGetDocs.mockResolvedValueOnce({
       empty: false,
@@ -159,7 +170,7 @@ describe('sponsors.service', () => {
       {},
       expect.objectContaining({
         name: 'Updated',
-        link: 'https://link',
+        link: 'https://link/',
         imageDataUrl: 'new-img',
         active: false,
         updatedAt: 'server-ts',

@@ -116,6 +116,34 @@ describe('AdminShell', () => {
     expect(screen.queryByText('Operação do torneio.')).not.toBeInTheDocument();
   });
 
+  it('traps focus in the mobile menu and restores it after closing', async () => {
+    const user = createUser();
+
+    render(
+      <AdminShell
+        navItems={navItems}
+        activeNav="add"
+        onSelectNav={vi.fn()}
+        onNavigateBranding={vi.fn()}
+        onLogout={vi.fn()}
+      >
+        <button type="button">Outside control</button>
+      </AdminShell>
+    );
+
+    const menuButton = screen.getByRole('button', { name: 'Menu' });
+    await user.click(menuButton);
+
+    const closeButton = screen.getByRole('button', { name: 'Fechar menu' });
+    expect(closeButton).toHaveFocus();
+
+    await user.keyboard('{Shift>}{Tab}{/Shift}');
+    expect(screen.getByRole('button', { name: 'Terminar sessão' })).toHaveFocus();
+
+    await user.keyboard('{Escape}');
+    expect(menuButton).toHaveFocus();
+  });
+
   it('renders menu actions and breadcrumbs', async () => {
     const user = createUser();
     const onNavigateBranding = vi.fn();

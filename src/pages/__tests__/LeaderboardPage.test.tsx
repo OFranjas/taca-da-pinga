@@ -20,7 +20,13 @@ vi.mock('../../services/branding.service', () => ({
 
 const { observeLeaderboard } = await import('../../services/leaderboard');
 const { observeSponsors } = await import('../../services/sponsors.service');
-const { default: LeaderboardPage, MAX_RENDERED_ROWS } = await import('../Leaderboard');
+const {
+  default: LeaderboardPage,
+  MAX_RENDERED_ROWS,
+  getRowsetHeight,
+  getVirtualRowMetrics,
+  splitSponsorsBalanced,
+} = await import('../Leaderboard');
 
 type ServiceTeam = {
   id: string;
@@ -53,6 +59,30 @@ describe('Leaderboard page', () => {
     observeSponsorsMock.mockImplementation(() => vi.fn());
   });
 
+  it('splits sponsors across rails with at most one item difference', () => {
+    const sponsors = Array.from({ length: 7 }, (_, index) => ({
+      id: `sponsor-${index}`,
+      name: `Sponsor ${index}`,
+      imageDataUrl: `data:image/png;base64,${index}`,
+      active: true,
+      order: index,
+    }));
+
+    const [left, right] = splitSponsorsBalanced(sponsors);
+
+    expect(left).toHaveLength(4);
+    expect(right).toHaveLength(3);
+    expect([...left, ...right].map((sponsor) => sponsor.id).sort()).toEqual(
+      sponsors.map((sponsor) => sponsor.id).sort()
+    );
+  });
+
+  it('keeps virtual row measurements in sync with compact laptop rows', () => {
+    expect(getVirtualRowMetrics(false)).toEqual({ height: 80, gap: 12 });
+    expect(getVirtualRowMetrics(true)).toEqual({ height: 64, gap: 8 });
+    expect(getRowsetHeight(120, 64, 8)).toBe(8632);
+  });
+
   it('orders teams by pingas (desc) and then name (asc)', async () => {
     observeLeaderboardMock.mockImplementation((callback) => {
       callback([
@@ -82,6 +112,18 @@ describe('Leaderboard page', () => {
     renderLeaderboard();
 
     expect(await screen.findByText(/Ainda não há equipas inscritas/i)).toBeInTheDocument();
+  });
+
+  it('shows sponsor skeletons instead of bundled fallback sponsors while loading', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    expect(screen.getAllByRole('status', { name: 'A carregar patrocinadores' })).toHaveLength(3);
+    expect(screen.queryByText('Patrocinador 1')).not.toBeInTheDocument();
   });
 
   it('does not show bundled sponsors after an active sponsor query returns empty', async () => {

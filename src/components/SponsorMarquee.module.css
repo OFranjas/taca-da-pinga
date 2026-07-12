@@ -8,8 +8,6 @@
 
 .row {
   --sponsor-card-width: min(20rem, calc(100vw - 5rem));
-  display: flex;
-  gap: var(--ui-space-md);
   width: 100%;
   min-width: 0;
   overflow-x: auto;
@@ -19,6 +17,22 @@
   touch-action: pan-x;
   cursor: grab;
   padding: 0 var(--ui-space-2xs) var(--ui-space-xs);
+  scroll-behavior: auto;
+}
+
+.track,
+.segment {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--ui-space-md);
+}
+
+.track {
+  width: max-content;
+}
+
+.segment {
+  padding-right: var(--ui-space-md);
 }
 
 .row:active {
@@ -27,6 +41,21 @@
 
 .row::-webkit-scrollbar {
   display: none;
+}
+
+.animatedRow {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1rem,
+    #000 calc(100% - 1rem),
+    transparent
+  );
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--ui-color-accent);
+  outline-offset: 2px;
 }
 
 .card {
@@ -45,6 +74,21 @@
   text-align: center;
   text-decoration: none;
   box-shadow: none;
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: inherit;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid var(--ui-color-accent);
+  outline-offset: 3px;
 }
 
 .imageFrame {
@@ -83,6 +127,15 @@
   padding-bottom: 0;
 }
 
+.compact .track,
+.compact .segment {
+  gap: var(--ui-space-xs);
+}
+
+.compact .segment {
+  padding-right: var(--ui-space-xs);
+}
+
 .compact .card {
   gap: var(--ui-space-2xs);
   padding: var(--ui-space-xs);
@@ -96,6 +149,24 @@
 
 .compact .name {
   font-size: 0.82rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animatedRow {
+    mask-image: none;
+  }
+}
+
+@media (hover: none) {
+  .animatedRow {
+    mask-image: none;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .animatedRow .track {
+    will-change: transform;
+  }
 }
 
 @media (min-width: 48rem) {

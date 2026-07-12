@@ -88,6 +88,37 @@ describe('Home page', () => {
     expect(heroLogo).toHaveAttribute('src', remoteLogo);
   });
 
+  test('keeps a short sponsor list in one moving row', async () => {
+    listSponsorsMock.mockResolvedValue([
+      {
+        id: 'sp-1',
+        name: 'Primeiro',
+        imageDataUrl: 'data:image/png;base64,ONE',
+        active: true,
+        order: 0,
+      },
+      {
+        id: 'sp-2',
+        name: 'Segundo',
+        imageDataUrl: 'data:image/png;base64,TWO',
+        active: true,
+        order: 1,
+      },
+      {
+        id: 'sp-3',
+        name: 'Terceiro',
+        imageDataUrl: 'data:image/png;base64,THREE',
+        active: true,
+        order: 2,
+      },
+    ]);
+
+    renderHome();
+
+    const sponsorList = await screen.findByRole('list', { name: 'Patrocinadores' });
+    expect(sponsorList.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+  });
+
   test('allows retrying after sponsor load failure', async () => {
     const sponsors: Sponsor[] = [
       {
@@ -127,7 +158,7 @@ describe('Home page', () => {
 
     const router = renderHome();
 
-    const leaderboardButton = await screen.findByRole('button', { name: /Ver leaderboard/i });
+    const leaderboardButton = await screen.findByRole('button', { name: /Ver classificação/i });
     await act(async () => {
       await userEvent.click(leaderboardButton);
     });
