@@ -172,4 +172,26 @@ describe('SponsorsAdminPanel ordering controls', () => {
       );
     });
   });
+
+  test('keeps a legacy HTTP site unchanged when editing another sponsor field', async () => {
+    sponsorServiceMocks.observeSponsors.mockImplementation(
+      (callback: (nextSponsors: Sponsor[]) => void) => {
+        callback([{ ...sponsors[0], link: 'http://legacy.example.com' }]);
+        return vi.fn();
+      }
+    );
+    render(<SponsorsAdminPanel />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar' }));
+    fireEvent.change(screen.getAllByLabelText('Nome')[1], { target: { value: 'Nome atualizado' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    await waitFor(() => {
+      expect(sponsorServiceMocks.updateSponsor).toHaveBeenCalledWith(
+        'first',
+        expect.objectContaining({ name: 'Nome atualizado' })
+      );
+    });
+    expect(sponsorServiceMocks.updateSponsor.mock.calls.at(-1)?.[1]).not.toHaveProperty('link');
+  });
 });

@@ -178,7 +178,7 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   }, [applyMobilePosition, shouldLoop]);
 
   const handlePointerDown = (event) => {
-    if (!usesMobileTransformAnimation()) {
+    if (!usesMobileTransformAnimation() || !shouldLoop) {
       pauseInteraction(event.currentTarget);
       return;
     }

@@ -204,5 +204,23 @@ describe('Firestore security rules', () => {
         active: 'yes please',
       }));
     });
+
+    test('allows non-link updates to legacy HTTP sponsor links', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await setDoc(doc(context.firestore(), 'sponsors/s-legacy-http'), {
+          ...baseSponsor,
+          link: 'http://legacy.example.com',
+        });
+      });
+
+      const { db: adminDb } = makeDb({ sub: 'admin6', user_id: 'admin6', admin: true });
+      await assertSucceeds(updateDoc(doc(adminDb, 'sponsors/s-legacy-http'), { active: false }));
+      await assertFails(
+        updateDoc(doc(adminDb, 'sponsors/s-legacy-http'), { link: 'http://new.example.com' })
+      );
+      await assertSucceeds(
+        updateDoc(doc(adminDb, 'sponsors/s-legacy-http'), { link: 'https://example.com' })
+      );
+    });
   });
 });

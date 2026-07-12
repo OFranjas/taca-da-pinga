@@ -265,9 +265,11 @@ export default function SponsorsAdminPanel() {
 
     setBusySponsorId(sponsor.id);
     try {
+      const originalLink = sponsor.link ?? '';
+      const linkUpdate = editLink.trim() === originalLink.trim() ? {} : { link: editLink };
       await updateSponsor(sponsor.id, {
         name,
-        link: editLink,
+        ...linkUpdate,
         imageFile: editImageFile,
       });
       toast.success('Patrocinador atualizado');

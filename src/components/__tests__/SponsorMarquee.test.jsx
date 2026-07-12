@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import SponsorMarquee, { normalizeMobileLoopPosition } from '../SponsorMarquee';
 
 const sponsors = [
@@ -57,5 +58,32 @@ describe('SponsorMarquee', () => {
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1);
     expect(screen.getAllByRole('img', { name: 'Primeiro sponsor' })).toHaveLength(1);
+  });
+
+  test('does not translate a non-looping row when swiped on touch devices', () => {
+    const originalMatchMedia = window.matchMedia;
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn((query) => ({
+        matches: query === '(hover: none)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    });
+
+    const { container, unmount } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
+    const row = container.querySelector('[tabindex="0"]');
+    const track = row?.firstElementChild;
+
+    fireEvent.pointerDown(row, { pointerId: 1, clientX: 20 });
+    fireEvent.pointerMove(row, { pointerId: 1, clientX: 120 });
+
+    expect(track?.style.transform).toBe('');
+
+    unmount();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: originalMatchMedia,
+    });
   });
 });
