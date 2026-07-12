@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-import Leaderboard from './pages/Leaderboard';
-import Admin from './pages/Admin';
-import Branding from './pages/Branding';
+
+const Home = lazy(() => import('./pages/Home'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Branding = lazy(() => import('./pages/Branding'));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -27,15 +28,17 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/display" element={<Leaderboard displayMode />} />
-        <Route path="/tv" element={<Navigate to="/display" replace />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/branding" element={<Branding />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/display" element={<Leaderboard displayMode />} />
+          <Route path="/tv" element={<Navigate to="/display" replace />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/branding" element={<Branding />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

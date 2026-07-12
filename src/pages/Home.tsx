@@ -139,7 +139,8 @@ export default function Home() {
   }, [branding]);
 
   const renderSponsorsGrid = (items: Sponsor[]) => {
-    return <SponsorMarquee sponsors={items} rows={2} ariaLabel="Patrocinadores" />;
+    const rows = items.length < 4 ? 1 : 2;
+    return <SponsorMarquee sponsors={items} rows={rows} autoScroll ariaLabel="Patrocinadores" />;
   };
 
   const renderSponsorsContent = () => {
@@ -273,7 +274,7 @@ export default function Home() {
                     navigate('/leaderboard');
                   }}
                 >
-                  Ver leaderboard
+                  Ver classificação
                 </Button>
                 <Button
                   size="lg"

@@ -19,6 +19,7 @@
   touch-action: pan-x;
   cursor: grab;
   padding: 0 var(--ui-space-2xs) var(--ui-space-xs);
+  scroll-behavior: auto;
 }
 
 .row:active {
@@ -27,6 +28,21 @@
 
 .row::-webkit-scrollbar {
   display: none;
+}
+
+.animatedRow {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1rem,
+    #000 calc(100% - 1rem),
+    transparent
+  );
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--ui-color-accent);
+  outline-offset: 2px;
 }
 
 .card {
@@ -45,6 +61,21 @@
   text-align: center;
   text-decoration: none;
   box-shadow: none;
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: inherit;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid var(--ui-color-accent);
+  outline-offset: 3px;
 }
 
 .imageFrame {
@@ -96,6 +127,12 @@
 
 .compact .name {
   font-size: 0.82rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animatedRow {
+    mask-image: none;
+  }
 }
 
 @media (min-width: 48rem) {

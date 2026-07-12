@@ -6,9 +6,15 @@ const RESUME_DELAY_MS = 1400;
 const LOOP_SEGMENTS = 3;
 
 /**
- * @param {{ images?: string[]; sponsors?: Array<{ imageDataUrl: string, name?: string }>; side?: 'left' | 'right' }} props
+ * @param {{ images?: string[]; sponsors?: Array<{ imageDataUrl: string, name?: string, link?: string }>; side?: 'left' | 'right'; loopItemTarget?: number; autoScroll?: boolean }} props
  */
-export default function SponsorsRail({ images = [], sponsors = [], side = 'left' }) {
+export default function SponsorsRail({
+  images = [],
+  sponsors = [],
+  side = 'left',
+  loopItemTarget,
+  autoScroll = true,
+}) {
   const viewportRef = React.useRef(null);
   const scrollPositionRef = React.useRef(0);
   const pausedUntilRef = React.useRef(0);
@@ -22,13 +28,38 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
         ? sponsors.map((sponsor, index) => ({
             src: sponsor.imageDataUrl,
             alt: sponsor.name || `Patrocinador ${index + 1}`,
+            link: sponsor.link,
           }))
         : images.map((src, index) => ({ src, alt: `Patrocinador ${index + 1}` })),
     [images, sponsors]
   );
 
-  const shouldLoop = items.length > 3;
-  const itemKey = React.useMemo(() => items.map((item) => item.src).join('|'), [items]);
+  const requestedCycleLength = Math.max(items.length, loopItemTarget ?? 0);
+  const cycleLength =
+    items.length === 2 && requestedCycleLength % 2 === 1
+      ? requestedCycleLength + 1
+      : requestedCycleLength;
+  const shouldLoop = autoScroll && items.length > 1 && cycleLength > 1;
+  const cycleItems = React.useMemo(() => {
+    if (!items.length) return [];
+
+    const nextCycle = [...items];
+    while (nextCycle.length < cycleLength) {
+      const previousItem = nextCycle[nextCycle.length - 1];
+      const firstItem = nextCycle[0];
+      const nextItem =
+        items.find((item) => item !== previousItem && item !== firstItem) ??
+        items.find((item) => item !== previousItem) ??
+        firstItem;
+      nextCycle.push(nextItem);
+    }
+
+    return nextCycle;
+  }, [cycleLength, items]);
+  const itemKey = React.useMemo(
+    () => `${cycleLength}:${items.map((item) => item.src).join('|')}`,
+    [cycleLength, items]
+  );
 
   const getSegmentHeight = React.useCallback(
     (viewport) => viewport.scrollHeight / LOOP_SEGMENTS,
@@ -48,7 +79,7 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
       }
 
       const segmentHeight = getSegmentHeight(viewport);
-      if (segmentHeight <= viewport.clientHeight) {
+      if (viewport.scrollHeight <= viewport.clientHeight) {
         return;
       }
 
@@ -123,7 +154,7 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
     }
 
     const segmentHeight = getSegmentHeight(viewport);
-    if (segmentHeight > viewport.clientHeight && viewport.dataset.loopKey !== itemKey) {
+    if (viewport.scrollHeight > viewport.clientHeight && viewport.dataset.loopKey !== itemKey) {
       viewport.scrollTop = segmentHeight;
       scrollPositionRef.current = segmentHeight;
       pausedUntilRef.current = 0;
@@ -156,9 +187,7 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
 
       const deltaSeconds = (timestamp - lastFrame) / 1000;
       lastFrame = timestamp;
-      const segmentHeight = getSegmentHeight(viewport);
-
-      if (segmentHeight > viewport.clientHeight && pausedUntilRef.current <= timestamp) {
+      if (viewport.scrollHeight > viewport.clientHeight && pausedUntilRef.current <= timestamp) {
         const nextPosition = scrollPositionRef.current + AUTO_SCROLL_SPEED * deltaSeconds;
         scrollPositionRef.current = nextPosition;
         isProgrammaticScrollRef.current = true;
@@ -180,23 +209,48 @@ export default function SponsorsRail({ images = [], sponsors = [], side = 'left'
   if (!items.length) return null;
 
   const renderedItems = shouldLoop
-    ? Array.from({ length: LOOP_SEGMENTS }, () => items).flat()
+    ? Array.from({ length: LOOP_SEGMENTS }, () => cycleItems).flat()
     : items;
 
   const renderItem = (item, index) => {
-    const segmentIndex = shouldLoop ? Math.floor(index / items.length) : 0;
-    const isDuplicate = shouldLoop && segmentIndex !== 1;
+    const segmentIndex = shouldLoop ? Math.floor(index / cycleLength) : 0;
+    const cycleIndex = shouldLoop ? index % cycleLength : index;
+    const isDuplicate = shouldLoop && (segmentIndex !== 1 || cycleIndex >= items.length);
 
-    return (
-      <div
-        key={`${isDuplicate ? 'duplicate' : 'item'}-${item.alt}-${index}`}
-        className={`${styles.slot} ${isDuplicate ? styles.duplicateSlot : ''}`}
-        aria-hidden={isDuplicate ? 'true' : undefined}
-      >
+    const content = (
+      <>
         <div className={styles.imageFrame}>
           <img className={styles.logo} src={item.src} alt={isDuplicate ? '' : item.alt} />
         </div>
         <span className={styles.name}>{item.alt}</span>
+      </>
+    );
+
+    const className = `${styles.slot} ${isDuplicate ? styles.duplicateSlot : ''}`;
+    if (item.link) {
+      return (
+        <a
+          key={`${isDuplicate ? 'duplicate' : 'item'}-${item.alt}-${index}`}
+          href={item.link}
+          target="_blank"
+          rel="noreferrer"
+          className={className}
+          aria-hidden={isDuplicate ? 'true' : undefined}
+          aria-label={isDuplicate ? undefined : item.alt}
+          tabIndex={isDuplicate ? -1 : undefined}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <div
+        key={`${isDuplicate ? 'duplicate' : 'item'}-${item.alt}-${index}`}
+        className={className}
+        aria-hidden={isDuplicate ? 'true' : undefined}
+      >
+        {content}
       </div>
     );
   };

@@ -1,4 +1,36 @@
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
+  type UniqueIdentifier,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { IconEye, IconEyeOff, IconGripVertical, IconPencil, IconTrash } from '@tabler/icons-react';
 import {
   createSponsor,
   deleteSponsor,
@@ -21,24 +53,80 @@ const initialForm: SponsorFormState = {
   imageFile: null,
 };
 
-const ChevronUpIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M7 14.5 12 9l5 5.5" />
-  </svg>
-);
+type DragHandleProps = {
+  attributes: DraggableAttributes;
+  listeners: DraggableSyntheticListeners;
+  setActivatorNodeRef: (element: HTMLElement | null) => void;
+};
 
-const ChevronDownIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="m7 9.5 5 5.5 5-5.5" />
-  </svg>
-);
+type SortableSponsorItemProps = {
+  disabled: boolean;
+  id: UniqueIdentifier;
+  children: (dragHandleProps: DragHandleProps) => ReactNode;
+};
 
-const EditIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M4.5 19.5h4.25L18.5 9.75a2.2 2.2 0 0 0-3.1-3.1L5.65 16.4 4.5 19.5Z" />
-    <path d="m13.75 8.25 2 2" />
-  </svg>
-);
+type SponsorDragPreviewProps = {
+  sponsor: Sponsor;
+};
+
+export function reorderSponsorsById(
+  sponsors: Sponsor[],
+  activeId: UniqueIdentifier,
+  overId: UniqueIdentifier | null
+) {
+  if (!overId || activeId === overId) {
+    return sponsors;
+  }
+
+  const activeIndex = sponsors.findIndex((sponsor) => sponsor.id === activeId);
+  const overIndex = sponsors.findIndex((sponsor) => sponsor.id === overId);
+
+  if (activeIndex < 0 || overIndex < 0) {
+    return sponsors;
+  }
+
+  return arrayMove(sponsors, activeIndex, overIndex);
+}
+
+function SortableSponsorItem({ disabled, id, children }: SortableSponsorItemProps) {
+  const {
+    attributes,
+    listeners,
+    setActivatorNodeRef,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled });
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      className={`${styles.item} ${isDragging ? styles.itemDragging : ''}`}
+      style={style}
+    >
+      {children({ attributes, listeners, setActivatorNodeRef })}
+    </li>
+  );
+}
+
+function SponsorDragPreview({ sponsor }: SponsorDragPreviewProps) {
+  return (
+    <div className={styles.dragPreview} aria-hidden="true">
+      <div className={styles.logoFrame}>
+        <img src={sponsor.imageDataUrl} alt="" className={styles.logo} />
+      </div>
+      <div className={styles.itemCopy}>
+        <strong>{sponsor.name}</strong>
+        <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function SponsorsAdminPanel() {
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
@@ -50,6 +138,13 @@ export default function SponsorsAdminPanel() {
   const [editName, setEditName] = useState('');
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [draggingSponsorId, setDraggingSponsorId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   useEffect(() => {
     const unsubscribe = observeSponsors(
@@ -185,25 +280,54 @@ export default function SponsorsAdminPanel() {
     try {
       await reorderSponsors(reorderedSponsors.map((sponsor) => sponsor.id));
       toast.success('Ordem atualizada');
+      return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Não foi possível atualizar a ordem';
       toast.error(message);
+      return false;
     } finally {
       setBusySponsorId(null);
     }
   };
 
-  const moveSponsor = async (sponsorIndex: number, direction: -1 | 1) => {
-    const nextIndex = sponsorIndex + direction;
-    if (nextIndex < 0 || nextIndex >= sponsors.length) {
+  const reorderSponsor = async (activeId: UniqueIdentifier, overId: UniqueIdentifier | null) => {
+    if (busySponsorId || editingSponsorId) {
       return;
     }
 
-    const reorderedSponsors = [...sponsors];
-    const [movedSponsor] = reorderedSponsors.splice(sponsorIndex, 1);
-    reorderedSponsors.splice(nextIndex, 0, movedSponsor);
-    await saveSponsorOrder(reorderedSponsors, movedSponsor);
+    const reorderedSponsors = reorderSponsorsById(sponsors, activeId, overId);
+    if (reorderedSponsors === sponsors) {
+      return;
+    }
+
+    const movedSponsor = sponsors.find((sponsor) => sponsor.id === activeId);
+    if (!movedSponsor) {
+      return;
+    }
+
+    const previousSponsors = sponsors;
+    setSponsors(reorderedSponsors);
+    const wasSaved = await saveSponsorOrder(reorderedSponsors, movedSponsor);
+    if (!wasSaved) {
+      setSponsors(previousSponsors);
+    }
   };
+
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    setDraggingSponsorId(String(active.id));
+  };
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    setDraggingSponsorId(null);
+    void reorderSponsor(active.id, over?.id ?? null);
+  };
+
+  const draggingSponsor = sponsors.find((sponsor) => sponsor.id === draggingSponsorId) ?? null;
+  const isOrderBusy = Boolean(busySponsorId || editingSponsorId);
+  const getSponsorName = (id: UniqueIdentifier) =>
+    sponsors.find((sponsor) => sponsor.id === id)?.name ?? 'patrocinador';
+  const getSponsorPosition = (id: UniqueIdentifier) =>
+    sponsors.findIndex((sponsor) => sponsor.id === id) + 1;
 
   return (
     <div className={styles.panel}>
@@ -255,129 +379,179 @@ export default function SponsorsAdminPanel() {
           ))}
         </div>
       ) : (
-        <ul className={styles.list}>
-          {sponsors.map((sponsor, index) => {
-            const isBusy = busySponsorId === sponsor.id;
-            const isEditing = editingSponsorId === sponsor.id;
-            return (
-              <li key={sponsor.id} className={styles.item}>
-                <div className={styles.logoFrame}>
-                  <img src={sponsor.imageDataUrl} alt={sponsor.name} className={styles.logo} />
-                </div>
-                {isEditing ? (
-                  <div className={styles.editFields}>
-                    <label>
-                      <span>Nome</span>
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(event) => setEditName(event.target.value)}
-                        disabled={isBusy}
-                      />
-                    </label>
-                    <label className={styles.replaceLogoButton}>
-                      <span>{editImageFile ? editImageFile.name : 'Substituir logotipo'}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => setEditImageFile(event.target.files?.[0] ?? null)}
-                        disabled={isBusy}
-                      />
-                    </label>
-                  </div>
-                ) : (
-                  <div className={styles.itemCopy}>
-                    <strong>{sponsor.name}</strong>
-                    <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
-                  </div>
-                )}
-                <div className={`${styles.actions} ${isEditing ? styles.editActions : ''}`}>
-                  {isEditing ? (
-                    <>
-                      <button
-                        type="button"
-                        className={styles.secondaryButton}
-                        onClick={() => {
-                          void saveSponsorEdit(sponsor);
-                        }}
-                        disabled={isBusy}
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.neutralButton}
-                        onClick={cancelEditingSponsor}
-                        disabled={isBusy}
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className={styles.iconActionGroup}>
-                        <button
-                          type="button"
-                          className={`${styles.orderButton} ${styles.iconButton}`}
-                          onClick={() => {
-                            void moveSponsor(index, -1);
-                          }}
-                          disabled={isBusy || index === 0}
-                          aria-label={`Mover ${sponsor.name} para cima`}
-                        >
-                          <ChevronUpIcon />
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.orderButton} ${styles.iconButton}`}
-                          onClick={() => {
-                            void moveSponsor(index, 1);
-                          }}
-                          disabled={isBusy || index === sponsors.length - 1}
-                          aria-label={`Mover ${sponsor.name} para baixo`}
-                        >
-                          <ChevronDownIcon />
-                        </button>
-                        <button
-                          type="button"
-                          className={`${styles.neutralButton} ${styles.iconButton}`}
-                          onClick={() => startEditingSponsor(sponsor)}
-                          disabled={isBusy}
-                          aria-label={`Editar ${sponsor.name}`}
-                          title="Editar"
-                        >
-                          <EditIcon />
-                        </button>
-                      </div>
-                      <div className={styles.siteActionGroup}>
-                        <button
-                          type="button"
-                          className={styles.secondaryButton}
-                          onClick={() => {
-                            void toggleSponsor(sponsor);
-                          }}
-                          disabled={isBusy}
-                        >
-                          {sponsor.active ? 'Ocultar' : 'Mostrar'}
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.dangerButton}
-                          onClick={() => {
-                            setSponsorToDelete(sponsor);
-                          }}
-                          disabled={isBusy}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setDraggingSponsorId(null)}
+          accessibility={{
+            announcements: {
+              onDragStart: ({ active }) => `A reordenar ${getSponsorName(active.id)}.`,
+              onDragOver: ({ active, over }) => {
+                if (!over) {
+                  return `A mover ${getSponsorName(active.id)}.`;
+                }
+
+                return `${getSponsorName(active.id)} sobre ${getSponsorName(over.id)}, posição ${getSponsorPosition(over.id)}.`;
+              },
+              onDragEnd: ({ active, over }) =>
+                over
+                  ? `${getSponsorName(active.id)} movido para a posição ${getSponsorPosition(over.id)}.`
+                  : `Reordenação de ${getSponsorName(active.id)} cancelada.`,
+              onDragCancel: ({ active }) =>
+                `Reordenação de ${getSponsorName(active.id)} cancelada.`,
+            },
+            screenReaderInstructions: {
+              draggable:
+                'Para alterar a ordem, prima Espaço ou Enter. Usa as setas para mover e prima Espaço ou Enter para confirmar.',
+            },
+          }}
+        >
+          <SortableContext
+            items={sponsors.map((sponsor) => sponsor.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <ul className={styles.list}>
+              {sponsors.map((sponsor) => {
+                const isBusy = busySponsorId === sponsor.id;
+                const isEditing = editingSponsorId === sponsor.id;
+                return (
+                  <SortableSponsorItem
+                    key={sponsor.id}
+                    id={sponsor.id}
+                    disabled={isOrderBusy || isEditing}
+                  >
+                    {({ attributes, listeners, setActivatorNodeRef }) => (
+                      <>
+                        {!isEditing ? (
+                          <button
+                            ref={setActivatorNodeRef}
+                            type="button"
+                            className={`${styles.dragHandle} ${styles.iconButton}`}
+                            disabled={isOrderBusy}
+                            aria-label={`Reordenar ${sponsor.name}`}
+                            title="Arrastar para reordenar"
+                            {...attributes}
+                            {...listeners}
+                          >
+                            <IconGripVertical aria-hidden="true" />
+                          </button>
+                        ) : (
+                          <span className={styles.dragHandleSpacer} aria-hidden="true" />
+                        )}
+                        <div className={styles.logoFrame}>
+                          <img
+                            src={sponsor.imageDataUrl}
+                            alt={sponsor.name}
+                            className={styles.logo}
+                          />
+                        </div>
+                        {isEditing ? (
+                          <div className={styles.editFields}>
+                            <label>
+                              <span>Nome</span>
+                              <input
+                                type="text"
+                                value={editName}
+                                onChange={(event) => setEditName(event.target.value)}
+                                disabled={isBusy}
+                              />
+                            </label>
+                            <label className={styles.replaceLogoButton}>
+                              <span>
+                                {editImageFile ? editImageFile.name : 'Substituir logotipo'}
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) =>
+                                  setEditImageFile(event.target.files?.[0] ?? null)
+                                }
+                                disabled={isBusy}
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <div className={styles.itemCopy}>
+                            <strong>{sponsor.name}</strong>
+                            <span>{sponsor.active ? 'Visível no site' : 'Oculto'}</span>
+                          </div>
+                        )}
+                        <div className={`${styles.actions} ${isEditing ? styles.editActions : ''}`}>
+                          {isEditing ? (
+                            <>
+                              <button
+                                type="button"
+                                className={styles.secondaryButton}
+                                onClick={() => {
+                                  void saveSponsorEdit(sponsor);
+                                }}
+                                disabled={isBusy}
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.neutralButton}
+                                onClick={cancelEditingSponsor}
+                                disabled={isBusy}
+                              >
+                                Cancelar
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                className={`${styles.neutralButton} ${styles.actionButton}`}
+                                onClick={() => startEditingSponsor(sponsor)}
+                                disabled={isBusy}
+                              >
+                                <IconPencil aria-hidden="true" />
+                                Editar
+                              </button>
+                              <div className={styles.siteActionGroup}>
+                                <button
+                                  type="button"
+                                  className={`${styles.secondaryButton} ${styles.actionButton}`}
+                                  onClick={() => {
+                                    void toggleSponsor(sponsor);
+                                  }}
+                                  disabled={isBusy}
+                                >
+                                  {sponsor.active ? (
+                                    <IconEyeOff aria-hidden="true" />
+                                  ) : (
+                                    <IconEye aria-hidden="true" />
+                                  )}
+                                  {sponsor.active ? 'Ocultar' : 'Mostrar'}
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`${styles.dangerButton} ${styles.actionButton}`}
+                                  onClick={() => {
+                                    setSponsorToDelete(sponsor);
+                                  }}
+                                  disabled={isBusy}
+                                >
+                                  <IconTrash aria-hidden="true" />
+                                  Eliminar
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </SortableSponsorItem>
+                );
+              })}
+            </ul>
+          </SortableContext>
+          <DragOverlay dropAnimation={null}>
+            {draggingSponsor ? <SponsorDragPreview sponsor={draggingSponsor} /> : null}
+          </DragOverlay>
+        </DndContext>
       )}
 
       <ConfirmModal

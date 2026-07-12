@@ -151,7 +151,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <label htmlFor="mainLogo" className={styles.assetTitle}>
                   Logotipo principal
                 </label>
-                <p className={styles.assetHint}>Usado na página inicial e na classificação</p>
+                <p className={styles.assetHint}>Logótipo em destaque na página inicial</p>
               </div>
               {mainPreview ? (
                 <button type="button" className={styles.clearButton} onClick={handleRemoveMainLogo}>
@@ -200,7 +200,7 @@ export default function BrandingForm({ initialBranding, isLoading, onSave }) {
                 <label htmlFor="icon" className={styles.assetTitle}>
                   Ícone
                 </label>
-                <p className={styles.assetHint}>Usado no cabeçalho e nos atalhos</p>
+                <p className={styles.assetHint}>Imagem redonda no cabeçalho de toda a app</p>
               </div>
               {iconPreview ? (
                 <button type="button" className={styles.clearButton} onClick={handleRemoveIcon}>

@@ -47,6 +47,38 @@
   margin-bottom: calc(-1 * var(--ui-space-xs));
 }
 
+.sponsorLoading {
+  display: grid;
+  gap: 0.875rem;
+  width: 100%;
+}
+
+.sponsorLoadingCard {
+  display: block;
+  min-height: 8.5rem;
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-sm);
+  background: linear-gradient(
+    110deg,
+    rgba(148, 163, 184, 0.12) 8%,
+    rgba(148, 163, 184, 0.25) 18%,
+    rgba(148, 163, 184, 0.12) 33%
+  );
+  background-size: 220% 100%;
+  animation: skeletonPulse 1.45s ease-in-out infinite;
+}
+
+.sponsorLoadingCompact {
+  display: flex;
+  gap: var(--ui-space-xs);
+  overflow: hidden;
+}
+
+.sponsorLoadingCompact .sponsorLoadingCard {
+  flex: 0 0 clamp(5.75rem, 24vw, 8rem);
+  min-height: 4.25rem;
+}
+
 .content {
   grid-area: content;
   display: flex;
@@ -294,7 +326,7 @@
   }
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 75rem) {
   .layout {
     grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 15rem);
     grid-template-areas: 'left content right';
@@ -318,10 +350,17 @@
   }
 }
 
-@media (max-width: 63.9375rem) {
+@media (max-width: 74.9375rem) {
   .leftRail,
   .rightRail {
     display: none;
+  }
+}
+
+@media (min-width: 75rem) and (max-width: 89.9375rem) {
+  .tableSurface {
+    --leaderboard-row-height: 4rem;
+    --leaderboard-row-gap: 0.5rem;
   }
 }
 

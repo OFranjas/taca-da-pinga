@@ -4,6 +4,7 @@ type SponsorMarqueeProps = {
   sponsors?: Sponsor[];
   rows?: number;
   compact?: boolean;
+  autoScroll?: boolean;
   ariaLabel?: string;
 };
 
