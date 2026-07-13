@@ -22,7 +22,7 @@ Originally developed in a couple of days as a request for a friend, this project
 ## ✨ Features
 
 - **Real-time Leaderboard** – Updates instantly as scores change.
-- **Admin Panel** – Secure login for managing teams and adding points.
+- **Admin Panel** – Secure login for managing teams and recording configured drinks with their pinga values.
 - **Responsive Design** – Optimized for desktop, TV display, and mobile.
 - **Firebase Integration** – Authentication & Firestore database.
 - **Sponsor Rail** – Displays tournament sponsors.

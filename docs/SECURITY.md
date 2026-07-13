@@ -39,7 +39,14 @@ service cloud.firestore {
 - Public can read `teams` and `events`; `app_config` is not publicly readable.
 - “Add pinga” increments are positive and bounded (delta ∈ [1..50]).
 - Totals never negative.
+- Drink scoring is service-owned: the service validates active catalogue IDs,
+  quantities, derived line deltas, duplicate consolidation, and receipt/projection
+  consistency before committing one batch. Rules do not attempt to validate
+  arbitrary dynamic receipt sums, but still enforce authorization and the score
+  increment bound.
 
 ## Logging & Audit
 
 - Every admin action must emit an events doc (ts, actorUid, type, delta, teamId).
+- Drink scoring receipts add `schemaVersion: 2` and immutable item snapshots:
+  `drinkId`, `drinkName`, `pingaValue`, `quantity`, and `lineDelta`.

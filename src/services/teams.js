@@ -29,7 +29,7 @@ export async function createTeamIfNotExists(name) {
     err.code = 'already-exists';
     throw err;
   }
-  await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0 });
+  await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0, drinkTotals: {} });
 }
 
 export async function deleteTeam(teamId) {

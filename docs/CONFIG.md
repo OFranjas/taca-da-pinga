@@ -34,10 +34,35 @@ The CI/CD workflows rely on the same Firebase configuration. Add these repositor
 
 - Admin allowlist: `app_config/admins` document in Firestore (or custom claim `admin`).
 - Collections:
-  - `teams`: { id, name, pingas }
-  - `events` (audit): { ts, actorUid, type, delta, teamId }
+  - `teams`: { id, name, pingas, drinkTotals }
+    - `pingas` remains the public leaderboard total.
+    - `drinkTotals.{drinkId}` contains `{ quantity, pingas }` projection counters.
+  - `events` (audit): `{ ts, actorUid, type, delta, teamId, schemaVersion, items }`.
+    - Drink receipts use `schemaVersion: 2` and immutable items with
+      `{ drinkId, drinkName, pingaValue, quantity, lineDelta }`.
   - `branding/current`: { mainLogoDataUrl?, iconDataUrl? } (data URLs, max 180 KB each)
   - `sponsors/{id}`: { name (≤80 chars), link (empty or https URL), imageDataUrl (≤180 KB data URL), active (bool), order (0-999) }
+
+## Developer-owned drinks catalogue
+
+Phase 1 drinks are configured in `src/config/drinks.ts`. Each entry has a stable
+lowercase kebab-case `id`, Portuguese `name`, positive integer `pingaValue`,
+`active` flag, `order`, and optional local `imageSrc`. The catalogue is bundled
+with the application; it is not read from `app_config` or Firestore. IDs must
+not be renamed or recycled after scoring data uses them.
+
+Each submission uses the derived catalogue total and must be between 1 and 50
+pingas. The UI, service, and Firestore Rules enforce this bound.
+
+No development-data reset is required to deploy Phase 1. Production must use
+its dedicated Firebase project and should start with the intended initial team
+and catalogue data. Existing development teams can continue to be used for
+Phase 1 testing; old raw totals simply have no drink breakdown, which is
+harmless until Phase 3.
+
+If a maintainer ever intends to reuse a Firebase project containing test
+scoring data for production, stop and obtain explicit approval for a targeted
+reset plan. Do not run destructive deletion commands by default.
 
 ## Environments
 

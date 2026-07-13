@@ -1,8 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
+import {
+  initializeTestEnvironment,
+  assertSucceeds,
+  assertFails,
+} from '@firebase/rules-unit-testing';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, setLogLevel, connectFirestoreEmulator } from 'firebase/firestore';
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  setLogLevel,
+  connectFirestoreEmulator,
+} from 'firebase/firestore';
 // Reduce Firestore internal console.warn noise during deny cases
 setLogLevel('error');
 
@@ -33,8 +46,12 @@ beforeEach(async () => {
 function makeDb(mockUserToken) {
   const app = initializeApp({ projectId: PROJECT_ID }, `rt-${Math.random()}`);
   const db = getFirestore(app);
-  connectFirestoreEmulator(db, EMULATOR_HOST, Number(EMULATOR_PORT),
-    mockUserToken ? { mockUserToken } : undefined);
+  connectFirestoreEmulator(
+    db,
+    EMULATOR_HOST,
+    Number(EMULATOR_PORT),
+    mockUserToken ? { mockUserToken } : undefined
+  );
   return { app, db };
 }
 
@@ -61,6 +78,9 @@ describe('Firestore security rules', () => {
     const { db: userDb } = makeDb({ sub: 'user1', user_id: 'user1', admin: false });
     await assertFails(setDoc(doc(userDb, 'teams/y'), { name: 'Y', pingas: 0 }));
     await assertFails(updateDoc(doc(userDb, 'teams/t1'), { pingas: 1 }));
+    await assertFails(
+      updateDoc(doc(userDb, 'teams/t1'), { 'drinkTotals.beer.quantity': 1 })
+    );
     await assertFails(deleteDoc(doc(userDb, 'teams/t1')));
     await assertFails(setDoc(doc(userDb, 'events/e3'), { type: 'y' }));
     await assertFails(setDoc(doc(userDb, 'app_config/app'), { feature: false }));
@@ -71,6 +91,7 @@ describe('Firestore security rules', () => {
 
     // Create team with non-negative total
     await assertSucceeds(setDoc(doc(adminDb, 'teams/a1'), { name: 'A', pingas: 0 }));
+    await assertFails(setDoc(doc(adminDb, 'teams/decimal'), { name: 'Decimal', pingas: 0.5 }));
 
     // Name update without pingas change allowed
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
@@ -79,6 +100,15 @@ describe('Firestore security rules', () => {
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 1 })); // 0 -> 1
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
+
+    // The drink projection is an admin-owned team shape. Dynamic receipt
+    // arithmetic remains service validation; rules enforce auth and pingas bounds.
+    await assertSucceeds(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        'drinkTotals.beer.quantity': 1,
+        'drinkTotals.beer.pingas': 1,
+      })
+    );
 
     // Out-of-range increments denied (>50)
     const { db: ownerDb } = makeDb('owner');
@@ -115,33 +145,41 @@ describe('Firestore security rules', () => {
     test('allows public reads and admin writes with valid data URLs', async () => {
       const { db: adminDb } = makeDb({ sub: 'admin2', user_id: 'admin2', admin: true });
       const validDataUrl = makeImageDataUrl(32);
-      await assertSucceeds(setDoc(doc(adminDb, 'branding/current'), {
-        mainLogoDataUrl: validDataUrl,
-        iconDataUrl: validDataUrl,
-      }));
+      await assertSucceeds(
+        setDoc(doc(adminDb, 'branding/current'), {
+          mainLogoDataUrl: validDataUrl,
+          iconDataUrl: validDataUrl,
+        })
+      );
 
       const { db: anonDb } = makeDb(undefined);
       await assertSucceeds(getDoc(doc(anonDb, 'branding/current')));
 
       const { db: userDb } = makeDb({ sub: 'user2', user_id: 'user2', admin: false });
-      await assertFails(setDoc(doc(userDb, 'branding/current'), {
-        mainLogoDataUrl: validDataUrl,
-      }));
+      await assertFails(
+        setDoc(doc(userDb, 'branding/current'), {
+          mainLogoDataUrl: validDataUrl,
+        })
+      );
     });
 
     test('rejects image data that exceeds MAX_IMG_LEN', async () => {
       const { db: adminDb } = makeDb({ sub: 'admin3', user_id: 'admin3', admin: true });
       const maxAllowed = 180000 - prefix.length;
       const atLimit = makeImageDataUrl(maxAllowed);
-      await assertSucceeds(setDoc(doc(adminDb, 'branding/current'), {
-        mainLogoDataUrl: atLimit,
-        iconDataUrl: atLimit,
-      }));
+      await assertSucceeds(
+        setDoc(doc(adminDb, 'branding/current'), {
+          mainLogoDataUrl: atLimit,
+          iconDataUrl: atLimit,
+        })
+      );
 
       const oversize = makeImageDataUrl(maxAllowed + 1);
-      await assertFails(setDoc(doc(adminDb, 'branding/current'), {
-        mainLogoDataUrl: oversize,
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'branding/current'), {
+          mainLogoDataUrl: oversize,
+        })
+      );
     });
   });
 
@@ -173,36 +211,48 @@ describe('Firestore security rules', () => {
     test('rejects invalid sponsor payloads', async () => {
       const { db: adminDb } = makeDb({ sub: 'admin5', user_id: 'admin5', admin: true });
 
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-name'), {
-        ...baseSponsor,
-        name: 'a'.repeat(81),
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-bad-name'), {
+          ...baseSponsor,
+          name: 'a'.repeat(81),
+        })
+      );
 
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-link'), {
-        ...baseSponsor,
-        link: 'ftp://invalid',
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-bad-link'), {
+          ...baseSponsor,
+          link: 'ftp://invalid',
+        })
+      );
 
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-http-link'), {
-        ...baseSponsor,
-        link: 'http://example.com',
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-http-link'), {
+          ...baseSponsor,
+          link: 'http://example.com',
+        })
+      );
 
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-order'), {
-        ...baseSponsor,
-        order: 1000,
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-bad-order'), {
+          ...baseSponsor,
+          order: 1000,
+        })
+      );
 
       const oversizeImage = prefix + 'a'.repeat(180000 - prefix.length + 1);
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-big-image'), {
-        ...baseSponsor,
-        imageDataUrl: oversizeImage,
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-big-image'), {
+          ...baseSponsor,
+          imageDataUrl: oversizeImage,
+        })
+      );
 
-      await assertFails(setDoc(doc(adminDb, 'sponsors/s-bad-active'), {
-        ...baseSponsor,
-        active: 'yes please',
-      }));
+      await assertFails(
+        setDoc(doc(adminDb, 'sponsors/s-bad-active'), {
+          ...baseSponsor,
+          active: 'yes please',
+        })
+      );
     });
 
     test('allows non-link updates to legacy HTTP sponsor links', async () => {

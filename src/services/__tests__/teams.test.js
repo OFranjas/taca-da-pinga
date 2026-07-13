@@ -45,7 +45,11 @@ describe('services/teams', () => {
     const { createTeamIfNotExists } = await import('../teams');
     mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
     await createTeamIfNotExists('New Team');
-    expect(mockAddDoc).toHaveBeenCalled();
+    expect(mockAddDoc).toHaveBeenCalledWith(undefined, {
+      name: 'New Team',
+      pingas: 0,
+      drinkTotals: {},
+    });
   });
 
   test('createTeamIfNotExists throws when already exists', async () => {
