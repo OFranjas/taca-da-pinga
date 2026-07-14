@@ -47,9 +47,9 @@ The CI/CD workflows rely on the same Firebase configuration. Add these repositor
 
 Phase 1 drinks are configured in `src/config/drinks.ts`. Each entry has a stable
 lowercase kebab-case `id`, Portuguese `name`, positive integer `pingaValue`,
-`active` flag, `order`, and optional local `imageSrc`. The catalogue is bundled
-with the application; it is not read from `app_config` or Firestore. IDs must
-not be renamed or recycled after scoring data uses them.
+`active` flag, `order`, a typed fallback `icon`, and optional local `imageSrc`.
+The catalogue is bundled with the application; it is not read from `app_config`
+or Firestore. IDs must not be renamed or recycled after scoring data uses them.
 
 Each submission uses the derived catalogue total and must be between 1 and 50
 pingas. The UI, service, and Firestore Rules enforce this bound.

@@ -73,17 +73,20 @@ The entry flow should be quick and calm rather than decorative. The existing gre
 Create a developer-owned typed catalogue, for example `src/config/drinks.ts`:
 
 ```ts
+export type DrinkIconName = 'beer' | 'bottle' | 'sangria' | 'spirit' | 'metro';
+
 export type ConfiguredDrink = {
   id: string;
   name: string;
   pingaValue: number;
+  icon: DrinkIconName;
   imageSrc?: string;
   active: boolean;
   order: number;
 };
 ```
 
-Images are optional in this phase. When supplied, use local repository assets imported by the catalogue. A consistent fallback icon is better than a remote URL or a broken image.
+Images are optional in this phase. When supplied, use local repository assets imported by the catalogue. The typed icon selects the consistent decorative fallback used if an image is absent or fails to load.
 
 This configuration is intentionally not stored in `app_config`: client reads of that collection are denied by the current security rules, while the admin scoring form must read the catalogue.
 

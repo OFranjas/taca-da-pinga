@@ -1,0 +1,58 @@
+import { describe, expect, test } from 'vitest';
+import { DRINK_CATALOGUE } from '../drinks';
+
+describe('drink catalogue', () => {
+  test('keeps the Phase 1 catalogue values and ordering explicit', () => {
+    expect(
+      DRINK_CATALOGUE.map(({ id, name, pingaValue, active, order, imageSrc }) => ({
+        id,
+        name,
+        pingaValue,
+        active,
+        order,
+        hasImage: Boolean(imageSrc),
+      }))
+    ).toEqual([
+      {
+        id: 'beer',
+        name: 'Cerveja',
+        pingaValue: 1,
+        active: true,
+        order: 0,
+        hasImage: true,
+      },
+      {
+        id: 'cider',
+        name: 'Cidra',
+        pingaValue: 1,
+        active: true,
+        order: 1,
+        hasImage: true,
+      },
+      {
+        id: 'sangria',
+        name: 'Sangria',
+        pingaValue: 1,
+        active: true,
+        order: 2,
+        hasImage: true,
+      },
+      {
+        id: 'white-spirit',
+        name: 'Bebida branca',
+        pingaValue: 5,
+        active: true,
+        order: 3,
+        hasImage: true,
+      },
+      {
+        id: 'metro',
+        name: 'Metro',
+        pingaValue: 11,
+        active: true,
+        order: 4,
+        hasImage: true,
+      },
+    ]);
+  });
+});

@@ -81,6 +81,7 @@ export default function AddPingasPanel() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const submissionLockRef = useRef(false);
 
   useEffect(() => {
     const unsubscribe = observeTeamsOrderedByName((nextTeams: TeamOption[]) => {
@@ -174,6 +175,8 @@ export default function AddPingasPanel() {
   };
 
   const handleAdd = async () => {
+    if (submissionLockRef.current) return;
+
     if (!selectedTeam) {
       const message = 'Seleciona uma equipa.';
       setSubmitError(message);
@@ -188,6 +191,7 @@ export default function AddPingasPanel() {
     }
 
     setSubmitError(null);
+    submissionLockRef.current = true;
     setIsSubmitting(true);
     try {
       await addDrinkPingas({
@@ -206,6 +210,7 @@ export default function AddPingasPanel() {
       setSubmitError(message);
       toast.error(message);
     } finally {
+      submissionLockRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -307,7 +312,9 @@ export default function AddPingasPanel() {
                 )}
                 <div className={styles.drinkInfo}>
                   <span className={styles.drinkName}>{drink.name}</span>
-                  <span className={styles.drinkUnit}>{drink.pingaValue} pingas/un.</span>
+                  <span className={styles.drinkUnit}>
+                    {formatCount(drink.pingaValue, 'pinga', 'pingas')}/un.
+                  </span>
                 </div>
                 <div className={styles.quantityPicker}>
                   <button
@@ -353,7 +360,7 @@ export default function AddPingasPanel() {
                   </button>
                 </div>
                 <span className={styles.lineSubtotal} id={`drink-${drink.id}-subtotal`}>
-                  +{quantity * drink.pingaValue} pingas
+                  +{formatCount(quantity * drink.pingaValue, 'pinga', 'pingas')}
                 </span>
               </div>
             );

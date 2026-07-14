@@ -97,18 +97,15 @@ describe('Firestore security rules', () => {
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
 
     // Allowed increments 1..50
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 1 })); // 0 -> 1
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
-
-    // The drink projection is an admin-owned team shape. Dynamic receipt
-    // arithmetic remains service validation; rules enforce auth and pingas bounds.
     await assertSucceeds(
       updateDoc(doc(adminDb, 'teams/a1'), {
+        pingas: 1,
         'drinkTotals.beer.quantity': 1,
         'drinkTotals.beer.pingas': 1,
       })
-    );
+    ); // 0 -> 1 with the service-owned projection shape
+    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
+    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
 
     // Out-of-range increments denied (>50)
     const { db: ownerDb } = makeDb('owner');

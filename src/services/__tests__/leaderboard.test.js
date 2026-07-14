@@ -1,5 +1,23 @@
 vi.mock('../../firebase', () => ({ db: {} }));
 
+vi.mock('../../config/drinks', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    DRINK_CATALOGUE: [
+      ...actual.DRINK_CATALOGUE,
+      {
+        id: 'inactive-test',
+        name: 'Inativa de teste',
+        pingaValue: 1,
+        icon: 'bottle',
+        active: false,
+        order: 999,
+      },
+    ],
+  };
+});
+
 const mockCollection = vi.fn();
 const mockQuery = vi.fn();
 const mockOrderBy = vi.fn((field, dir) => ({ field, dir }));
@@ -203,6 +221,7 @@ describe('services/leaderboard', () => {
 
   test.each([
     ['unknown drink', [{ drinkId: 'unknown', quantity: 1 }], 'Unknown or inactive drink'],
+    ['inactive drink', [{ drinkId: 'inactive-test', quantity: 1 }], 'Unknown or inactive drink'],
     ['invalid quantity', [{ drinkId: 'beer', quantity: 0 }], 'positive integers'],
     ['negative quantity', [{ drinkId: 'beer', quantity: -1 }], 'positive integers'],
     ['non-integer quantity', [{ drinkId: 'beer', quantity: 1.5 }], 'positive integers'],
@@ -211,23 +230,6 @@ describe('services/leaderboard', () => {
     const { addDrinkPingas } = await import('../leaderboard');
     await expect(addDrinkPingas({ teamId: 'team1', items })).rejects.toThrow(message);
     expect(mockBatchCommit).not.toHaveBeenCalled();
-  });
-
-  test('addDrinkPingas rejects a configured drink when it is inactive', async () => {
-    const { DRINK_CATALOGUE } = await import('../../config/drinks');
-    const drink = DRINK_CATALOGUE.find((item) => item.id === 'cider');
-    const originalActive = drink.active;
-    drink.active = false;
-
-    try {
-      const { addDrinkPingas } = await import('../leaderboard');
-      await expect(
-        addDrinkPingas({ teamId: 'team1', items: [{ drinkId: 'cider', quantity: 1 }] })
-      ).rejects.toThrow('Unknown or inactive drink');
-      expect(mockBatchCommit).not.toHaveBeenCalled();
-    } finally {
-      drink.active = originalActive;
-    }
   });
 
   test('addDrinkPingas rejects totals below 1 or above 50', async () => {

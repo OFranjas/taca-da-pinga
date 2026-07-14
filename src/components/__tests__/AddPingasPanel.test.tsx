@@ -64,6 +64,7 @@ describe('AddPingasPanel drinks workflow', () => {
     expect(screen.getByText('Bebida branca')).toBeInTheDocument();
     expect(screen.getByText('Metro')).toBeInTheDocument();
     expect(document.querySelectorAll('fieldset img')).toHaveLength(5);
+    expect(screen.getAllByText('1 pinga/un.')).toHaveLength(3);
     expect(screen.getByText('5 pingas/un.')).toBeInTheDocument();
     expect(screen.getByText('11 pingas/un.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
@@ -124,7 +125,7 @@ describe('AddPingasPanel drinks workflow', () => {
     const submit = screen.getByRole('button', { name: 'Adicionar' });
     await user.click(submit);
     expect(submit).toBeDisabled();
-    await user.click(submit);
+    fireEvent.submit(submit.closest('form')!);
     expect(addDrinkPingasMock).toHaveBeenCalledTimes(1);
 
     resolveSubmission();
@@ -150,6 +151,7 @@ describe('AddPingasPanel drinks workflow', () => {
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
 
     expect(screen.getByText('1 bebida · +1 pinga')).toBeInTheDocument();
+    expect(screen.getByText('+1 pinga')).toBeInTheDocument();
   });
 
   test('renders the Tabler fallback icon when a configured image fails', () => {
