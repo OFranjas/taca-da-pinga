@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { DRINK_CATALOGUE, type ConfiguredDrink } from '../config/drinks';
+import { DRINK_CATALOGUE, type ConfiguredDrink, type DrinkIconName } from '../config/drinks';
 import { observeTeamsOrderedByName } from '../services/teams';
 import { addDrinkPingas } from '../services/leaderboard';
 import { auth } from '../firebase';
-import { IconGlassFull } from '@tabler/icons-react';
+import {
+  IconBeer,
+  IconBottle,
+  IconGlassCocktail,
+  IconGlassGin,
+  IconRulerMeasure,
+  type TablerIcon,
+} from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import styles from './AddPingasPanel.module.css';
 
@@ -11,6 +18,14 @@ const MIN_PINGAS = 1;
 const MAX_PINGAS = 50;
 const INVALID_AMOUNT_MESSAGE = `A quantidade tem de estar entre ${MIN_PINGAS} e ${MAX_PINGAS} pingas.`;
 const TEAM_LISTBOX_ID = 'team-suggestions';
+
+const DRINK_ICONS: Record<DrinkIconName, TablerIcon> = {
+  beer: IconBeer,
+  bottle: IconBottle,
+  sangria: IconGlassCocktail,
+  spirit: IconGlassGin,
+  metro: IconRulerMeasure,
+};
 
 type TeamOption = {
   id: string;
@@ -271,6 +286,7 @@ export default function AddPingasPanel() {
           {activeDrinks.map((drink) => {
             const quantity = quantities[drink.id] ?? 0;
             const imageFailed = failedImages[drink.id];
+            const DrinkIcon = DRINK_ICONS[drink.icon];
             return (
               <div className={styles.drinkRow} key={drink.id}>
                 {drink.imageSrc && !imageFailed ? (
@@ -286,7 +302,7 @@ export default function AddPingasPanel() {
                     data-testid={`drink-fallback-${drink.id}`}
                     aria-hidden="true"
                   >
-                    <IconGlassFull size={24} stroke={1.8} />
+                    <DrinkIcon size={24} stroke={1.8} />
                   </span>
                 )}
                 <div className={styles.drinkInfo}>

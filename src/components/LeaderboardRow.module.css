@@ -99,9 +99,9 @@
 
 .scoreCell {
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
   justify-content: flex-end;
-  gap: var(--ui-space-2xs);
+  gap: 0.35rem;
   text-align: right;
   min-width: 0;
 }
@@ -114,11 +114,12 @@
   min-width: 0;
 }
 
-.scoreLabel {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ui-color-text-muted);
+.scoreIcon {
+  display: block;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 @media (max-width: 640px) {
@@ -143,7 +144,8 @@
     font-size: 1rem;
   }
 
-  .scoreLabel {
-    display: none;
+  .scoreIcon {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 }

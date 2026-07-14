@@ -394,6 +394,11 @@
     padding: var(--ui-space-sm);
   }
 
+  .drinkName {
+    line-height: var(--ui-line-height-snug);
+    white-space: normal;
+  }
+
   .lineSubtotal {
     grid-column: 2 / -1;
     min-width: 0;

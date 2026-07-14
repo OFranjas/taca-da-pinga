@@ -59,10 +59,13 @@ describe('AddPingasPanel drinks workflow', () => {
     renderPanel();
 
     expect(screen.getByText('Cerveja')).toBeInTheDocument();
-    expect(screen.getByText('Shot')).toBeInTheDocument();
-    expect(screen.getByText('Sidra')).toBeInTheDocument();
-    expect(screen.queryByText('Vinho')).not.toBeInTheDocument();
-    expect(screen.getAllByTestId(/^drink-fallback-/)).toHaveLength(2);
+    expect(screen.getByText('Cidra')).toBeInTheDocument();
+    expect(screen.getByText('Sangria')).toBeInTheDocument();
+    expect(screen.getByText('Bebida branca')).toBeInTheDocument();
+    expect(screen.getByText('Metro')).toBeInTheDocument();
+    expect(document.querySelectorAll('fieldset img')).toHaveLength(5);
+    expect(screen.getByText('5 pingas/un.')).toBeInTheDocument();
+    expect(screen.getByText('11 pingas/un.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
     expect(screen.getByText('0 bebidas · +0 pingas')).toBeInTheDocument();
   });
@@ -73,10 +76,11 @@ describe('AddPingasPanel drinks workflow', () => {
 
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Shot' }));
+    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida branca' }));
 
-    expect(screen.getByText('3 bebidas · +4 pingas')).toBeInTheDocument();
-    expect(screen.getAllByText('+2 pingas')).toHaveLength(2);
+    expect(screen.getByText('3 bebidas · +7 pingas')).toBeInTheDocument();
+    expect(screen.getByText('+2 pingas')).toBeInTheDocument();
+    expect(screen.getByText('+5 pingas')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
 
     await selectTeam(user);
@@ -158,7 +162,7 @@ describe('AddPingasPanel drinks workflow', () => {
     const fallback = screen.getByTestId('drink-fallback-beer');
     expect(fallback).toHaveAttribute('aria-hidden', 'true');
     expect(fallback.querySelector('svg')).toBeInTheDocument();
-    expect(container.querySelector('img')).not.toBeInTheDocument();
+    expect(container.querySelectorAll('img')).toHaveLength(4);
   });
 
   test('sends only positive selections and resets after a successful submission', async () => {
@@ -166,7 +170,7 @@ describe('AddPingasPanel drinks workflow', () => {
     renderPanel();
     await selectTeam(user);
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Shot' }));
+    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cidra' }));
 
     await act(async () => {
       user.click(screen.getByRole('button', { name: 'Adicionar' }));
@@ -178,16 +182,16 @@ describe('AddPingasPanel drinks workflow', () => {
         actorUid: 'admin-1',
         items: [
           { drinkId: 'beer', quantity: 1 },
-          { drinkId: 'shot', quantity: 1 },
+          { drinkId: 'cider', quantity: 1 },
         ],
       });
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled());
     expect(toastMock.success).toHaveBeenCalledWith(
-      'Registado: 1× Cerveja + 1× Shot para Equipa Alfa (+3 pingas)'
+      'Registado: 1× Cerveja + 1× Cidra para Equipa Alfa (+2 pingas)'
     );
     expect(screen.getByRole('combobox', { name: 'Procurar equipa' })).toHaveValue('');
-    expect(screen.getByLabelText('Quantidade de Shot')).toHaveValue(0);
+    expect(screen.getByLabelText('Quantidade de Cidra')).toHaveValue(0);
     expect(screen.getByText('0 bebidas · +0 pingas')).toBeInTheDocument();
   });
 
@@ -207,9 +211,9 @@ describe('AddPingasPanel drinks workflow', () => {
     const user = userEvent;
     renderPanel();
     await selectTeam(user);
-    fireEvent.change(screen.getByLabelText('Quantidade de Shot'), { target: { value: '26' } });
+    fireEvent.change(screen.getByLabelText('Quantidade de Metro'), { target: { value: '5' } });
 
-    expect(screen.getByText('26 bebidas · +52 pingas')).toBeInTheDocument();
+    expect(screen.getByText('5 bebidas · +55 pingas')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('O máximo por adição é de 50 pingas');
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
     expect(addDrinkPingasMock).not.toHaveBeenCalled();
