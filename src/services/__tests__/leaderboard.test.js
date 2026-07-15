@@ -130,7 +130,7 @@ describe('services/leaderboard', () => {
     async (teamId) => {
       const { addDrinkPingas } = await import('../leaderboard');
       await expect(
-        addDrinkPingas({ teamId, items: [{ drinkId: 'beer', quantity: 1 }] })
+        addDrinkPingas({ teamId, items: [{ drinkId: 'light', quantity: 1 }] })
       ).rejects.toThrow('Team ID must be a non-empty Firestore document ID');
       expect(mockBatchCommit).not.toHaveBeenCalled();
     }
@@ -143,7 +143,7 @@ describe('services/leaderboard', () => {
       teamId: 'team1',
       actorUid: 'u1',
       items: [
-        { drinkId: 'beer', quantity: 3 },
+        { drinkId: 'light', quantity: 3 },
         { drinkId: 'white-spirit', quantity: 1 },
       ],
     });
@@ -152,8 +152,8 @@ describe('services/leaderboard', () => {
       { col: 'teams', id: 'team1' },
       {
         pingas: { __op: 'increment', n: 8 },
-        'drinkTotals.beer.quantity': { __op: 'increment', n: 3 },
-        'drinkTotals.beer.pingas': { __op: 'increment', n: 3 },
+        'drinkTotals.light.quantity': { __op: 'increment', n: 3 },
+        'drinkTotals.light.pingas': { __op: 'increment', n: 3 },
         'drinkTotals.white-spirit.quantity': { __op: 'increment', n: 1 },
         'drinkTotals.white-spirit.pingas': { __op: 'increment', n: 5 },
       }
@@ -167,8 +167,8 @@ describe('services/leaderboard', () => {
       schemaVersion: 2,
       items: [
         {
-          drinkId: 'beer',
-          drinkName: 'Cerveja, Sidra ou Sangria',
+          drinkId: 'light',
+          drinkName: 'Bebida Leve',
           pingaValue: 1,
           quantity: 3,
           lineDelta: 3,
@@ -218,9 +218,9 @@ describe('services/leaderboard', () => {
   test.each([
     ['unknown drink', [{ drinkId: 'unknown', quantity: 1 }], 'Unknown or inactive drink'],
     ['inactive drink', [{ drinkId: 'inactive-test', quantity: 1 }], 'Unknown or inactive drink'],
-    ['invalid quantity', [{ drinkId: 'beer', quantity: 0 }], 'positive integers'],
-    ['negative quantity', [{ drinkId: 'beer', quantity: -1 }], 'positive integers'],
-    ['non-integer quantity', [{ drinkId: 'beer', quantity: 1.5 }], 'positive integers'],
+    ['invalid quantity', [{ drinkId: 'light', quantity: 0 }], 'positive integers'],
+    ['negative quantity', [{ drinkId: 'light', quantity: -1 }], 'positive integers'],
+    ['non-integer quantity', [{ drinkId: 'light', quantity: 1.5 }], 'positive integers'],
     ['empty selection', [], 'At least one drink is required'],
   ])('addDrinkPingas rejects %s', async (_label, items, message) => {
     const { addDrinkPingas } = await import('../leaderboard');
@@ -231,7 +231,7 @@ describe('services/leaderboard', () => {
   test('addDrinkPingas rejects totals below 1 or above 50', async () => {
     const { addDrinkPingas } = await import('../leaderboard');
     await expect(
-      addDrinkPingas({ teamId: 'team1', items: [{ drinkId: 'beer', quantity: 51 }] })
+      addDrinkPingas({ teamId: 'team1', items: [{ drinkId: 'light', quantity: 51 }] })
     ).rejects.toThrow('between 1 and 50');
     await expect(
       addDrinkPingas({ teamId: 'team1', items: [{ drinkId: 'metro', quantity: 5 }] })

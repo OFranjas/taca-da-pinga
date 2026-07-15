@@ -14,8 +14,8 @@ describe('drink catalogue', () => {
       }))
     ).toEqual([
       {
-        id: 'beer',
-        name: 'Cerveja, Sidra ou Sangria',
+        id: 'light',
+        name: 'Bebida Leve',
         pingaValue: 1,
         active: true,
         order: 0,

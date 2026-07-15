@@ -18,8 +18,8 @@ export type ConfiguredDrink = {
 // Edit this list in code for Phase 1; do not rename or recycle an ID once used.
 export const DRINK_CATALOGUE: readonly ConfiguredDrink[] = [
   {
-    id: 'beer',
-    name: 'Cerveja, Sidra ou Sangria',
+    id: 'light',
+    name: 'Bebida Leve',
     pingaValue: 1,
     icon: 'beer',
     imageSrc: beerImage,

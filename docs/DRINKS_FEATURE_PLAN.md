@@ -38,11 +38,11 @@ A drink is a catalogue item with a stable identifier, a Portuguese display name,
 
 Examples for a first developer-owned catalogue:
 
-| Stable ID      | Display name              | Pingas per unit |
-| -------------- | ------------------------- | --------------: |
-| `beer`         | Cerveja, Sidra ou Sangria |               1 |
-| `white-spirit` | Bebida branca             |               5 |
-| `metro`        | Metro                     |              11 |
+| Stable ID      | Display name  | Pingas per unit |
+| -------------- | ------------- | --------------: |
+| `light`        | Bebida Leve   |               1 |
+| `white-spirit` | Bebida branca |               5 |
+| `metro`        | Metro         |              11 |
 
 The IDs are permanent internal keys, not names. They must be lowercase kebab-case, must not contain `.`, and must never be recycled. A name or value may change later without rewriting history.
 
@@ -102,8 +102,8 @@ Keep the current base audit fields and make the receipt fields below part of eve
   schemaVersion: 2,
   items: [
     {
-      drinkId: 'beer',
-      drinkName: 'Cerveja, Sidra ou Sangria',
+      drinkId: 'light',
+      drinkName: 'Bebida Leve',
       pingaValue: 1,
       quantity: 3,
       lineDelta: 3
@@ -122,7 +122,7 @@ When a drink receipt is written, also atomically update a compact projection on 
 {
   pingas: 42,
   drinkTotals: {
-    beer: { quantity: 18, pingas: 18 },
+    light: { quantity: 18, pingas: 18 },
     'white-spirit': { quantity: 4, pingas: 20 }
   }
 }
@@ -210,7 +210,7 @@ Move the runtime catalogue to a public-read, admin-write `drinks` collection. Ad
 ```ts
 // drinks/{drinkId}
 {
-  name: 'Cerveja, Sidra ou Sangria',
+  name: 'Bebida Leve',
   pingaValue: 1,
   imageDataUrl?: 'data:image/...',
   active: true,
