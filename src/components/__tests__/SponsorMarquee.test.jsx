@@ -114,6 +114,11 @@ describe('SponsorMarquee', () => {
     fireEvent(row, wheelEvent);
     expect(animation.currentTime).not.toBe(100);
 
+    animation.currentTime = 600;
+    fireEvent.focus(row);
+    expect(animation.currentTime).toBe(0);
+    expect(animation.pause).toHaveBeenCalled();
+
     unmount();
     Object.defineProperty(HTMLElement.prototype, 'animate', {
       configurable: true,

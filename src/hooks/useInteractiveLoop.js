@@ -205,11 +205,18 @@ export default function useInteractiveLoop({
     [axis, cycleExtent, durationSeconds, pause, resumeLater]
   );
 
+  const onFocus = useCallback(() => {
+    pause();
+    if (animationRef.current) {
+      animationRef.current.currentTime = 0;
+    }
+  }, [pause]);
+
   return {
     onBlur: resumeLater,
     onClickCapture,
     onDragStart,
-    onFocus: pause,
+    onFocus,
     onKeyDown,
     onMouseEnter: pause,
     onMouseLeave: resumeLater,
