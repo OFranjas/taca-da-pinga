@@ -60,22 +60,6 @@
   padding-bottom: 0.875rem;
 }
 
-.animatedViewport .stack {
-  animation: sponsors-rail var(--loop-duration, 30s) linear infinite;
-  will-change: transform;
-}
-
-.animatedViewport:hover .stack,
-.animatedViewport:focus-within .stack {
-  animation-play-state: paused;
-}
-
-@keyframes sponsors-rail {
-  to {
-    transform: translate3d(0, var(--loop-distance), 0);
-  }
-}
-
 .slot {
   display: flex;
   flex-direction: column;
@@ -197,10 +181,5 @@
 @media (prefers-reduced-motion: reduce) {
   .animatedViewport {
     overflow-y: auto;
-  }
-
-  .animatedViewport .stack {
-    animation: none;
-    transform: none;
   }
 }
