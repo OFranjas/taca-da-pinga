@@ -41,7 +41,7 @@ Examples for a first developer-owned catalogue:
 | Stable ID      | Display name  | Pingas per unit |
 | -------------- | ------------- | --------------: |
 | `light`        | Bebida Leve   |               1 |
-| `white-spirit` | Bebida branca |               5 |
+| `white-spirit` | Bebida Branca |               5 |
 | `metro`        | Metro         |              11 |
 
 The IDs are permanent internal keys, not names. They must be lowercase kebab-case, must not contain `.`, and must never be recycled. A name or value may change later without rewriting history.

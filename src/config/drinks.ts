@@ -28,7 +28,7 @@ export const DRINK_CATALOGUE: readonly ConfiguredDrink[] = [
   },
   {
     id: 'white-spirit',
-    name: 'Bebida branca',
+    name: 'Bebida Branca',
     pingaValue: 5,
     icon: 'spirit',
     imageSrc: whiteSpiritImage,

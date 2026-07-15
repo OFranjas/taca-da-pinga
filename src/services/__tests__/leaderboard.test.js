@@ -175,7 +175,7 @@ describe('services/leaderboard', () => {
         },
         {
           drinkId: 'white-spirit',
-          drinkName: 'Bebida branca',
+          drinkName: 'Bebida Branca',
           pingaValue: 5,
           quantity: 1,
           lineDelta: 5,

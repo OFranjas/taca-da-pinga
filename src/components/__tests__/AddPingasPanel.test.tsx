@@ -59,7 +59,7 @@ describe('AddPingasPanel drinks workflow', () => {
     renderPanel();
 
     expect(screen.getByText('Bebida Leve')).toBeInTheDocument();
-    expect(screen.getByText('Bebida branca')).toBeInTheDocument();
+    expect(screen.getByText('Bebida Branca')).toBeInTheDocument();
     expect(screen.getByText('Metro')).toBeInTheDocument();
     expect(document.querySelectorAll('fieldset img')).toHaveLength(3);
     expect(screen.getAllByText('1 pinga/un.')).toHaveLength(1);
@@ -75,7 +75,7 @@ describe('AddPingasPanel drinks workflow', () => {
 
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida Leve' }));
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida Leve' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida branca' }));
+    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida Branca' }));
 
     expect(screen.getByText('3 bebidas · +7 pingas')).toBeInTheDocument();
     expect(screen.getByText('+2 pingas')).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe('AddPingasPanel drinks workflow', () => {
     renderPanel();
     await selectTeam(user);
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida Leve' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida branca' }));
+    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida Branca' }));
 
     await act(async () => {
       user.click(screen.getByRole('button', { name: 'Adicionar' }));
@@ -188,10 +188,10 @@ describe('AddPingasPanel drinks workflow', () => {
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled());
     expect(toastMock.success).toHaveBeenCalledWith(
-      'Registado: 1× Bebida Leve + 1× Bebida branca para Equipa Alfa (+6 pingas)'
+      'Registado: 1× Bebida Leve + 1× Bebida Branca para Equipa Alfa (+6 pingas)'
     );
     expect(screen.getByRole('combobox', { name: 'Procurar equipa' })).toHaveValue('');
-    expect(screen.getByLabelText('Quantidade de Bebida branca')).toHaveValue(0);
+    expect(screen.getByLabelText('Quantidade de Bebida Branca')).toHaveValue(0);
     expect(screen.getByText('0 bebidas · +0 pingas')).toBeInTheDocument();
   });
 

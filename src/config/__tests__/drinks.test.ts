@@ -23,7 +23,7 @@ describe('drink catalogue', () => {
       },
       {
         id: 'white-spirit',
-        name: 'Bebida branca',
+        name: 'Bebida Branca',
         pingaValue: 5,
         active: true,
         order: 1,
