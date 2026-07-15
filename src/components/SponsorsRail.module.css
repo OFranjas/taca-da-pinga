@@ -18,7 +18,29 @@
 }
 
 .animatedViewport {
+  position: relative;
   overflow-y: hidden;
+}
+
+.animatedViewport::before,
+.animatedViewport::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  left: 0;
+  height: 1rem;
+  pointer-events: none;
+}
+
+.animatedViewport::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ui-color-page), transparent);
+}
+
+.animatedViewport::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--ui-color-page), transparent);
 }
 
 .viewport::-webkit-scrollbar {
