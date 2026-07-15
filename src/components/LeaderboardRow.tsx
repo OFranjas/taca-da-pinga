@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import beerIcon from '../assets/beer.svg';
 import styles from './LeaderboardRow.module.css';
 
 const fallbackFormatter = new Intl.NumberFormat('pt-PT');
@@ -131,9 +132,13 @@ export function LeaderboardRow({
       </div>
       <div role="cell" className={styles.scoreCell}>
         <span className={styles.scoreValue}>{scoreText}</span>
-        <span className={styles.scoreLabel} aria-hidden="true">
-          pts
-        </span>
+        <img
+          className={styles.scoreIcon}
+          src={beerIcon}
+          alt=""
+          aria-hidden="true"
+          data-testid="score-beer-icon"
+        />
       </div>
     </div>
   );

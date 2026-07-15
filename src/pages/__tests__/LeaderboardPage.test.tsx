@@ -101,6 +101,8 @@ describe('Leaderboard page', () => {
     expect(rows[0]).toHaveTextContent('Alpha Squad');
     expect(rows[1]).toHaveTextContent('Beta Rockets');
     expect(rows[2]).toHaveTextContent('Charlie Crew');
+    expect(screen.getAllByTestId('score-beer-icon')).toHaveLength(3);
+    expect(screen.queryByText('pts')).not.toBeInTheDocument();
   });
 
   it('shows the empty state when there are no teams', async () => {

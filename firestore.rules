@@ -29,11 +29,16 @@ service cloud.firestore {
       // Create/update/delete only by admins
       allow create: if isAdmin() &&
         // New documents must start with non-negative total
-        (!('pingas' in request.resource.data) || request.resource.data.pingas >= 0);
+        (!('pingas' in request.resource.data) ||
+          (request.resource.data.pingas is int && request.resource.data.pingas >= 0));
 
       allow update: if isAdmin() && (
-        // If pingas is not being changed, allow (for name-only etc.)
-        !(request.resource.data.diff(resource.data).changedKeys().hasAny(['pingas'])) ||
+        // Metadata-only edits are allowed, but the service-owned drink projection
+        // cannot change without a score increment.
+        (
+          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['pingas'])) &&
+          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['drinkTotals']))
+        ) ||
         // If pingas changes, enforce bounds and positivity, and types
         (
           (request.resource.data.pingas is int) &&
@@ -44,6 +49,10 @@ service cloud.firestore {
           (request.resource.data.pingas - resource.data.pingas) <= 50
         )
       );
+
+      // The service validates drinkTotals arithmetic and receipt consistency.
+      // Rules preserve authorization and the total increment bound, but cannot
+      // prove that arbitrary dynamic receipt items sum to this projection.
 
       allow delete: if isAdmin();
     }
