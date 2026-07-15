@@ -191,9 +191,9 @@ export function AdminShell<TNav extends string = string>({
                       rel="noreferrer"
                       variant="secondary"
                       size="sm"
-                      aria-label="Abrir modo TV (abre numa nova janela)"
+                      fullWidth
                     >
-                      Abrir modo TV (abre numa nova janela)
+                      Abrir modo TV
                     </Button>
                     <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
                       Branding

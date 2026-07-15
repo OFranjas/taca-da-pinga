@@ -191,18 +191,19 @@ describe('AdminShell', () => {
     );
 
     const displayLink = screen.getByRole('link', {
-      name: /Abrir modo TV \(abre numa nova janela\)/i,
+      name: 'Abrir modo TV',
       hidden: true,
     });
 
     expect(displayLink).toHaveAttribute('href', '/display');
     expect(displayLink).toHaveAttribute('target', '_blank');
     expect(displayLink).toHaveAttribute('rel', 'noreferrer');
+    expect(displayLink).toHaveTextContent('Abrir modo TV');
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
     expect(
       screen.getAllByRole('link', {
-        name: /Abrir modo TV \(abre numa nova janela\)/i,
+        name: 'Abrir modo TV',
         hidden: true,
       })
     ).toHaveLength(1);
