@@ -38,13 +38,11 @@ A drink is a catalogue item with a stable identifier, a Portuguese display name,
 
 Examples for a first developer-owned catalogue:
 
-| Stable ID      | Display name  | Pingas per unit |
-| -------------- | ------------- | --------------: |
-| `beer`         | Cerveja       |               1 |
-| `cider`        | Cidra         |               1 |
-| `sangria`      | Sangria       |               1 |
-| `white-spirit` | Bebida branca |               5 |
-| `metro`        | Metro         |              11 |
+| Stable ID      | Display name              | Pingas per unit |
+| -------------- | ------------------------- | --------------: |
+| `beer`         | Cerveja, Sidra ou Sangria |               1 |
+| `white-spirit` | Bebida branca             |               5 |
+| `metro`        | Metro                     |              11 |
 
 The IDs are permanent internal keys, not names. They must be lowercase kebab-case, must not contain `.`, and must never be recycled. A name or value may change later without rewriting history.
 
@@ -73,7 +71,7 @@ The entry flow should be quick and calm rather than decorative. The existing gre
 Create a developer-owned typed catalogue, for example `src/config/drinks.ts`:
 
 ```ts
-export type DrinkIconName = 'beer' | 'bottle' | 'sangria' | 'spirit' | 'metro';
+export type DrinkIconName = 'beer' | 'spirit' | 'metro';
 
 export type ConfiguredDrink = {
   id: string;
@@ -105,7 +103,7 @@ Keep the current base audit fields and make the receipt fields below part of eve
   items: [
     {
       drinkId: 'beer',
-      drinkName: 'Cerveja',
+      drinkName: 'Cerveja, Sidra ou Sangria',
       pingaValue: 1,
       quantity: 3,
       lineDelta: 3
@@ -212,7 +210,7 @@ Move the runtime catalogue to a public-read, admin-write `drinks` collection. Ad
 ```ts
 // drinks/{drinkId}
 {
-  name: 'Cerveja',
+  name: 'Cerveja, Sidra ou Sangria',
   pingaValue: 1,
   imageDataUrl?: 'data:image/...',
   active: true,

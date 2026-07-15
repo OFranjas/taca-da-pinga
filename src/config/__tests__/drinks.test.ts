@@ -15,26 +15,10 @@ describe('drink catalogue', () => {
     ).toEqual([
       {
         id: 'beer',
-        name: 'Cerveja',
+        name: 'Cerveja, Sidra ou Sangria',
         pingaValue: 1,
         active: true,
         order: 0,
-        hasImage: true,
-      },
-      {
-        id: 'cider',
-        name: 'Cidra',
-        pingaValue: 1,
-        active: true,
-        order: 1,
-        hasImage: true,
-      },
-      {
-        id: 'sangria',
-        name: 'Sangria',
-        pingaValue: 1,
-        active: true,
-        order: 2,
         hasImage: true,
       },
       {
@@ -42,7 +26,7 @@ describe('drink catalogue', () => {
         name: 'Bebida branca',
         pingaValue: 5,
         active: true,
-        order: 3,
+        order: 1,
         hasImage: true,
       },
       {
@@ -50,7 +34,7 @@ describe('drink catalogue', () => {
         name: 'Metro',
         pingaValue: 11,
         active: true,
-        order: 4,
+        order: 2,
         hasImage: true,
       },
     ]);

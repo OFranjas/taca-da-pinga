@@ -10,7 +10,7 @@ vi.mock('../../config/drinks', async (importOriginal) => {
         id: 'inactive-test',
         name: 'Inativa de teste',
         pingaValue: 1,
-        icon: 'bottle',
+        icon: 'beer',
         active: false,
         order: 999,
       },
@@ -143,8 +143,7 @@ describe('services/leaderboard', () => {
       teamId: 'team1',
       actorUid: 'u1',
       items: [
-        { drinkId: 'beer', quantity: 2 },
-        { drinkId: 'sangria', quantity: 1 },
+        { drinkId: 'beer', quantity: 3 },
         { drinkId: 'white-spirit', quantity: 1 },
       ],
     });
@@ -153,10 +152,8 @@ describe('services/leaderboard', () => {
       { col: 'teams', id: 'team1' },
       {
         pingas: { __op: 'increment', n: 8 },
-        'drinkTotals.beer.quantity': { __op: 'increment', n: 2 },
-        'drinkTotals.beer.pingas': { __op: 'increment', n: 2 },
-        'drinkTotals.sangria.quantity': { __op: 'increment', n: 1 },
-        'drinkTotals.sangria.pingas': { __op: 'increment', n: 1 },
+        'drinkTotals.beer.quantity': { __op: 'increment', n: 3 },
+        'drinkTotals.beer.pingas': { __op: 'increment', n: 3 },
         'drinkTotals.white-spirit.quantity': { __op: 'increment', n: 1 },
         'drinkTotals.white-spirit.pingas': { __op: 'increment', n: 5 },
       }
@@ -169,13 +166,12 @@ describe('services/leaderboard', () => {
       teamId: 'team1',
       schemaVersion: 2,
       items: [
-        { drinkId: 'beer', drinkName: 'Cerveja', pingaValue: 1, quantity: 2, lineDelta: 2 },
         {
-          drinkId: 'sangria',
-          drinkName: 'Sangria',
+          drinkId: 'beer',
+          drinkName: 'Cerveja, Sidra ou Sangria',
           pingaValue: 1,
-          quantity: 1,
-          lineDelta: 1,
+          quantity: 3,
+          lineDelta: 3,
         },
         {
           drinkId: 'white-spirit',

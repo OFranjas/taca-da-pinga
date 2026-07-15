@@ -58,13 +58,11 @@ describe('AddPingasPanel drinks workflow', () => {
   test('renders all active drinks with stable fallback and starts with submit disabled', () => {
     renderPanel();
 
-    expect(screen.getByText('Cerveja')).toBeInTheDocument();
-    expect(screen.getByText('Cidra')).toBeInTheDocument();
-    expect(screen.getByText('Sangria')).toBeInTheDocument();
+    expect(screen.getByText('Cerveja, Sidra ou Sangria')).toBeInTheDocument();
     expect(screen.getByText('Bebida branca')).toBeInTheDocument();
     expect(screen.getByText('Metro')).toBeInTheDocument();
-    expect(document.querySelectorAll('fieldset img')).toHaveLength(5);
-    expect(screen.getAllByText('1 pinga/un.')).toHaveLength(3);
+    expect(document.querySelectorAll('fieldset img')).toHaveLength(3);
+    expect(screen.getAllByText('1 pinga/un.')).toHaveLength(1);
     expect(screen.getByText('5 pingas/un.')).toBeInTheDocument();
     expect(screen.getByText('11 pingas/un.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
@@ -75,8 +73,12 @@ describe('AddPingasPanel drinks workflow', () => {
     const user = userEvent;
     renderPanel();
 
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
     await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida branca' }));
 
     expect(screen.getByText('3 bebidas · +7 pingas')).toBeInTheDocument();
@@ -120,7 +122,9 @@ describe('AddPingasPanel drinks workflow', () => {
     );
     renderPanel();
     await selectTeam(user);
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
 
     const submit = screen.getByRole('button', { name: 'Adicionar' });
     await user.click(submit);
@@ -148,7 +152,9 @@ describe('AddPingasPanel drinks workflow', () => {
   test('uses singular Portuguese wording for one drink and one pinga', async () => {
     const user = userEvent;
     renderPanel();
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
 
     expect(screen.getByText('1 bebida · +1 pinga')).toBeInTheDocument();
     expect(screen.getByText('+1 pinga')).toBeInTheDocument();
@@ -164,15 +170,17 @@ describe('AddPingasPanel drinks workflow', () => {
     const fallback = screen.getByTestId('drink-fallback-beer');
     expect(fallback).toHaveAttribute('aria-hidden', 'true');
     expect(fallback.querySelector('svg')).toBeInTheDocument();
-    expect(container.querySelectorAll('img')).toHaveLength(4);
+    expect(container.querySelectorAll('img')).toHaveLength(2);
   });
 
   test('sends only positive selections and resets after a successful submission', async () => {
     const user = userEvent;
     renderPanel();
     await selectTeam(user);
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cidra' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Bebida branca' }));
 
     await act(async () => {
       user.click(screen.getByRole('button', { name: 'Adicionar' }));
@@ -184,16 +192,16 @@ describe('AddPingasPanel drinks workflow', () => {
         actorUid: 'admin-1',
         items: [
           { drinkId: 'beer', quantity: 1 },
-          { drinkId: 'cider', quantity: 1 },
+          { drinkId: 'white-spirit', quantity: 1 },
         ],
       });
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled());
     expect(toastMock.success).toHaveBeenCalledWith(
-      'Registado: 1× Cerveja + 1× Cidra para Equipa Alfa (+2 pingas)'
+      'Registado: 1× Cerveja, Sidra ou Sangria + 1× Bebida branca para Equipa Alfa (+6 pingas)'
     );
     expect(screen.getByRole('combobox', { name: 'Procurar equipa' })).toHaveValue('');
-    expect(screen.getByLabelText('Quantidade de Cidra')).toHaveValue(0);
+    expect(screen.getByLabelText('Quantidade de Bebida branca')).toHaveValue(0);
     expect(screen.getByText('0 bebidas · +0 pingas')).toBeInTheDocument();
   });
 
@@ -201,11 +209,13 @@ describe('AddPingasPanel drinks workflow', () => {
     const user = userEvent;
     renderPanel();
     await selectTeam(user);
-    await user.click(screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Aumentar quantidade de Cerveja, Sidra ou Sangria' })
+    );
     await user.click(screen.getByRole('button', { name: 'Limpar' }));
 
     expect(screen.getByRole('combobox', { name: 'Procurar equipa' })).toHaveValue('Equipa Alfa');
-    expect(screen.getByLabelText('Quantidade de Cerveja')).toHaveValue(0);
+    expect(screen.getByLabelText('Quantidade de Cerveja, Sidra ou Sangria')).toHaveValue(0);
     expect(screen.getByRole('button', { name: 'Adicionar' })).toBeDisabled();
   });
 
@@ -224,7 +234,7 @@ describe('AddPingasPanel drinks workflow', () => {
   test('supports keyboard quantity changes and renders service errors', async () => {
     const user = userEvent;
     renderPanel();
-    const beerQuantity = screen.getByLabelText('Quantidade de Cerveja');
+    const beerQuantity = screen.getByLabelText('Quantidade de Cerveja, Sidra ou Sangria');
     beerQuantity.focus();
     await user.keyboard('{ArrowUp}{ArrowUp}{ArrowDown}');
     expect(beerQuantity).toHaveValue(1);

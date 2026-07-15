@@ -1,10 +1,8 @@
 import beerImage from '../assets/beer.svg';
-import ciderImage from '../assets/cider.svg';
 import metroImage from '../assets/metro.svg';
-import sangriaImage from '../assets/sangria.svg';
 import whiteSpiritImage from '../assets/white-spirit.svg';
 
-export type DrinkIconName = 'beer' | 'bottle' | 'sangria' | 'spirit' | 'metro';
+export type DrinkIconName = 'beer' | 'spirit' | 'metro';
 
 export type ConfiguredDrink = {
   id: string;
@@ -21,30 +19,12 @@ export type ConfiguredDrink = {
 export const DRINK_CATALOGUE: readonly ConfiguredDrink[] = [
   {
     id: 'beer',
-    name: 'Cerveja',
+    name: 'Cerveja, Sidra ou Sangria',
     pingaValue: 1,
     icon: 'beer',
     imageSrc: beerImage,
     active: true,
     order: 0,
-  },
-  {
-    id: 'cider',
-    name: 'Cidra',
-    pingaValue: 1,
-    icon: 'bottle',
-    imageSrc: ciderImage,
-    active: true,
-    order: 1,
-  },
-  {
-    id: 'sangria',
-    name: 'Sangria',
-    pingaValue: 1,
-    icon: 'sangria',
-    imageSrc: sangriaImage,
-    active: true,
-    order: 2,
   },
   {
     id: 'white-spirit',
@@ -53,7 +33,7 @@ export const DRINK_CATALOGUE: readonly ConfiguredDrink[] = [
     icon: 'spirit',
     imageSrc: whiteSpiritImage,
     active: true,
-    order: 3,
+    order: 1,
   },
   {
     id: 'metro',
@@ -62,6 +42,6 @@ export const DRINK_CATALOGUE: readonly ConfiguredDrink[] = [
     icon: 'metro',
     imageSrc: metroImage,
     active: true,
-    order: 4,
+    order: 2,
   },
 ];

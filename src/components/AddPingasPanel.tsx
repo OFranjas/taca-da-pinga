@@ -3,14 +3,7 @@ import { DRINK_CATALOGUE, type ConfiguredDrink, type DrinkIconName } from '../co
 import { observeTeamsOrderedByName } from '../services/teams';
 import { addDrinkPingas } from '../services/leaderboard';
 import { auth } from '../firebase';
-import {
-  IconBeer,
-  IconBottle,
-  IconGlassCocktail,
-  IconGlassGin,
-  IconRulerMeasure,
-  type TablerIcon,
-} from '@tabler/icons-react';
+import { IconBeer, IconGlassGin, IconRulerMeasure, type TablerIcon } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import styles from './AddPingasPanel.module.css';
 
@@ -21,8 +14,6 @@ const TEAM_LISTBOX_ID = 'team-suggestions';
 
 const DRINK_ICONS: Record<DrinkIconName, TablerIcon> = {
   beer: IconBeer,
-  bottle: IconBottle,
-  sangria: IconGlassCocktail,
   spirit: IconGlassGin,
   metro: IconRulerMeasure,
 };
