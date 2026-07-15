@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import SponsorsRail from '../SponsorsRail';
+import SponsorsRail, { getLoopWrapPosition } from '../SponsorsRail';
 
 const sponsors = [
   { imageDataUrl: 'data:image/png;base64,one', name: 'Primeiro', link: 'https://example.com/one' },
@@ -10,7 +10,7 @@ describe('SponsorsRail', () => {
   test('fills a shorter visual rail to the shared loop capacity without duplicating accessible sponsors', () => {
     const { container } = render(<SponsorsRail sponsors={sponsors} loopItemTarget={3} />);
 
-    expect(container.querySelectorAll('a, div[class*="slot"]')).toHaveLength(12);
+    expect(container.querySelectorAll('a, div[class*="slot"]')).toHaveLength(20);
     expect(screen.getAllByRole('img')).toHaveLength(2);
     expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(screen.getByRole('link', { name: 'Primeiro' })).toHaveAttribute(
@@ -39,5 +39,16 @@ describe('SponsorsRail', () => {
 
     expect(container.querySelectorAll('a, div[class*="slot"]')).toHaveLength(1);
     expect(screen.getAllByRole('img')).toHaveLength(1);
+  });
+
+  test('wraps at the reachable scroll limit when the viewport is taller than a cycle', () => {
+    expect(
+      getLoopWrapPosition({
+        scrollTop: 650,
+        scrollHeight: 1250,
+        clientHeight: 600,
+        segmentHeight: 250,
+      })
+    ).toBe(400);
   });
 });

@@ -16,8 +16,8 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_PX_PER_SECOND = 42;
-const DISPLAY_SCROLL_PAUSE_MS = 1200;
+const DISPLAY_SCROLL_PX_PER_SECOND = 30;
+const DISPLAY_SCROLL_PAUSE_MS = 2200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 

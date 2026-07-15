@@ -3,7 +3,30 @@ import styles from './SponsorsRail.module.css';
 
 const AUTO_SCROLL_SPEED = 22;
 const RESUME_DELAY_MS = 1400;
-const LOOP_SEGMENTS = 3;
+// Extra copies keep the rail scrollable even when a sponsor cycle is shorter
+// than the display viewport.
+const LOOP_SEGMENTS = 5;
+
+export function getLoopWrapPosition({ scrollTop, scrollHeight, clientHeight, segmentHeight }) {
+  const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
+  if (segmentHeight <= 0 || maxScrollTop <= segmentHeight) {
+    return scrollTop;
+  }
+
+  // Usually we wrap at the end of the second segment. On taller displays the
+  // browser can reach its scroll limit before that point, so wrap at that
+  // limit instead. Both positions render the same repeated sponsor cycle.
+  const upperWrapBoundary = Math.min(segmentHeight * 2, maxScrollTop);
+  if (scrollTop >= upperWrapBoundary) {
+    return scrollTop - segmentHeight;
+  }
+
+  if (scrollTop <= 0) {
+    return scrollTop + segmentHeight;
+  }
+
+  return scrollTop;
+}
 
 /**
  * @param {{ images?: string[]; sponsors?: Array<{ imageDataUrl: string, name?: string, link?: string }>; side?: 'left' | 'right'; loopItemTarget?: number; autoScroll?: boolean }} props
@@ -83,14 +106,12 @@ export default function SponsorsRail({
         return;
       }
 
-      let nextScrollTop = viewport.scrollTop;
-      if (viewport.scrollTop >= segmentHeight * 2) {
-        nextScrollTop = viewport.scrollTop - segmentHeight;
-      }
-
-      if (viewport.scrollTop <= 0) {
-        nextScrollTop = viewport.scrollTop + segmentHeight;
-      }
+      const nextScrollTop = getLoopWrapPosition({
+        scrollTop: viewport.scrollTop,
+        scrollHeight: viewport.scrollHeight,
+        clientHeight: viewport.clientHeight,
+        segmentHeight,
+      });
 
       if (nextScrollTop !== viewport.scrollTop) {
         isWrappingRef.current = true;
