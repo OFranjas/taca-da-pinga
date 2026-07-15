@@ -156,13 +156,15 @@ export default function SponsorsRail({
   const handleScroll = React.useCallback(
     (event) => {
       const viewport = event.currentTarget;
+      if (isProgrammaticScrollRef.current) {
+        return;
+      }
+
       wrapViewport(viewport);
 
-      if (!isProgrammaticScrollRef.current) {
-        syncPosition(viewport);
-        if (!isInteractingRef.current) {
-          pausedUntilRef.current = performance.now() + RESUME_DELAY_MS;
-        }
+      syncPosition(viewport);
+      if (!isInteractingRef.current) {
+        pausedUntilRef.current = performance.now() + RESUME_DELAY_MS;
       }
     },
     [syncPosition, wrapViewport]
