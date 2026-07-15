@@ -191,7 +191,7 @@ describe('AdminShell', () => {
     );
 
     const displayLink = screen.getByRole('link', {
-      name: /Abrir modo ecrã \(abre numa nova aba\)/i,
+      name: /Abrir modo TV \(abre numa nova janela\)/i,
       hidden: true,
     });
 
@@ -202,7 +202,7 @@ describe('AdminShell', () => {
     await user.click(screen.getByRole('button', { name: 'Menu' }));
     expect(
       screen.getAllByRole('link', {
-        name: /Abrir modo ecrã \(abre numa nova aba\)/i,
+        name: /Abrir modo TV \(abre numa nova janela\)/i,
         hidden: true,
       })
     ).toHaveLength(1);
