@@ -19,6 +19,9 @@ export const getLoopTimeAfterDistance = (startTime, distance, cycleExtent, durat
   return normalizeLoopTime(startTime + (distance / cycleExtent) * duration, duration);
 };
 
+export const getWheelDistance = (axis, deltaX, deltaY) =>
+  axis === 'x' ? (Math.abs(deltaX) > 0 ? deltaX : deltaY) : deltaY;
+
 export default function useInteractiveLoop({
   axis,
   cycleExtent,
@@ -155,8 +158,7 @@ export default function useInteractiveLoop({
         return;
       }
 
-      const distance =
-        axis === 'x' ? event.deltaX || (event.shiftKey ? event.deltaY : 0) : event.deltaY;
+      const distance = getWheelDistance(axis, event.deltaX, event.deltaY);
       if (!distance) {
         return;
       }
@@ -175,11 +177,40 @@ export default function useInteractiveLoop({
     [axis, cycleExtent, durationSeconds, pause, resumeLater]
   );
 
+  const onKeyDown = useCallback(
+    (event) => {
+      const forwardKey = axis === 'x' ? 'ArrowRight' : 'ArrowDown';
+      const backwardKey = axis === 'x' ? 'ArrowLeft' : 'ArrowUp';
+      if (event.key !== forwardKey && event.key !== backwardKey) {
+        return;
+      }
+
+      const animation = animationRef.current;
+      if (!animation || !cycleExtent || !durationSeconds) {
+        return;
+      }
+
+      pause();
+      const duration = durationSeconds * 1000;
+      const distance = event.key === forwardKey ? 120 : -120;
+      animation.currentTime = getLoopTimeAfterDistance(
+        Number(animation.currentTime ?? 0),
+        distance,
+        cycleExtent,
+        duration
+      );
+      event.preventDefault();
+      resumeLater();
+    },
+    [axis, cycleExtent, durationSeconds, pause, resumeLater]
+  );
+
   return {
     onBlur: resumeLater,
     onClickCapture,
     onDragStart,
     onFocus: pause,
+    onKeyDown,
     onMouseEnter: pause,
     onMouseLeave: resumeLater,
     onPointerCancel: onPointerEnd,

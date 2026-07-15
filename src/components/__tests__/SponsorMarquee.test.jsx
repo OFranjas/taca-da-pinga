@@ -1,6 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import SponsorMarquee from '../SponsorMarquee';
-import { getLoopTimeAfterDistance, normalizeLoopTime } from '../../hooks/useInteractiveLoop';
+import {
+  getLoopTimeAfterDistance,
+  getWheelDistance,
+  normalizeLoopTime,
+} from '../../hooks/useInteractiveLoop';
 import { getLoopCopyCount, getLoopDurationSeconds } from '../../hooks/useMeasuredLoop';
 
 const sponsors = [
@@ -27,6 +32,8 @@ describe('SponsorMarquee', () => {
     expect(normalizeLoopTime(-200, 1000)).toBe(800);
     expect(normalizeLoopTime(1250, 1000)).toBe(250);
     expect(getLoopTimeAfterDistance(200, 50, 100, 1000)).toBe(700);
+    expect(getWheelDistance('x', 0, 120)).toBe(120);
+    expect(getWheelDistance('x', 30, 120)).toBe(30);
   });
 
   test('does not render an empty sponsor list', () => {
@@ -77,5 +84,49 @@ describe('SponsorMarquee', () => {
     const row = container.querySelector('[tabindex="0"]');
 
     expect(fireEvent.dragStart(row)).toBe(false);
+  });
+
+  test('maps a laptop mouse wheel gesture to the smooth animation timeline', () => {
+    const originalAnimate = HTMLElement.prototype.animate;
+    const originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    const originalClientWidth = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'clientWidth'
+    );
+    const animation = { cancel: vi.fn(), currentTime: 100, pause: vi.fn(), play: vi.fn() };
+    const animate = vi.fn(() => animation);
+
+    Object.defineProperty(HTMLElement.prototype, 'animate', { configurable: true, value: animate });
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get: () => 200,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ height: 100, width: 300 }),
+    });
+
+    const { container, unmount } = render(<SponsorMarquee sponsors={sponsors} autoScroll />);
+    const row = container.querySelector('[tabindex="0"]');
+    const wheelEvent = createEvent.wheel(row, { cancelable: true, deltaY: 120 });
+
+    expect(animate).toHaveBeenCalled();
+    fireEvent(row, wheelEvent);
+    expect(animation.currentTime).not.toBe(100);
+
+    unmount();
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
+      configurable: true,
+      value: originalAnimate,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+      configurable: true,
+      value: originalGetBoundingClientRect,
+    });
+    if (originalClientWidth) {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', originalClientWidth);
+    } else {
+      delete HTMLElement.prototype.clientWidth;
+    }
   });
 });
