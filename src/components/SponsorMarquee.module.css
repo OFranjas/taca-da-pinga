@@ -53,19 +53,7 @@
 }
 
 .animatedRow .track {
-  animation: sponsor-marquee var(--loop-duration, 30s) linear infinite;
   will-change: transform;
-}
-
-.animatedRow:hover .track,
-.animatedRow:focus-within .track {
-  animation-play-state: paused;
-}
-
-@keyframes sponsor-marquee {
-  to {
-    transform: translate3d(var(--loop-distance), 0, 0);
-  }
 }
 
 .row:focus-visible {

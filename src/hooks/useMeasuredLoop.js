@@ -21,12 +21,13 @@ export const getLoopDurationSeconds = (cycleExtent, pixelsPerSecond) => {
 export default function useMeasuredLoop({ axis, cycleRef, enabled, pixelsPerSecond, viewportRef }) {
   const [loop, setLoop] = useState(() => ({
     copies: enabled ? MIN_LOOP_COPIES : 1,
+    cycleExtent: 0,
     durationSeconds: undefined,
   }));
 
   useEffect(() => {
     if (!enabled) {
-      setLoop({ copies: 1, durationSeconds: undefined });
+      setLoop({ copies: 1, cycleExtent: 0, durationSeconds: undefined });
       return undefined;
     }
 
@@ -42,11 +43,14 @@ export default function useMeasuredLoop({ axis, cycleRef, enabled, pixelsPerSeco
       const viewportExtent = axis === 'x' ? viewport.clientWidth : viewport.clientHeight;
       const nextLoop = {
         copies: getLoopCopyCount(viewportExtent, cycleExtent),
+        cycleExtent,
         durationSeconds: getLoopDurationSeconds(cycleExtent, pixelsPerSecond),
       };
 
       setLoop((current) =>
-        current.copies === nextLoop.copies && current.durationSeconds === nextLoop.durationSeconds
+        current.copies === nextLoop.copies &&
+        current.cycleExtent === nextLoop.cycleExtent &&
+        current.durationSeconds === nextLoop.durationSeconds
           ? current
           : nextLoop
       );

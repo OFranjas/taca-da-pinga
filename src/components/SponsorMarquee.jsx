@@ -1,4 +1,5 @@
 import React, { useMemo, useRef } from 'react';
+import useInteractiveLoop from '../hooks/useInteractiveLoop';
 import useMeasuredLoop from '../hooks/useMeasuredLoop';
 import styles from './SponsorMarquee.module.css';
 
@@ -7,21 +8,22 @@ const AUTO_SCROLL_SPEED = 18;
 function SponsorRow({ sponsors, autoScroll, rowIndex }) {
   const viewportRef = useRef(null);
   const cycleRef = useRef(null);
+  const trackRef = useRef(null);
   const shouldLoop = autoScroll && sponsors.length > 1;
-  const { copies, durationSeconds } = useMeasuredLoop({
+  const { copies, cycleExtent, durationSeconds } = useMeasuredLoop({
     axis: 'x',
     cycleRef,
     enabled: shouldLoop,
     pixelsPerSecond: AUTO_SCROLL_SPEED,
     viewportRef,
   });
-  const loopStyle = shouldLoop
-    ? {
-        '--loop-copies': copies,
-        '--loop-distance': `-${100 / copies}%`,
-        '--loop-duration': durationSeconds ? `${durationSeconds}s` : undefined,
-      }
-    : undefined;
+  const interactionHandlers = useInteractiveLoop({
+    axis: 'x',
+    cycleExtent,
+    durationSeconds,
+    enabled: shouldLoop,
+    trackRef,
+  });
 
   const renderSponsor = (sponsor, index, isDuplicate) => {
     const hasLink = Boolean(sponsor.link && sponsor.link.trim().length > 0);
@@ -84,8 +86,9 @@ function SponsorRow({ sponsors, autoScroll, rowIndex }) {
       ref={viewportRef}
       className={`${styles.row} ${shouldLoop ? styles.animatedRow : ''}`}
       tabIndex={0}
+      {...interactionHandlers}
     >
-      <span className={styles.track} style={loopStyle}>
+      <span ref={trackRef} className={styles.track}>
         {Array.from({ length: shouldLoop ? copies : 1 }, (_, cycleIndex) =>
           renderCycle(cycleIndex)
         )}

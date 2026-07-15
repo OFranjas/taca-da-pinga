@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import SponsorMarquee from '../SponsorMarquee';
+import { normalizeLoopTime } from '../../hooks/useInteractiveLoop';
 import { getLoopCopyCount, getLoopDurationSeconds } from '../../hooks/useMeasuredLoop';
 
 const sponsors = [
@@ -20,6 +21,11 @@ describe('SponsorMarquee', () => {
   test('sizes a loop to cover wide viewports and uses a readable animation duration', () => {
     expect(getLoopCopyCount(1200, 200)).toBe(9);
     expect(getLoopDurationSeconds(360, 18)).toBe(20);
+  });
+
+  test('normalizes a dragged animation position inside one smooth loop', () => {
+    expect(normalizeLoopTime(-200, 1000)).toBe(800);
+    expect(normalizeLoopTime(1250, 1000)).toBe(250);
   });
 
   test('does not render an empty sponsor list', () => {

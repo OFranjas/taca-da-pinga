@@ -35,7 +35,9 @@ describe('SponsorsRail', () => {
   });
 
   test('does not animate or duplicate a single unpaired sponsor', () => {
-    const { container } = render(<SponsorsRail sponsors={[sponsors[0]]} loopItemTarget={1} />);
+    const { container } = render(
+      <SponsorsRail sponsors={[sponsors[0]]} loopItemTarget={2} autoScroll={false} />
+    );
 
     expect(container.querySelectorAll('a, div[class*="slot"]')).toHaveLength(1);
     expect(screen.getAllByRole('img')).toHaveLength(1);

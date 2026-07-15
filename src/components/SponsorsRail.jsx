@@ -107,6 +107,7 @@ export default function SponsorsRail({
 
   const renderCycle = (cycleIndex) => {
     const isDuplicate = shouldLoop && cycleIndex > 0;
+    const renderedItems = shouldLoop ? cycleItems : items;
     return (
       <div
         key={cycleIndex}
@@ -114,7 +115,7 @@ export default function SponsorsRail({
         className={styles.segment}
         aria-hidden={isDuplicate || undefined}
       >
-        {cycleItems.map((item, index) => {
+        {renderedItems.map((item, index) => {
           const isRepeatedItem = isDuplicate || index >= items.length;
           return renderItem(item, index, isRepeatedItem);
         })}
