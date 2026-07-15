@@ -174,4 +174,38 @@ describe('AdminShell', () => {
     await user.click(screen.getByRole('button', { name: /Terminar sessão/i }));
     expect(onLogout).toHaveBeenCalled();
   });
+
+  it('exposes display mode as a desktop-only new-tab link', async () => {
+    const user = createUser();
+
+    render(
+      <AdminShell
+        navItems={navItems}
+        activeNav="manage"
+        onSelectNav={vi.fn()}
+        onNavigateBranding={vi.fn()}
+        onLogout={vi.fn()}
+      >
+        <div>Admin content</div>
+      </AdminShell>
+    );
+
+    const displayLink = screen.getByRole('link', {
+      name: 'Abrir modo TV',
+      hidden: true,
+    });
+
+    expect(displayLink).toHaveAttribute('href', '/display');
+    expect(displayLink).toHaveAttribute('target', '_blank');
+    expect(displayLink).toHaveAttribute('rel', 'noreferrer');
+    expect(displayLink).toHaveTextContent('Abrir modo TV');
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }));
+    expect(
+      screen.getAllByRole('link', {
+        name: 'Abrir modo TV',
+        hidden: true,
+      })
+    ).toHaveLength(1);
+  });
 });

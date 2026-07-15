@@ -16,8 +16,8 @@ const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
 const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
-const DISPLAY_SCROLL_PX_PER_SECOND = 42;
-const DISPLAY_SCROLL_PAUSE_MS = 1200;
+const DISPLAY_SCROLL_PX_PER_SECOND = 30;
+const DISPLAY_SCROLL_PAUSE_MS = 2200;
 
 const numberFormatter = new Intl.NumberFormat('pt-PT');
 
@@ -230,9 +230,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     let pauseTimeoutId = 0;
     let direction: 1 | -1 = 1;
 
-    const easeInOut = (progress: number) =>
-      progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
     const getMaxScrollTop = () => Math.max(0, container.scrollHeight - container.clientHeight);
 
     const animateTo = (targetScrollTop: number) => {
@@ -248,8 +245,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
         }
 
         const progress = Math.min(1, (timestamp - startTime) / duration);
-        const easedProgress = easeInOut(progress);
-        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * easedProgress;
+        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * progress;
 
         if (progress < 1) {
           frameId = window.requestAnimationFrame(step);

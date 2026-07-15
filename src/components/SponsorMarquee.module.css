@@ -20,18 +20,15 @@
   scroll-behavior: auto;
 }
 
-.track,
-.segment {
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--ui-space-md);
-}
-
 .track {
+  display: flex;
   width: max-content;
 }
 
 .segment {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--ui-space-md);
   padding-right: var(--ui-space-md);
 }
 
@@ -44,6 +41,10 @@
 }
 
 .animatedRow {
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-drag: none;
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -51,6 +52,15 @@
     #000 calc(100% - 1rem),
     transparent
   );
+}
+
+.animatedRow .track {
+  will-change: transform;
+}
+
+.animatedRow img,
+.animatedRow a {
+  -webkit-user-drag: none;
 }
 
 .row:focus-visible {
@@ -129,10 +139,11 @@
 
 .compact .track,
 .compact .segment {
-  gap: var(--ui-space-xs);
+  gap: 0;
 }
 
 .compact .segment {
+  gap: var(--ui-space-xs);
   padding-right: var(--ui-space-xs);
 }
 
@@ -154,18 +165,18 @@
 @media (prefers-reduced-motion: reduce) {
   .animatedRow {
     mask-image: none;
+    overflow-x: auto;
+  }
+
+  .animatedRow .track {
+    animation: none;
+    transform: none;
   }
 }
 
 @media (hover: none) {
   .animatedRow {
     mask-image: none;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-
-  .animatedRow .track {
-    will-change: transform;
   }
 }
 

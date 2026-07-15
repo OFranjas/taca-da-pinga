@@ -1,6 +1,12 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import SponsorMarquee, { normalizeMobileLoopPosition } from '../SponsorMarquee';
+import SponsorMarquee from '../SponsorMarquee';
+import {
+  getLoopTimeAfterDistance,
+  getWheelDistance,
+  normalizeLoopTime,
+} from '../../hooks/useInteractiveLoop';
+import { getLoopCopyCount, getLoopDurationSeconds } from '../../hooks/useMeasuredLoop';
 
 const sponsors = [
   {
@@ -17,10 +23,17 @@ const sponsors = [
 ];
 
 describe('SponsorMarquee', () => {
-  test('keeps mobile transform motion within the interactive middle segment', () => {
-    expect(normalizeMobileLoopPosition(0, 120)).toBe(120);
-    expect(normalizeMobileLoopPosition(179, 120)).toBe(179);
-    expect(normalizeMobileLoopPosition(240, 120)).toBe(120);
+  test('sizes a loop to cover wide viewports and uses a readable animation duration', () => {
+    expect(getLoopCopyCount(1200, 200)).toBe(9);
+    expect(getLoopDurationSeconds(360, 18)).toBe(20);
+  });
+
+  test('normalizes a dragged animation position inside one smooth loop', () => {
+    expect(normalizeLoopTime(-200, 1000)).toBe(800);
+    expect(normalizeLoopTime(1250, 1000)).toBe(250);
+    expect(getLoopTimeAfterDistance(200, 50, 100, 1000)).toBe(700);
+    expect(getWheelDistance('x', 0, 120)).toBe(120);
+    expect(getWheelDistance('x', 30, 120)).toBe(30);
   });
 
   test('does not render an empty sponsor list', () => {
@@ -46,7 +59,7 @@ describe('SponsorMarquee', () => {
       '_blank'
     );
     const duplicateLinks = container.querySelectorAll('[aria-hidden="true"] a');
-    expect(duplicateLinks).toHaveLength(2);
+    expect(duplicateLinks.length).toBeGreaterThan(0);
     duplicateLinks.forEach((link) => {
       expect(link).toHaveAttribute('href', 'https://example.com/one');
       expect(link).toHaveAttribute('tabindex', '-1');
@@ -60,30 +73,65 @@ describe('SponsorMarquee', () => {
     expect(screen.getAllByRole('img', { name: 'Primeiro sponsor' })).toHaveLength(1);
   });
 
-  test('does not translate a non-looping row when swiped on touch devices', () => {
-    const originalMatchMedia = window.matchMedia;
-    Object.defineProperty(window, 'matchMedia', {
+  test('keeps a non-looping row as a single static cycle', () => {
+    const { container } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
+
+    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
+  });
+
+  test('prevents native browser dragging from stealing a laptop carousel gesture', () => {
+    const { container } = render(<SponsorMarquee sponsors={sponsors} autoScroll />);
+    const row = container.querySelector('[tabindex="0"]');
+
+    expect(fireEvent.dragStart(row)).toBe(false);
+  });
+
+  test('maps a laptop mouse wheel gesture to the smooth animation timeline', () => {
+    const originalAnimate = HTMLElement.prototype.animate;
+    const originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
+    const originalClientWidth = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'clientWidth'
+    );
+    const animation = { cancel: vi.fn(), currentTime: 100, pause: vi.fn(), play: vi.fn() };
+    const animate = vi.fn(() => animation);
+
+    Object.defineProperty(HTMLElement.prototype, 'animate', { configurable: true, value: animate });
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
       configurable: true,
-      value: vi.fn((query) => ({
-        matches: query === '(hover: none)',
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
+      get: () => 200,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ height: 100, width: 300 }),
     });
 
-    const { container, unmount } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
+    const { container, unmount } = render(<SponsorMarquee sponsors={sponsors} autoScroll />);
     const row = container.querySelector('[tabindex="0"]');
-    const track = row?.firstElementChild;
+    const wheelEvent = createEvent.wheel(row, { cancelable: true, deltaY: 120 });
 
-    fireEvent.pointerDown(row, { pointerId: 1, clientX: 20 });
-    fireEvent.pointerMove(row, { pointerId: 1, clientX: 120 });
+    expect(animate).toHaveBeenCalled();
+    fireEvent(row, wheelEvent);
+    expect(animation.currentTime).not.toBe(100);
 
-    expect(track?.style.transform).toBe('');
+    animation.currentTime = 600;
+    fireEvent.focus(row);
+    expect(animation.currentTime).toBe(0);
+    expect(animation.pause).toHaveBeenCalled();
 
     unmount();
-    Object.defineProperty(window, 'matchMedia', {
+    Object.defineProperty(HTMLElement.prototype, 'animate', {
       configurable: true,
-      value: originalMatchMedia,
+      value: originalAnimate,
     });
+    Object.defineProperty(HTMLElement.prototype, 'getBoundingClientRect', {
+      configurable: true,
+      value: originalGetBoundingClientRect,
+    });
+    if (originalClientWidth) {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', originalClientWidth);
+    } else {
+      delete HTMLElement.prototype.clientWidth;
+    }
   });
 });

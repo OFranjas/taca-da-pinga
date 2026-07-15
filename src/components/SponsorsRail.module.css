@@ -17,15 +17,41 @@
   border-radius: var(--ui-radius-sm);
 }
 
+.animatedViewport {
+  overflow-y: hidden;
+}
+
 .viewport::-webkit-scrollbar {
   display: none;
 }
 
 .stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.segment {
   display: grid;
   grid-auto-rows: min-content;
   gap: 0.875rem;
-  min-width: 0;
+  padding-bottom: 0.875rem;
+}
+
+.animatedViewport .stack {
+  animation: sponsors-rail var(--loop-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+.animatedViewport:hover .stack,
+.animatedViewport:focus-within .stack {
+  animation-play-state: paused;
+}
+
+@keyframes sponsors-rail {
+  to {
+    transform: translate3d(0, var(--loop-distance), 0);
+  }
 }
 
 .slot {
@@ -93,13 +119,19 @@
     overflow: visible;
   }
 
-  .stack {
+  .animatedViewport {
+    overflow: hidden;
+  }
+
+  .stack,
+  .segment {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
     gap: 0.75rem;
     overflow: visible;
     width: 100%;
     max-width: 100%;
+    padding-bottom: 0;
   }
 
   .slot {
@@ -116,7 +148,8 @@
     margin-top: 0;
   }
 
-  .stack {
+  .stack,
+  .segment {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.625rem;
   }
@@ -136,5 +169,16 @@
 
   .name {
     font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animatedViewport {
+    overflow-y: auto;
+  }
+
+  .animatedViewport .stack {
+    animation: none;
+    transform: none;
   }
 }

@@ -184,6 +184,17 @@ export function AdminShell<TNav extends string = string>({
                     {renderNavItems(handleSelectNav)}
                   </nav>
                   <div className={styles.sidebarFooter}>
+                    <Button
+                      as="a"
+                      href="/display"
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="secondary"
+                      size="sm"
+                      fullWidth
+                    >
+                      Abrir modo TV
+                    </Button>
                     <Button variant="secondary" size="sm" onClick={onNavigateBranding}>
                       Branding
                     </Button>
