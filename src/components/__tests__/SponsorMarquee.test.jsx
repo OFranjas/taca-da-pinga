@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
-import SponsorMarquee, { normalizeMobileLoopPosition } from '../SponsorMarquee';
+import { render, screen } from '@testing-library/react';
+import SponsorMarquee from '../SponsorMarquee';
+import { getLoopCopyCount, getLoopDurationSeconds } from '../../hooks/useMeasuredLoop';
 
 const sponsors = [
   {
@@ -17,10 +17,9 @@ const sponsors = [
 ];
 
 describe('SponsorMarquee', () => {
-  test('keeps mobile transform motion within the interactive middle segment', () => {
-    expect(normalizeMobileLoopPosition(0, 120)).toBe(120);
-    expect(normalizeMobileLoopPosition(179, 120)).toBe(179);
-    expect(normalizeMobileLoopPosition(240, 120)).toBe(120);
+  test('sizes a loop to cover wide viewports and uses a readable animation duration', () => {
+    expect(getLoopCopyCount(1200, 200)).toBe(9);
+    expect(getLoopDurationSeconds(360, 18)).toBe(20);
   });
 
   test('does not render an empty sponsor list', () => {
@@ -46,7 +45,7 @@ describe('SponsorMarquee', () => {
       '_blank'
     );
     const duplicateLinks = container.querySelectorAll('[aria-hidden="true"] a');
-    expect(duplicateLinks).toHaveLength(2);
+    expect(duplicateLinks.length).toBeGreaterThan(0);
     duplicateLinks.forEach((link) => {
       expect(link).toHaveAttribute('href', 'https://example.com/one');
       expect(link).toHaveAttribute('tabindex', '-1');
@@ -60,30 +59,9 @@ describe('SponsorMarquee', () => {
     expect(screen.getAllByRole('img', { name: 'Primeiro sponsor' })).toHaveLength(1);
   });
 
-  test('does not translate a non-looping row when swiped on touch devices', () => {
-    const originalMatchMedia = window.matchMedia;
-    Object.defineProperty(window, 'matchMedia', {
-      configurable: true,
-      value: vi.fn((query) => ({
-        matches: query === '(hover: none)',
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
-    });
+  test('keeps a non-looping row as a single static cycle', () => {
+    const { container } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
 
-    const { container, unmount } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
-    const row = container.querySelector('[tabindex="0"]');
-    const track = row?.firstElementChild;
-
-    fireEvent.pointerDown(row, { pointerId: 1, clientX: 20 });
-    fireEvent.pointerMove(row, { pointerId: 1, clientX: 120 });
-
-    expect(track?.style.transform).toBe('');
-
-    unmount();
-    Object.defineProperty(window, 'matchMedia', {
-      configurable: true,
-      value: originalMatchMedia,
-    });
+    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
   });
 });

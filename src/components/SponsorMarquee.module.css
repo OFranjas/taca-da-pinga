@@ -20,18 +20,15 @@
   scroll-behavior: auto;
 }
 
-.track,
-.segment {
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--ui-space-md);
-}
-
 .track {
+  display: flex;
   width: max-content;
 }
 
 .segment {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--ui-space-md);
   padding-right: var(--ui-space-md);
 }
 
@@ -44,6 +41,8 @@
 }
 
 .animatedRow {
+  overflow: hidden;
+  touch-action: pan-y;
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -51,6 +50,22 @@
     #000 calc(100% - 1rem),
     transparent
   );
+}
+
+.animatedRow .track {
+  animation: sponsor-marquee var(--loop-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+.animatedRow:hover .track,
+.animatedRow:focus-within .track {
+  animation-play-state: paused;
+}
+
+@keyframes sponsor-marquee {
+  to {
+    transform: translate3d(var(--loop-distance), 0, 0);
+  }
 }
 
 .row:focus-visible {
@@ -129,10 +144,11 @@
 
 .compact .track,
 .compact .segment {
-  gap: var(--ui-space-xs);
+  gap: 0;
 }
 
 .compact .segment {
+  gap: var(--ui-space-xs);
   padding-right: var(--ui-space-xs);
 }
 
@@ -154,18 +170,18 @@
 @media (prefers-reduced-motion: reduce) {
   .animatedRow {
     mask-image: none;
+    overflow-x: auto;
+  }
+
+  .animatedRow .track {
+    animation: none;
+    transform: none;
   }
 }
 
 @media (hover: none) {
   .animatedRow {
     mask-image: none;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-
-  .animatedRow .track {
-    will-change: transform;
   }
 }
 
