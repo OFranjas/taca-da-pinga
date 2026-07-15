@@ -93,17 +93,21 @@ describe('Firestore security rules', () => {
     await assertSucceeds(setDoc(doc(adminDb, 'teams/a1'), { name: 'A', pingas: 0 }));
     await assertFails(setDoc(doc(adminDb, 'teams/decimal'), { name: 'Decimal', pingas: 0.5 }));
 
-    // Name update without pingas change allowed
+    // Metadata-only updates are allowed.
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
 
     // Allowed increments 1..50
     await assertSucceeds(
       updateDoc(doc(adminDb, 'teams/a1'), {
         pingas: 1,
-        'drinkTotals.beer.quantity': 1,
-        'drinkTotals.beer.pingas': 1,
+        'drinkTotals.light.quantity': 1,
+        'drinkTotals.light.pingas': 1,
       })
     ); // 0 -> 1 with the service-owned projection shape
+
+    // A direct projection edit cannot bypass the bounded score increment.
+    await assertFails(updateDoc(doc(adminDb, 'teams/a1'), { 'drinkTotals.light.quantity': 2 }));
+
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
 
