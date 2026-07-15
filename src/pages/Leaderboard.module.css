@@ -14,6 +14,7 @@
 }
 
 .displayPage {
+  height: calc(100dvh - (var(--ui-space-md) * 2));
   min-height: calc(100dvh - (var(--ui-space-md) * 2));
 }
 
@@ -350,8 +351,24 @@
 }
 
 .displayPage .layout {
-  min-height: calc(100dvh - (var(--ui-space-md) * 2));
+  height: 100%;
+  min-height: 0;
   gap: var(--ui-space-lg);
+  align-items: stretch;
+}
+
+.displayPage .content,
+.displayPage .content > section,
+.displayPage .tableCard,
+.displayPage .tableSurface,
+.displayPage .scrollRegion {
+  min-height: 0;
+}
+
+.displayPage .content > section,
+.displayPage .tableCard,
+.displayPage .tableSurface {
+  flex: 1 1 auto;
 }
 
 .displayPage .tableCard {
@@ -371,8 +388,9 @@
 }
 
 .displayPage .scrollRegion {
-  height: min(54rem, calc(100dvh - 13rem));
-  max-height: calc(100dvh - 10rem);
+  flex: 1 1 auto;
+  height: auto;
+  max-height: none;
   background: transparent;
   overflow-y: hidden;
   scrollbar-width: none;

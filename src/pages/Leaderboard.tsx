@@ -347,7 +347,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                 sponsors={sponsorColumns[0]}
                 side="left"
                 loopItemTarget={sponsorLoopItemTarget}
-                autoScroll={canAnimateSponsorRails}
+                autoScroll={displayMode && canAnimateSponsorRails}
               />
             )}
           </div>
@@ -522,7 +522,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                 sponsors={sponsorColumns[1]}
                 side="right"
                 loopItemTarget={sponsorLoopItemTarget}
-                autoScroll={canAnimateSponsorRails}
+                autoScroll={displayMode && canAnimateSponsorRails}
               />
             )}
           </div>
