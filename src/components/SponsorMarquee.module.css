@@ -43,6 +43,8 @@
 .animatedRow {
   overflow: hidden;
   touch-action: pan-y;
+  user-select: none;
+  -webkit-user-drag: none;
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -54,6 +56,11 @@
 
 .animatedRow .track {
   will-change: transform;
+}
+
+.animatedRow img,
+.animatedRow a {
+  -webkit-user-drag: none;
 }
 
 .row:focus-visible {

@@ -11,6 +11,14 @@ export const normalizeLoopTime = (time, duration) => {
   return ((time % duration) + duration) % duration;
 };
 
+export const getLoopTimeAfterDistance = (startTime, distance, cycleExtent, duration) => {
+  if (!Number.isFinite(distance) || !Number.isFinite(cycleExtent) || cycleExtent <= 0) {
+    return normalizeLoopTime(startTime, duration);
+  }
+
+  return normalizeLoopTime(startTime + (distance / cycleExtent) * duration, duration);
+};
+
 export default function useInteractiveLoop({
   axis,
   cycleExtent,
@@ -72,7 +80,7 @@ export default function useInteractiveLoop({
   const onPointerDown = useCallback(
     (event) => {
       const animation = animationRef.current;
-      if (!animation || !cycleExtent || !durationSeconds) {
+      if (event.button !== 0 || !animation || !cycleExtent || !durationSeconds) {
         return;
       }
 
@@ -103,8 +111,10 @@ export default function useInteractiveLoop({
       }
 
       const duration = durationSeconds * 1000;
-      animation.currentTime = normalizeLoopTime(
-        drag.startTime - (distance / cycleExtent) * duration,
+      animation.currentTime = getLoopTimeAfterDistance(
+        drag.startTime,
+        -distance,
+        cycleExtent,
         duration
       );
       event.preventDefault();
@@ -134,9 +144,41 @@ export default function useInteractiveLoop({
     }
   }, []);
 
+  const onDragStart = useCallback((event) => {
+    event.preventDefault();
+  }, []);
+
+  const onWheel = useCallback(
+    (event) => {
+      const animation = animationRef.current;
+      if (!animation || !cycleExtent || !durationSeconds) {
+        return;
+      }
+
+      const distance =
+        axis === 'x' ? event.deltaX || (event.shiftKey ? event.deltaY : 0) : event.deltaY;
+      if (!distance) {
+        return;
+      }
+
+      pause();
+      const duration = durationSeconds * 1000;
+      animation.currentTime = getLoopTimeAfterDistance(
+        Number(animation.currentTime ?? 0),
+        distance,
+        cycleExtent,
+        duration
+      );
+      event.preventDefault();
+      resumeLater();
+    },
+    [axis, cycleExtent, durationSeconds, pause, resumeLater]
+  );
+
   return {
     onBlur: resumeLater,
     onClickCapture,
+    onDragStart,
     onFocus: pause,
     onMouseEnter: pause,
     onMouseLeave: resumeLater,
@@ -144,5 +186,6 @@ export default function useInteractiveLoop({
     onPointerDown,
     onPointerMove,
     onPointerUp: onPointerEnd,
+    onWheel,
   };
 }

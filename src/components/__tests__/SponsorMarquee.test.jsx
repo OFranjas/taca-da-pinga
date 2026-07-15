@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import SponsorMarquee from '../SponsorMarquee';
-import { normalizeLoopTime } from '../../hooks/useInteractiveLoop';
+import { getLoopTimeAfterDistance, normalizeLoopTime } from '../../hooks/useInteractiveLoop';
 import { getLoopCopyCount, getLoopDurationSeconds } from '../../hooks/useMeasuredLoop';
 
 const sponsors = [
@@ -26,6 +26,7 @@ describe('SponsorMarquee', () => {
   test('normalizes a dragged animation position inside one smooth loop', () => {
     expect(normalizeLoopTime(-200, 1000)).toBe(800);
     expect(normalizeLoopTime(1250, 1000)).toBe(250);
+    expect(getLoopTimeAfterDistance(200, 50, 100, 1000)).toBe(700);
   });
 
   test('does not render an empty sponsor list', () => {
@@ -69,5 +70,12 @@ describe('SponsorMarquee', () => {
     const { container } = render(<SponsorMarquee sponsors={[sponsors[0]]} autoScroll />);
 
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
+  });
+
+  test('prevents native browser dragging from stealing a laptop carousel gesture', () => {
+    const { container } = render(<SponsorMarquee sponsors={sponsors} autoScroll />);
+    const row = container.querySelector('[tabindex="0"]');
+
+    expect(fireEvent.dragStart(row)).toBe(false);
   });
 });
