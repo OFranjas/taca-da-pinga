@@ -19,8 +19,6 @@ const DISPLAY_PINNED_ROWS = 5;
 const DISPLAY_SCROLL_PX_PER_SECOND = 30;
 const DISPLAY_SCROLL_PAUSE_MS = 2200;
 
-const numberFormatter = new Intl.NumberFormat('pt-PT');
-
 const skeletonRows = Array.from({ length: 8 }, (_, index) => index);
 
 type ServiceTeam = {
@@ -310,7 +308,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     [teams]
   );
 
-  const totalPingas = useMemo(() => teams.reduce((total, team) => total + team.pingas, 0), [teams]);
   const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
   const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
 
@@ -329,7 +326,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const sponsorLoopItemTarget =
     canAnimateSponsorRails && largestSponsorRail === 3 ? 4 : largestSponsorRail || undefined;
 
-  const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
+  const tableAriaLabel = 'Classificação geral das equipas por pingas em escala relativa';
 
   return (
     <>
@@ -390,14 +387,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                         ? '1 equipa em prova'
                         : `${teams.length} equipas em prova`}
                     </Text>
-                    <div className={styles.totalBadge} aria-label="Total de pingas registadas">
-                      <Text as="span" variant="label" tone="muted">
-                        Total de Pingas
-                      </Text>
-                      <Text as="span" variant="heading" weight="bold" className={styles.totalValue}>
-                        {numberFormatter.format(totalPingas)}
-                      </Text>
-                    </div>
                   </div>
                 </Stack>
 
@@ -444,10 +433,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                           <span role="columnheader" className={styles.headerCell}>
                             Equipa
                           </span>
-                          <span
-                            role="columnheader"
-                            className={`${styles.headerCell} ${styles.headerCellEnd}`}
-                          >
+                          <span role="columnheader" className={styles.headerCell}>
                             Pingas
                           </span>
                         </div>
@@ -465,7 +451,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
                                   ariaRowIndex={index + 2}
-                                  numberFormatter={numberFormatter}
                                 />
                               ))}
                             </div>
@@ -479,7 +464,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                     pingas={team.pingas}
                                     maxPingas={maxPingas}
                                     ariaRowIndex={index + DISPLAY_PINNED_ROWS + 2}
-                                    numberFormatter={numberFormatter}
                                   />
                                 ))}
                               </div>
@@ -504,7 +488,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
                                   ariaRowIndex={virtualState.startIndex + index + 2}
-                                  numberFormatter={numberFormatter}
                                 />
                               ))}
                             </div>
@@ -519,7 +502,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                 pingas={team.pingas}
                                 maxPingas={maxPingas}
                                 ariaRowIndex={index + 2}
-                                numberFormatter={numberFormatter}
                               />
                             ))}
                           </div>

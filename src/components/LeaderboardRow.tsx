@@ -1,8 +1,5 @@
 import type { CSSProperties } from 'react';
-import beerIcon from '../assets/beer.svg';
 import styles from './LeaderboardRow.module.css';
-
-const fallbackFormatter = new Intl.NumberFormat('pt-PT');
 
 type LeaderboardRowTone = {
   accent: string;
@@ -10,7 +7,7 @@ type LeaderboardRowTone = {
   badgeColor: string;
   meterStart: string;
   meterEnd: string;
-  scoreColor: string;
+  meterShadow: string;
 };
 
 type LeaderboardRowProps = {
@@ -19,7 +16,6 @@ type LeaderboardRowProps = {
   pingas: number;
   maxPingas: number;
   ariaRowIndex: number;
-  numberFormatter?: Intl.NumberFormat;
 };
 
 const getTone = (rank: number): LeaderboardRowTone => {
@@ -29,36 +25,36 @@ const getTone = (rank: number): LeaderboardRowTone => {
         accent: 'rgba(250, 204, 21, 0.32)',
         badgeBg: 'rgba(250, 204, 21, 0.38)',
         badgeColor: '#854d0e',
-        meterStart: '#facc15',
-        meterEnd: '#f59e0b',
-        scoreColor: '#ca8a04',
+        meterStart: '#d97706',
+        meterEnd: '#facc15',
+        meterShadow: 'rgba(180, 83, 9, 0.28)',
       };
     case 2:
       return {
         accent: 'rgba(148, 163, 184, 0.28)',
         badgeBg: 'rgba(226, 232, 240, 0.6)',
         badgeColor: '#1f2937',
-        meterStart: '#cbd5f5',
-        meterEnd: '#94a3b8',
-        scoreColor: '#64748b',
+        meterStart: '#64748b',
+        meterEnd: '#cbd5e1',
+        meterShadow: 'rgba(71, 85, 105, 0.24)',
       };
     case 3:
       return {
         accent: 'rgba(249, 115, 22, 0.25)',
         badgeBg: 'rgba(253, 186, 116, 0.5)',
         badgeColor: '#7c2d12',
-        meterStart: '#fb923c',
-        meterEnd: '#f97316',
-        scoreColor: '#c2410c',
+        meterStart: '#c2410c',
+        meterEnd: '#fb923c',
+        meterShadow: 'rgba(154, 52, 18, 0.26)',
       };
     default:
       return {
         accent: 'rgba(34, 197, 94, 0.2)',
         badgeBg: 'rgba(16, 185, 129, 0.18)',
         badgeColor: '#065f46',
-        meterStart: '#22c55e',
-        meterEnd: '#0f766e',
-        scoreColor: '#0f172a',
+        meterStart: '#047857',
+        meterEnd: '#22c55e',
+        meterShadow: 'rgba(4, 120, 87, 0.28)',
       };
   }
 };
@@ -81,12 +77,11 @@ export function LeaderboardRow({
   pingas,
   maxPingas,
   ariaRowIndex,
-  numberFormatter,
 }: LeaderboardRowProps) {
-  const formatter = numberFormatter ?? fallbackFormatter;
   const safePingas = Number.isFinite(pingas) ? Math.max(0, Math.floor(pingas)) : 0;
-  const safeMax = Math.max(maxPingas, safePingas, 0);
+  const safeMax = Number.isFinite(maxPingas) ? Math.max(0, Math.floor(maxPingas)) : 0;
   const fillPercent = safeMax > 0 ? clampPercentage((safePingas / safeMax) * 100) : 0;
+  const roundedFillPercent = Math.round(fillPercent);
   const tone = getTone(rank);
 
   const style = {
@@ -94,13 +89,17 @@ export function LeaderboardRow({
     '--row-accent': tone.accent,
     '--row-rank-bg': tone.badgeBg,
     '--row-rank-color': tone.badgeColor,
-    '--row-meter-fill-start': tone.meterStart,
-    '--row-meter-fill-end': tone.meterEnd,
-    '--row-score-color': tone.scoreColor,
+    '--row-meter-start': tone.meterStart,
+    '--row-meter-end': tone.meterEnd,
+    '--row-meter-shadow': tone.meterShadow,
   } as CSSProperties;
 
-  const scoreText = formatter.format(safePingas);
-  const ariaValueMax = safeMax === 0 ? 0 : safeMax;
+  const ariaValueText =
+    safeMax === 0
+      ? `${teamName} ainda não tem valor registado`
+      : roundedFillPercent === 100
+        ? `${teamName} está no valor de referência`
+        : `${teamName} está a ${roundedFillPercent}% do valor da equipa líder`;
 
   return (
     <div
@@ -119,26 +118,18 @@ export function LeaderboardRow({
         <span className={styles.teamName} title={teamName}>
           {teamName}
         </span>
+      </div>
+      <div role="cell" className={styles.meterCell}>
         <div
           className={styles.meter}
           role="meter"
           aria-valuemin={0}
-          aria-valuenow={safePingas}
-          aria-valuemax={ariaValueMax}
-          aria-valuetext={`${teamName} tem ${scoreText} pingas`}
+          aria-valuenow={roundedFillPercent}
+          aria-valuemax={100}
+          aria-valuetext={ariaValueText}
         >
-          <div className={styles.meterFill} style={{ width: `${fillPercent}%` }} aria-hidden />
+          <div className={styles.meterFill} aria-hidden="true" />
         </div>
-      </div>
-      <div role="cell" className={styles.scoreCell}>
-        <span className={styles.scoreValue}>{scoreText}</span>
-        <img
-          className={styles.scoreIcon}
-          src={beerIcon}
-          alt=""
-          aria-hidden="true"
-          data-testid="score-beer-icon"
-        />
       </div>
     </div>
   );

@@ -3,9 +3,9 @@
   display: grid;
   grid-template-columns: var(
     --leaderboard-grid-template,
-    minmax(3.25rem, 3.75rem) minmax(0, 1fr) clamp(6rem, 16vw, 8rem)
+    minmax(3.25rem, 3.75rem) minmax(10rem, 0.7fr) minmax(0, 1.3fr)
   );
-  column-gap: var(--ui-space-xs);
+  column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   width: 100%;
   min-width: 0;
@@ -25,7 +25,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
-  background: var(--row-meter-fill-start, var(--ui-color-accent));
+  background: var(--row-accent, var(--ui-color-accent));
   z-index: 0;
 }
 
@@ -35,7 +35,7 @@
 
 .rankCell,
 .teamCell,
-.scoreCell {
+.meterCell {
   position: relative;
   z-index: 1;
   display: flex;
@@ -63,9 +63,9 @@
 }
 
 .teamCell {
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
-  gap: var(--ui-space-sm);
+  justify-content: center;
   min-width: 0;
 }
 
@@ -80,7 +80,17 @@
 }
 
 .meter {
-  display: none;
+  position: relative;
+  width: 100%;
+  height: 0.75rem;
+  overflow: hidden;
+  border-radius: var(--ui-radius-full);
+  background: rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.meterCell {
+  min-width: 0;
 }
 
 .meterFill {
@@ -88,46 +98,43 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 0%;
+  width: var(--row-fill-width, 0%);
+  border-radius: inherit;
   background: linear-gradient(
     90deg,
-    var(--row-meter-fill-start, rgba(34, 197, 94, 0.75)),
-    var(--row-meter-fill-end, rgba(15, 118, 110, 0.85))
+    var(--row-meter-start, var(--ui-color-accent-strong)) 0%,
+    var(--row-meter-end, var(--ui-color-accent)) 100%
   );
-  transition: width 220ms ease;
+  box-shadow:
+    0 1px 2px var(--row-meter-shadow, rgba(4, 120, 87, 0.28)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition: width 240ms ease-out;
 }
 
-.scoreCell {
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  text-align: right;
-  min-width: 0;
+.meterFill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 65%);
 }
 
-.scoreValue {
-  font-size: 1.35rem;
-  font-weight: var(--ui-font-weight-extrabold);
-  font-variant-numeric: tabular-nums;
-  color: var(--row-score-color, var(--ui-color-text-primary));
-  min-width: 0;
-}
-
-.scoreIcon {
-  display: block;
-  width: 1.4rem;
-  height: 1.4rem;
-  flex: 0 0 auto;
-  object-fit: contain;
+@media (prefers-reduced-motion: reduce) {
+  .meterFill {
+    transition: none;
+  }
 }
 
 @media (max-width: 640px) {
   .root {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    grid-template-rows: min-content min-content;
+    align-content: center;
+    align-items: center;
+    row-gap: 0.4rem;
     height: 64px;
-    padding-left: var(--ui-space-xs);
-    padding-right: var(--ui-space-xs);
-    column-gap: var(--ui-space-2xs);
+    padding-left: var(--ui-space-sm);
+    padding-right: var(--ui-space-sm);
+    column-gap: var(--ui-space-sm);
   }
 
   .rankBadge {
@@ -138,14 +145,30 @@
 
   .teamName {
     font-size: 1rem;
+    line-height: 1.2;
   }
 
-  .scoreValue {
-    font-size: 1rem;
+  .rankCell {
+    grid-row: 1 / -1;
   }
 
-  .scoreIcon {
-    width: 1.05rem;
-    height: 1.05rem;
+  .teamCell,
+  .meterCell {
+    grid-column: 2;
+  }
+
+  .teamCell {
+    grid-row: 1;
+    justify-content: center;
+    align-self: end;
+  }
+
+  .meterCell {
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .meter {
+    height: 0.625rem;
   }
 }

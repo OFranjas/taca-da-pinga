@@ -127,25 +127,6 @@
   flex: 0 1 auto;
 }
 
-.totalBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--ui-radius-sm);
-  background: rgba(34, 197, 94, 0.04);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  box-shadow: none;
-  max-width: 15rem;
-  line-height: 1;
-}
-
-.totalValue {
-  white-space: nowrap;
-  font-size: clamp(1rem, 0.75vw + 0.55rem, 1.28rem);
-  line-height: 1;
-}
-
 .feedback {
   padding: var(--ui-space-lg);
   border-radius: var(--ui-radius-lg);
@@ -168,6 +149,7 @@
     --leaderboard-grid-template,
     clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem)
   );
+  column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   min-height: var(--leaderboard-row-height, 5rem);
   padding: var(--ui-space-sm) var(--ui-space-md);
@@ -202,13 +184,14 @@
 }
 
 .skeletonValue {
-  justify-self: end;
-  width: 3.25rem;
-  height: 1.25rem;
+  justify-self: stretch;
+  width: auto;
+  height: 0.75rem;
 }
 
 .tableSurface {
-  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem);
+  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(9rem, 0.55fr) minmax(0, 1.45fr);
+  --leaderboard-column-gap: var(--ui-space-md);
   --leaderboard-row-height: 5rem;
   --leaderboard-row-gap: 0.75rem;
   display: flex;
@@ -246,6 +229,7 @@
 .headerRow {
   display: grid;
   grid-template-columns: var(--leaderboard-grid-template);
+  column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   padding: var(--ui-space-xs) var(--ui-space-md);
   border-radius: var(--ui-radius-sm);
@@ -359,6 +343,7 @@
 
 @media (min-width: 75rem) and (max-width: 89.9375rem) {
   .tableSurface {
+    --leaderboard-grid-template: 4rem minmax(8.5rem, 0.5fr) minmax(0, 1.5fr);
     --leaderboard-row-height: 4rem;
     --leaderboard-row-gap: 0.5rem;
   }
@@ -376,9 +361,13 @@
 }
 
 .displayPage .tableSurface {
-  --leaderboard-grid-template: 4.5rem minmax(0, 1fr) 8rem;
+  --leaderboard-grid-template: 4.5rem minmax(12rem, 0.58fr) minmax(18rem, 1.42fr);
   --leaderboard-row-height: 3rem;
   --leaderboard-row-gap: 0.3125rem;
+}
+
+.displayPage .skeletonValue {
+  height: 0.625rem;
 }
 
 .displayPage .scrollRegion {
@@ -421,11 +410,6 @@
 
 .displayPage .tableCount {
   font-size: 1rem;
-}
-
-.displayPage .totalBadge {
-  gap: var(--ui-space-sm);
-  padding: 0.5rem 0.875rem;
 }
 
 @media (max-width: 48rem) {
@@ -473,15 +457,20 @@
     gap: var(--ui-space-xs);
   }
 
-  .totalBadge {
-    width: auto;
-    min-width: 0;
-  }
-
   .tableSurface {
-    --leaderboard-grid-template: 2.75rem minmax(0, 1fr) minmax(4.25rem, 4.75rem);
+    --leaderboard-grid-template: 2.5rem minmax(0, 1fr) auto;
+    --leaderboard-column-gap: var(--ui-space-sm);
     --leaderboard-row-height: 4rem;
     --leaderboard-row-gap: 0.4375rem;
+  }
+
+  .headerRow {
+    padding-left: var(--ui-space-sm);
+    padding-right: var(--ui-space-sm);
+  }
+
+  .headerCell:last-child {
+    justify-content: flex-end;
   }
 
   .heroStatCard {
