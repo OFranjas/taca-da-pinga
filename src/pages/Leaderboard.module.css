@@ -353,6 +353,12 @@
   .tableBadges {
     margin-right: var(--ui-space-xs);
   }
+
+  @supports (font: -apple-system-body) {
+    .tableBadges {
+      margin-right: var(--ui-space-2xs);
+    }
+  }
 }
 
 @media (max-width: 74.9375rem) {
