@@ -377,7 +377,7 @@
   .tableSurface {
     --leaderboard-grid-template: clamp(3.25rem, 5vw, 4rem) minmax(clamp(8rem, 20vw, 12rem), 0.5fr)
       minmax(0, 1.5fr);
-    --leaderboard-row-height: 2.25rem;
+    --leaderboard-row-height: 2.75rem;
     --leaderboard-row-gap: 0.125rem;
   }
 
@@ -391,8 +391,8 @@
   }
 
   .skeletonRank {
-    width: 1.875rem;
-    height: 1.875rem;
+    width: 2.125rem;
+    height: 2.125rem;
   }
 
   .skeletonName {

@@ -126,8 +126,8 @@
 
 @media (min-width: 75rem) and (max-width: 89.9375rem) {
   .rankBadge {
-    min-width: 1.875rem;
-    height: 1.875rem;
+    min-width: 2.125rem;
+    height: 2.125rem;
     padding: 0 var(--ui-space-2xs);
     font-size: 1rem;
   }
