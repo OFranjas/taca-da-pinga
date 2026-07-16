@@ -112,6 +112,11 @@
 .tableHeaderMeta {
   gap: var(--ui-space-sm);
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.tableHeaderMeta > :first-child {
+  min-width: 0;
 }
 
 .tableCount {
@@ -126,6 +131,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   flex: 0 1 auto;
+  min-width: 0;
 }
 
 .feedback {
@@ -313,7 +319,10 @@
 
 @media (min-width: 75rem) {
   .layout {
-    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 15rem);
+    grid-template-columns: minmax(11rem, clamp(11rem, 18vw, 15rem)) minmax(0, 1fr) minmax(
+        11rem,
+        clamp(11rem, 18vw, 15rem)
+      );
     grid-template-areas: 'left content right';
     align-items: start;
   }
@@ -331,7 +340,18 @@
   }
 
   .tableHeaderMeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     flex-wrap: nowrap;
+  }
+
+  .tableHeaderMeta h2 {
+    min-width: 0;
+  }
+
+  .tableBadges {
+    margin-right: var(--ui-space-xs);
   }
 }
 
@@ -349,9 +369,32 @@
   }
 
   .tableSurface {
-    --leaderboard-grid-template: 4rem minmax(8.5rem, 0.5fr) minmax(0, 1.5fr);
-    --leaderboard-row-height: 2.5rem;
+    --leaderboard-grid-template: clamp(3.25rem, 5vw, 4rem) minmax(clamp(8rem, 20vw, 12rem), 0.5fr)
+      minmax(0, 1.5fr);
+    --leaderboard-row-height: 2.25rem;
     --leaderboard-row-gap: 0.125rem;
+  }
+
+  .tableHeaderMeta {
+    gap: var(--ui-space-sm);
+  }
+
+  .tableHeaderMeta h2 {
+    font-size: clamp(1.75rem, 2.65vw, 2.25rem);
+    line-height: 1.05;
+  }
+
+  .skeletonRank {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  .skeletonName {
+    height: 1rem;
+  }
+
+  .skeletonValue {
+    height: 0.625rem;
   }
 }
 
@@ -393,7 +436,8 @@
 }
 
 .displayPage .tableSurface {
-  --leaderboard-grid-template: 4.5rem minmax(12rem, 0.58fr) minmax(18rem, 1.42fr);
+  --leaderboard-grid-template: clamp(3.75rem, 4vw, 4.5rem) minmax(clamp(10rem, 16vw, 15rem), 0.58fr)
+    minmax(18rem, 1.42fr);
   --leaderboard-row-height: 3rem;
   --leaderboard-row-gap: 0.3125rem;
 }
@@ -524,6 +568,9 @@
 
 @media (min-width: 90rem) {
   .displayPage .layout {
-    grid-template-columns: minmax(0, 13.75rem) minmax(0, 1fr) minmax(0, 13.75rem);
+    grid-template-columns: minmax(11rem, clamp(11rem, 14vw, 13.75rem)) minmax(0, 1fr) minmax(
+        11rem,
+        clamp(11rem, 14vw, 13.75rem)
+      );
   }
 }

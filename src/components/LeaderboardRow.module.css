@@ -3,13 +3,13 @@
   display: grid;
   grid-template-columns: var(
     --leaderboard-grid-template,
-    minmax(3.25rem, 3.75rem) minmax(10rem, 0.7fr) minmax(0, 1.3fr)
+    minmax(3.25rem, 3.75rem) minmax(clamp(8rem, 18vw, 12rem), 0.7fr) minmax(0, 1.3fr)
   );
   column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   width: 100%;
   min-width: 0;
-  height: var(--leaderboard-row-height, 80px);
+  height: var(--leaderboard-row-height, 5rem);
   padding: 0 var(--ui-space-md);
   border-radius: var(--ui-radius-sm);
   background: var(--ui-color-surface);
@@ -24,7 +24,7 @@
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
-  width: 4px;
+  width: 0.25rem;
   background: var(--row-accent, var(--ui-color-accent));
   z-index: 0;
 }
@@ -124,6 +124,23 @@
   }
 }
 
+@media (min-width: 75rem) and (max-width: 89.9375rem) {
+  .rankBadge {
+    min-width: 1.875rem;
+    height: 1.875rem;
+    padding: 0 var(--ui-space-2xs);
+    font-size: 1rem;
+  }
+
+  .teamName {
+    font-size: 1rem;
+  }
+
+  .meter {
+    height: 0.625rem;
+  }
+}
+
 @media (max-width: 640px) {
   .root {
     grid-template-columns: 2.25rem minmax(0, 1fr);
@@ -131,7 +148,7 @@
     align-content: center;
     align-items: center;
     row-gap: 0.4rem;
-    height: 64px;
+    height: 4rem;
     padding-left: var(--ui-space-sm);
     padding-right: var(--ui-space-sm);
     column-gap: var(--ui-space-sm);
