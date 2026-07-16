@@ -357,6 +357,10 @@
   align-items: stretch;
 }
 
+.displayPage .railSlot > aside {
+  top: 0;
+}
+
 .displayPage .content,
 .displayPage .content > section,
 .displayPage .tableCard,
