@@ -343,10 +343,15 @@
 }
 
 @media (min-width: 75rem) and (max-width: 89.9375rem) {
+  .page:not(.displayPage) .railSlot > aside {
+    top: 3rem;
+    margin-top: calc(-1 * var(--ui-space-lg));
+  }
+
   .tableSurface {
     --leaderboard-grid-template: 4rem minmax(8.5rem, 0.5fr) minmax(0, 1.5fr);
-    --leaderboard-row-height: 4rem;
-    --leaderboard-row-gap: 0.5rem;
+    --leaderboard-row-height: 3.5rem;
+    --leaderboard-row-gap: 0.375rem;
   }
 }
 
