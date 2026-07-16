@@ -110,6 +110,7 @@
 }
 
 .tableHeaderMeta {
+  --leaderboard-header-end-inset: var(--ui-space-xs);
   gap: var(--ui-space-sm);
   flex-wrap: wrap;
   min-width: 0;
@@ -192,7 +193,6 @@
 
 .skeletonValue {
   justify-self: stretch;
-  width: auto;
   height: 0.75rem;
 }
 
@@ -319,10 +319,7 @@
 
 @media (min-width: 75rem) {
   .layout {
-    grid-template-columns: minmax(11rem, clamp(11rem, 18vw, 15rem)) minmax(0, 1fr) minmax(
-        11rem,
-        clamp(11rem, 18vw, 15rem)
-      );
+    grid-template-columns: clamp(11rem, 18vw, 15rem) minmax(0, 1fr) clamp(11rem, 18vw, 15rem);
     grid-template-areas: 'left content right';
     align-items: start;
   }
@@ -351,12 +348,12 @@
   }
 
   .tableBadges {
-    margin-right: var(--ui-space-xs);
+    margin-right: var(--leaderboard-header-end-inset);
   }
 
   @supports (font: -apple-system-body) {
-    .tableBadges {
-      margin-right: var(--ui-space-2xs);
+    .tableHeaderMeta {
+      --leaderboard-header-end-inset: var(--ui-space-2xs);
     }
   }
 }
@@ -379,10 +376,6 @@
       minmax(0, 1.5fr);
     --leaderboard-row-height: 2.75rem;
     --leaderboard-row-gap: 0.125rem;
-  }
-
-  .tableHeaderMeta {
-    gap: var(--ui-space-sm);
   }
 
   .tableHeaderMeta h2 {
@@ -574,9 +567,6 @@
 
 @media (min-width: 90rem) {
   .displayPage .layout {
-    grid-template-columns: minmax(11rem, clamp(11rem, 14vw, 13.75rem)) minmax(0, 1fr) minmax(
-        11rem,
-        clamp(11rem, 14vw, 13.75rem)
-      );
+    grid-template-columns: clamp(11rem, 14vw, 13.75rem) minmax(0, 1fr) clamp(11rem, 14vw, 13.75rem);
   }
 }

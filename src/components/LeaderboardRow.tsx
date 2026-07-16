@@ -68,7 +68,7 @@ const clampPercentage = (value: number) => {
     return 100;
   }
 
-  return Math.max(0, value);
+  return value;
 };
 
 export function LeaderboardRow({

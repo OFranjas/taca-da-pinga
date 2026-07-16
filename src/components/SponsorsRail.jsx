@@ -104,7 +104,7 @@ export default function SponsorsRail({
       window.cancelAnimationFrame(frameId);
       track.style.transform = '';
     };
-  }, [copies, cycleExtent, shouldLoop]);
+  }, [cycleExtent, shouldLoop]);
 
   if (!items.length) return null;
 
