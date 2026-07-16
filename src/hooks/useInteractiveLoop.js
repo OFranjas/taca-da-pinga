@@ -30,6 +30,7 @@ export default function useInteractiveLoop({
   trackRef,
 }) {
   const animationRef = useRef(null);
+  const animationProgressRef = useRef(0);
   const dragRef = useRef(null);
   const resumeTimeoutRef = useRef(0);
   const suppressClickRef = useRef(false);
@@ -61,18 +62,23 @@ export default function useInteractiveLoop({
       axis === 'x'
         ? `translate3d(${-cycleExtent}px, 0, 0)`
         : `translate3d(0, ${-cycleExtent}px, 0)`;
+    const animationDuration = durationSeconds * 1000;
     const animation = track.animate(
       [{ transform: 'translate3d(0, 0, 0)' }, { transform: translate }],
       {
-        duration: durationSeconds * 1000,
+        duration: animationDuration,
         easing: 'linear',
         iterations: Infinity,
       }
     );
+    animation.currentTime = animationProgressRef.current * animationDuration;
     animationRef.current = animation;
 
     return () => {
       window.clearTimeout(resumeTimeoutRef.current);
+      const currentTime = Number(animation.currentTime ?? 0);
+      animationProgressRef.current =
+        normalizeLoopTime(currentTime, animationDuration) / animationDuration;
       animation.cancel();
       if (animationRef.current === animation) {
         animationRef.current = null;

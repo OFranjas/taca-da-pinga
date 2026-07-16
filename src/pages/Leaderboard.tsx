@@ -10,7 +10,7 @@ import styles from './Leaderboard.module.css';
 import { LeaderboardRow } from '../components/LeaderboardRow';
 
 const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
-const LAPTOP_ROW_METRICS = { height: 56, gap: 6 };
+const LAPTOP_ROW_METRICS = { height: 48, gap: 4 };
 const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
@@ -106,6 +106,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const [isCompactViewport, setIsCompactViewport] = useState(false);
   const [isLaptopViewport, setIsLaptopViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const displayScrollListRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
@@ -215,47 +216,53 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     }
 
     const container = scrollRef.current;
-    if (!container) {
+    const list = displayScrollListRef.current;
+    if (!container || !list) {
       return;
     }
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-    if (reduceMotion) {
+    if (reduceMotion || typeof list.animate !== 'function') {
       return;
     }
 
-    let frameId = 0;
     let pauseTimeoutId = 0;
     let direction: 1 | -1 = 1;
+    let currentOffset = 0;
+    let activeAnimation: Animation | null = null;
 
     const getMaxScrollTop = () => Math.max(0, container.scrollHeight - container.clientHeight);
+    const applyOffset = (offset: number) => {
+      list.style.transform = `translate3d(0, -${offset}px, 0)`;
+    };
 
-    const animateTo = (targetScrollTop: number) => {
-      window.cancelAnimationFrame(frameId);
-      const startScrollTop = container.scrollTop;
-      const distance = Math.abs(targetScrollTop - startScrollTop);
+    const animateTo = (targetOffset: number) => {
+      activeAnimation?.cancel();
+      const startOffset = currentOffset;
+      const distance = Math.abs(targetOffset - startOffset);
       const duration = Math.max(2600, (distance / DISPLAY_SCROLL_PX_PER_SECOND) * 1000);
-      let startTime = 0;
 
-      const step = (timestamp: number) => {
-        if (!startTime) {
-          startTime = timestamp;
-        }
+      const animation = list.animate(
+        [
+          { transform: `translate3d(0, -${startOffset}px, 0)` },
+          { transform: `translate3d(0, -${targetOffset}px, 0)` },
+        ],
+        { duration, easing: 'linear', fill: 'forwards' }
+      );
+      activeAnimation = animation;
 
-        const progress = Math.min(1, (timestamp - startTime) / duration);
-        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * progress;
-
-        if (progress < 1) {
-          frameId = window.requestAnimationFrame(step);
+      animation.onfinish = () => {
+        if (activeAnimation !== animation) {
           return;
         }
 
-        container.scrollTop = targetScrollTop;
+        currentOffset = targetOffset;
+        applyOffset(currentOffset);
+        animation.cancel();
+        activeAnimation = null;
         direction = direction === 1 ? -1 : 1;
         pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
       };
-
-      frameId = window.requestAnimationFrame(step);
     };
 
     const scheduleNextScroll = () => {
@@ -268,14 +275,13 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       animateTo(direction === 1 ? maxScrollTop : 0);
     };
 
-    container.scrollTop = 0;
-    frameId = window.requestAnimationFrame(() => {
-      pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
-    });
+    applyOffset(0);
+    pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      activeAnimation?.cancel();
       window.clearTimeout(pauseTimeoutId);
+      list.style.transform = '';
     };
   }, [displayMode, teams.length]);
 
@@ -455,7 +461,11 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                               ))}
                             </div>
                             {displayScrollableTeams.length > 0 ? (
-                              <div className={styles.fullList} role="presentation">
+                              <div
+                                ref={displayScrollListRef}
+                                className={styles.fullList}
+                                role="presentation"
+                              >
                                 {displayScrollableTeams.map((team, index) => (
                                   <LeaderboardRow
                                     key={team.id}

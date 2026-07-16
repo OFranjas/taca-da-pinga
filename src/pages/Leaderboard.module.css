@@ -350,8 +350,8 @@
 
   .tableSurface {
     --leaderboard-grid-template: 4rem minmax(8.5rem, 0.5fr) minmax(0, 1.5fr);
-    --leaderboard-row-height: 3.5rem;
-    --leaderboard-row-gap: 0.375rem;
+    --leaderboard-row-height: 3rem;
+    --leaderboard-row-gap: 0.25rem;
   }
 }
 
@@ -422,6 +422,10 @@
   z-index: 1;
   padding-bottom: var(--leaderboard-row-gap, 0.3125rem);
   background: var(--ui-color-surface-muted);
+}
+
+.displayPage .fullList {
+  will-change: transform;
 }
 
 .displayPage .introSection {
