@@ -45,6 +45,13 @@
   touch-action: pan-y;
   user-select: none;
   -webkit-user-drag: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1rem,
+    #000 calc(100% - 1rem),
+    transparent
+  );
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -171,12 +178,6 @@
   .animatedRow .track {
     animation: none;
     transform: none;
-  }
-}
-
-@media (hover: none) {
-  .animatedRow {
-    mask-image: none;
   }
 }
 
