@@ -46,6 +46,10 @@
   min-width: 0;
 }
 
+.animatedViewport .stack {
+  will-change: transform;
+}
+
 .segment {
   display: grid;
   grid-auto-rows: min-content;

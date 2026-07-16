@@ -1,4 +1,5 @@
 import React from 'react';
+import useInteractiveLoop from '../hooks/useInteractiveLoop';
 import useMeasuredLoop from '../hooks/useMeasuredLoop';
 import styles from './SponsorsRail.module.css';
 
@@ -16,7 +17,7 @@ export default function SponsorsRail({
 }) {
   const viewportRef = React.useRef(null);
   const cycleRef = React.useRef(null);
-  const isPausedRef = React.useRef(false);
+  const trackRef = React.useRef(null);
   const items = React.useMemo(
     () =>
       sponsors.length
@@ -51,55 +52,22 @@ export default function SponsorsRail({
 
     return nextCycle;
   }, [cycleLength, items]);
-  const { copies, cycleExtent } = useMeasuredLoop({
+  const { copies, cycleExtent, durationSeconds } = useMeasuredLoop({
     axis: 'y',
     cycleRef,
     enabled: shouldLoop,
     pixelsPerSecond: AUTO_SCROLL_SPEED,
     viewportRef,
   });
-
-  React.useEffect(() => {
-    if (!shouldLoop || !cycleExtent) return undefined;
-
-    const viewport = viewportRef.current;
-    if (!viewport) return undefined;
-
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    let frameId;
-    let previousTime;
-    let offset = viewport.scrollTop % cycleExtent;
-
-    const tick = (time) => {
-      if (previousTime === undefined) previousTime = time;
-
-      const elapsedSeconds = (time - previousTime) / 1000;
-      previousTime = time;
-
-      if (!isPausedRef.current && !reducedMotion?.matches) {
-        offset = (offset + elapsedSeconds * AUTO_SCROLL_SPEED) % cycleExtent;
-        viewport.scrollTop = offset;
-      }
-
-      frameId = window.requestAnimationFrame(tick);
-    };
-
-    frameId = window.requestAnimationFrame(tick);
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [copies, cycleExtent, shouldLoop]);
+  const interactionHandlers = useInteractiveLoop({
+    axis: 'y',
+    cycleExtent,
+    durationSeconds,
+    enabled: shouldLoop,
+    trackRef,
+  });
 
   if (!items.length) return null;
-
-  const pauseLoop = () => {
-    isPausedRef.current = true;
-  };
-
-  const resumeLoop = (event) => {
-    if (event.currentTarget.contains(event.relatedTarget)) return;
-
-    isPausedRef.current = false;
-  };
 
   const renderItem = (item, index, isDuplicate) => {
     const content = (
@@ -161,16 +129,13 @@ export default function SponsorsRail({
   return (
     <aside
       className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}
-      onMouseEnter={pauseLoop}
-      onMouseLeave={resumeLoop}
-      onFocusCapture={pauseLoop}
-      onBlurCapture={resumeLoop}
+      {...interactionHandlers}
     >
       <div
         ref={viewportRef}
         className={`${styles.viewport} ${shouldLoop ? styles.animatedViewport : ''}`}
       >
-        <div className={styles.stack}>
+        <div ref={trackRef} className={styles.stack}>
           {Array.from({ length: shouldLoop ? copies : 1 }, (_, cycleIndex) =>
             renderCycle(cycleIndex)
           )}
