@@ -350,8 +350,8 @@
 
   .tableSurface {
     --leaderboard-grid-template: 4rem minmax(8.5rem, 0.5fr) minmax(0, 1.5fr);
-    --leaderboard-row-height: 3rem;
-    --leaderboard-row-gap: 0.25rem;
+    --leaderboard-row-height: 2.625rem;
+    --leaderboard-row-gap: 0.1875rem;
   }
 }
 

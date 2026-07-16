@@ -1,5 +1,4 @@
 import React from 'react';
-import useInteractiveLoop from '../hooks/useInteractiveLoop';
 import useMeasuredLoop from '../hooks/useMeasuredLoop';
 import styles from './SponsorsRail.module.css';
 
@@ -18,6 +17,8 @@ export default function SponsorsRail({
   const viewportRef = React.useRef(null);
   const cycleRef = React.useRef(null);
   const trackRef = React.useRef(null);
+  const isPausedRef = React.useRef(false);
+  const loopProgressRef = React.useRef(0);
   const items = React.useMemo(
     () =>
       sponsors.length
@@ -52,22 +53,72 @@ export default function SponsorsRail({
 
     return nextCycle;
   }, [cycleLength, items]);
-  const { copies, cycleExtent, durationSeconds } = useMeasuredLoop({
+  const { copies, cycleExtent } = useMeasuredLoop({
     axis: 'y',
     cycleRef,
     enabled: shouldLoop,
     pixelsPerSecond: AUTO_SCROLL_SPEED,
     viewportRef,
   });
-  const interactionHandlers = useInteractiveLoop({
-    axis: 'y',
-    cycleExtent,
-    durationSeconds,
-    enabled: shouldLoop,
-    trackRef,
-  });
+  React.useEffect(() => {
+    if (!shouldLoop || !cycleExtent) {
+      return undefined;
+    }
+
+    const track = trackRef.current;
+    if (!track) {
+      return undefined;
+    }
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    let frameId = 0;
+    let previousTime;
+    let offset = loopProgressRef.current * cycleExtent;
+
+    const applyOffset = () => {
+      track.style.transform = `translate3d(0, -${offset}px, 0)`;
+    };
+
+    const tick = (time) => {
+      if (previousTime === undefined) {
+        previousTime = time;
+      }
+
+      const elapsedSeconds = Math.min((time - previousTime) / 1000, 0.05);
+      previousTime = time;
+
+      if (!isPausedRef.current && !reducedMotion?.matches) {
+        offset = (offset + elapsedSeconds * AUTO_SCROLL_SPEED) % cycleExtent;
+        loopProgressRef.current = offset / cycleExtent;
+        applyOffset();
+      }
+
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    applyOffset();
+    frameId = window.requestAnimationFrame(tick);
+
+    return () => {
+      loopProgressRef.current = offset / cycleExtent;
+      window.cancelAnimationFrame(frameId);
+      track.style.transform = '';
+    };
+  }, [copies, cycleExtent, shouldLoop]);
 
   if (!items.length) return null;
+
+  const pauseLoop = () => {
+    isPausedRef.current = true;
+  };
+
+  const resumeLoop = (event) => {
+    if (event.currentTarget.contains(event.relatedTarget)) {
+      return;
+    }
+
+    isPausedRef.current = false;
+  };
 
   const renderItem = (item, index, isDuplicate) => {
     const content = (
@@ -129,7 +180,10 @@ export default function SponsorsRail({
   return (
     <aside
       className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}
-      {...interactionHandlers}
+      onMouseEnter={pauseLoop}
+      onMouseLeave={resumeLoop}
+      onFocusCapture={pauseLoop}
+      onBlurCapture={resumeLoop}
     >
       <div
         ref={viewportRef}

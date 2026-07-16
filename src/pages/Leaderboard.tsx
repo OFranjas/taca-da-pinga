@@ -10,7 +10,7 @@ import styles from './Leaderboard.module.css';
 import { LeaderboardRow } from '../components/LeaderboardRow';
 
 const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
-const LAPTOP_ROW_METRICS = { height: 48, gap: 4 };
+const LAPTOP_ROW_METRICS = { height: 42, gap: 3 };
 const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;

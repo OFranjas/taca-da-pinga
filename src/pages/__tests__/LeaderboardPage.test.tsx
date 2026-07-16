@@ -79,8 +79,8 @@ describe('Leaderboard page', () => {
 
   it('keeps virtual row measurements in sync with compact laptop rows', () => {
     expect(getVirtualRowMetrics(false)).toEqual({ height: 80, gap: 12 });
-    expect(getVirtualRowMetrics(true)).toEqual({ height: 48, gap: 4 });
-    expect(getRowsetHeight(120, 48, 4)).toBe(6236);
+    expect(getVirtualRowMetrics(true)).toEqual({ height: 42, gap: 3 });
+    expect(getRowsetHeight(120, 42, 3)).toBe(5397);
   });
 
   it('orders teams by pingas (desc) and then name (asc)', async () => {
