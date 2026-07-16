@@ -19,6 +19,21 @@
 
 .animatedViewport {
   overflow-y: hidden;
+  --rail-edge-fade-size: 1.25rem;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--rail-edge-fade-size),
+    #000 calc(100% - var(--rail-edge-fade-size)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--rail-edge-fade-size),
+    #000 calc(100% - var(--rail-edge-fade-size)),
+    transparent
+  );
 }
 
 .viewport::-webkit-scrollbar {
