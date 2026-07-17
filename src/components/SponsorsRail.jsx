@@ -16,6 +16,14 @@ export default function SponsorsRail({
 }) {
   const viewportRef = React.useRef(null);
   const cycleRef = React.useRef(null);
+  const trackRef = React.useRef(null);
+  const loopProgressRef = React.useRef(0);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() =>
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
   const items = React.useMemo(
     () =>
       sponsors.length
@@ -50,21 +58,103 @@ export default function SponsorsRail({
 
     return nextCycle;
   }, [cycleLength, items]);
-  const { copies, durationSeconds } = useMeasuredLoop({
+  const { copies, cycleExtent } = useMeasuredLoop({
     axis: 'y',
     cycleRef,
     enabled: shouldLoop,
     pixelsPerSecond: AUTO_SCROLL_SPEED,
     viewportRef,
   });
-  const loopStyle = shouldLoop
-    ? {
-        '--loop-distance': `-${100 / copies}%`,
-        '--loop-duration': durationSeconds ? `${durationSeconds}s` : undefined,
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!mediaQuery) {
+      return undefined;
+    }
+
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener?.('change', updatePreference);
+
+    return () => mediaQuery.removeEventListener?.('change', updatePreference);
+  }, []);
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) {
+      return undefined;
+    }
+
+    if (!shouldLoop || !cycleExtent) {
+      track.style.transform = '';
+      return undefined;
+    }
+
+    if (prefersReducedMotion) {
+      loopProgressRef.current = 0;
+      track.style.transform = '';
+      return undefined;
+    }
+
+    let frameId = 0;
+    let previousTime;
+    let offset = loopProgressRef.current * cycleExtent;
+
+    const applyOffset = () => {
+      track.style.transform = `translate3d(0, -${offset}px, 0)`;
+    };
+
+    const tick = (time) => {
+      if (previousTime === undefined) {
+        previousTime = time;
       }
-    : undefined;
+
+      const elapsedSeconds = Math.min((time - previousTime) / 1000, 0.05);
+      previousTime = time;
+
+      offset = (offset + elapsedSeconds * AUTO_SCROLL_SPEED) % cycleExtent;
+      loopProgressRef.current = offset / cycleExtent;
+      applyOffset();
+
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    applyOffset();
+
+    if (isPaused) {
+      return () => {
+        loopProgressRef.current = offset / cycleExtent;
+      };
+    }
+
+    frameId = window.requestAnimationFrame(tick);
+
+    return () => {
+      loopProgressRef.current = offset / cycleExtent;
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [cycleExtent, isPaused, prefersReducedMotion, shouldLoop]);
+
+  React.useEffect(
+    () => () => {
+      trackRef.current?.style.removeProperty('transform');
+    },
+    []
+  );
 
   if (!items.length) return null;
+
+  const pauseLoop = () => {
+    setIsPaused(true);
+  };
+
+  const resumeLoop = (event) => {
+    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+      return;
+    }
+
+    setIsPaused(false);
+  };
 
   const renderItem = (item, index, isDuplicate) => {
     const content = (
@@ -124,12 +214,18 @@ export default function SponsorsRail({
   };
 
   return (
-    <aside className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}>
+    <aside
+      className={`${styles.rail} ${side === 'right' ? styles.right : styles.left}`}
+      onMouseEnter={pauseLoop}
+      onMouseLeave={resumeLoop}
+      onFocusCapture={pauseLoop}
+      onBlurCapture={resumeLoop}
+    >
       <div
         ref={viewportRef}
         className={`${styles.viewport} ${shouldLoop ? styles.animatedViewport : ''}`}
       >
-        <div className={styles.stack} style={loopStyle}>
+        <div ref={trackRef} className={styles.stack}>
           {Array.from({ length: shouldLoop ? copies : 1 }, (_, cycleIndex) =>
             renderCycle(cycleIndex)
           )}

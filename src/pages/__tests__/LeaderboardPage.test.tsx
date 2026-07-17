@@ -79,8 +79,8 @@ describe('Leaderboard page', () => {
 
   it('keeps virtual row measurements in sync with compact laptop rows', () => {
     expect(getVirtualRowMetrics(false)).toEqual({ height: 80, gap: 12 });
-    expect(getVirtualRowMetrics(true)).toEqual({ height: 64, gap: 8 });
-    expect(getRowsetHeight(120, 64, 8)).toBe(8632);
+    expect(getVirtualRowMetrics(true)).toEqual({ height: 44, gap: 2 });
+    expect(getRowsetHeight(120, 44, 2)).toBe(5518);
   });
 
   it('orders teams by pingas (desc) and then name (asc)', async () => {
@@ -89,6 +89,7 @@ describe('Leaderboard page', () => {
         { id: 'b', name: 'Beta Rockets', pingas: 20 },
         { id: 'a', name: 'Alpha Squad', pingas: 20 },
         { id: 'c', name: 'Charlie Crew', pingas: 15 },
+        { id: 'd', name: 'Delta Crew', pingas: 1 },
       ]);
       return vi.fn();
     });
@@ -97,12 +98,80 @@ describe('Leaderboard page', () => {
 
     const rows = await screen.findAllByTestId('leaderboard-row');
 
-    expect(rows).toHaveLength(3);
+    expect(rows).toHaveLength(4);
     expect(rows[0]).toHaveTextContent('Alpha Squad');
     expect(rows[1]).toHaveTextContent('Beta Rockets');
     expect(rows[2]).toHaveTextContent('Charlie Crew');
-    expect(screen.getAllByTestId('score-beer-icon')).toHaveLength(3);
+    expect(rows[3]).toHaveTextContent('Delta Crew');
+    expect(rows[0]).toHaveStyle('--row-meter-start: #d97706');
+    expect(rows[1]).toHaveStyle('--row-meter-start: #64748b');
+    expect(rows[2]).toHaveStyle('--row-meter-start: #c2410c');
+    expect(rows[3]).toHaveStyle('--row-meter-start: #047857');
+    const meters = screen.getAllByRole('meter');
+    expect(meters).toHaveLength(4);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuenow'))).toEqual([
+      '100',
+      '100',
+      '75',
+      '5',
+    ]);
+    expect(meters.every((meter) => meter.getAttribute('aria-valuemax') === '100')).toBe(true);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuetext'))).toEqual([
+      'Alpha Squad está no valor de referência',
+      'Beta Rockets está no valor de referência',
+      'Charlie Crew está a 75% do valor da equipa líder',
+      'Delta Crew está a 5% do valor da equipa líder',
+    ]);
+    expect(screen.queryByTestId('score-beer-icon')).not.toBeInTheDocument();
+    expect(screen.queryByText('Total de Pingas')).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Pingas' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Comparação' })).not.toBeInTheDocument();
     expect(screen.queryByText('pts')).not.toBeInTheDocument();
+    expect(rows[0]).not.toHaveTextContent(/\b20\b/);
+    expect(rows[2]).not.toHaveTextContent(/\b15\b/);
+    expect(rows[3]).not.toHaveTextContent(/\b1\b/);
+    expect(screen.queryByText('56')).not.toBeInTheDocument();
+  });
+
+  it('renders empty comparison meters without exposing a score', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([
+        { id: 'a', name: 'Alpha Squad', pingas: 0 },
+        { id: 'b', name: 'Beta Rockets', pingas: 0 },
+      ]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    const meters = await screen.findAllByRole('meter');
+    expect(meters).toHaveLength(2);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuenow'))).toEqual(['0', '0']);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuetext'))).toEqual([
+      'Alpha Squad ainda não tem valor registado',
+      'Beta Rockets ainda não tem valor registado',
+    ]);
+    expect(screen.queryByText('Total de Pingas')).not.toBeInTheDocument();
+  });
+
+  it('does not announce a near-tied trailing team as the reference value', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([
+        { id: 'leader', name: 'Leader Squad', pingas: 201 },
+        { id: 'trailing', name: 'Trailing Squad', pingas: 200 },
+      ]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    const meters = await screen.findAllByRole('meter');
+
+    expect(meters.map((meter) => meter.getAttribute('aria-valuenow'))).toEqual(['100', '99']);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuetext'))).toEqual([
+      'Leader Squad está no valor de referência',
+      'Trailing Squad está a 99% do valor da equipa líder',
+    ]);
   });
 
   it('shows the empty state when there are no teams', async () => {

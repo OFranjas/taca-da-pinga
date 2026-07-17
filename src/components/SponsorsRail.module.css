@@ -19,6 +19,25 @@
 
 .animatedViewport {
   overflow-y: hidden;
+  --rail-edge-fade-size: 1.25rem;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--rail-edge-fade-size),
+    #000 calc(100% - var(--rail-edge-fade-size)),
+    transparent
+  );
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--rail-edge-fade-size),
+    #000 calc(100% - var(--rail-edge-fade-size)),
+    transparent
+  );
 }
 
 .viewport::-webkit-scrollbar {
@@ -31,27 +50,15 @@
   min-width: 0;
 }
 
+.animatedViewport .stack {
+  will-change: transform;
+}
+
 .segment {
   display: grid;
   grid-auto-rows: min-content;
   gap: 0.875rem;
   padding-bottom: 0.875rem;
-}
-
-.animatedViewport .stack {
-  animation: sponsors-rail var(--loop-duration, 30s) linear infinite;
-  will-change: transform;
-}
-
-.animatedViewport:hover .stack,
-.animatedViewport:focus-within .stack {
-  animation-play-state: paused;
-}
-
-@keyframes sponsors-rail {
-  to {
-    transform: translate3d(0, var(--loop-distance), 0);
-  }
 }
 
 .slot {
@@ -175,10 +182,5 @@
 @media (prefers-reduced-motion: reduce) {
   .animatedViewport {
     overflow-y: auto;
-  }
-
-  .animatedViewport .stack {
-    animation: none;
-    transform: none;
   }
 }

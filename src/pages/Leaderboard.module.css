@@ -14,6 +14,7 @@
 }
 
 .displayPage {
+  height: calc(100dvh - (var(--ui-space-md) * 2));
   min-height: calc(100dvh - (var(--ui-space-md) * 2));
 }
 
@@ -109,8 +110,14 @@
 }
 
 .tableHeaderMeta {
+  --leaderboard-header-end-inset: var(--ui-space-xs);
   gap: var(--ui-space-sm);
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+.tableHeaderMeta > :first-child {
+  min-width: 0;
 }
 
 .tableCount {
@@ -125,25 +132,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   flex: 0 1 auto;
-}
-
-.totalBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--ui-radius-sm);
-  background: rgba(34, 197, 94, 0.04);
-  border: 1px solid rgba(34, 197, 94, 0.1);
-  box-shadow: none;
-  max-width: 15rem;
-  line-height: 1;
-}
-
-.totalValue {
-  white-space: nowrap;
-  font-size: clamp(1rem, 0.75vw + 0.55rem, 1.28rem);
-  line-height: 1;
+  min-width: 0;
 }
 
 .feedback {
@@ -168,6 +157,7 @@
     --leaderboard-grid-template,
     clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem)
   );
+  column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   min-height: var(--leaderboard-row-height, 5rem);
   padding: var(--ui-space-sm) var(--ui-space-md);
@@ -202,13 +192,13 @@
 }
 
 .skeletonValue {
-  justify-self: end;
-  width: 3.25rem;
-  height: 1.25rem;
+  justify-self: stretch;
+  height: 0.75rem;
 }
 
 .tableSurface {
-  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(0, 1fr) clamp(5rem, 12vw, 7rem);
+  --leaderboard-grid-template: clamp(3.25rem, 8vw, 4.25rem) minmax(9rem, 0.55fr) minmax(0, 1.45fr);
+  --leaderboard-column-gap: var(--ui-space-md);
   --leaderboard-row-height: 5rem;
   --leaderboard-row-gap: 0.75rem;
   display: flex;
@@ -246,6 +236,7 @@
 .headerRow {
   display: grid;
   grid-template-columns: var(--leaderboard-grid-template);
+  column-gap: var(--leaderboard-column-gap, var(--ui-space-md));
   align-items: center;
   padding: var(--ui-space-xs) var(--ui-space-md);
   border-radius: var(--ui-radius-sm);
@@ -328,7 +319,7 @@
 
 @media (min-width: 75rem) {
   .layout {
-    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 15rem);
+    grid-template-columns: clamp(11rem, 18vw, 15rem) minmax(0, 1fr) clamp(11rem, 18vw, 15rem);
     grid-template-areas: 'left content right';
     align-items: start;
   }
@@ -346,7 +337,24 @@
   }
 
   .tableHeaderMeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     flex-wrap: nowrap;
+  }
+
+  .tableHeaderMeta h2 {
+    min-width: 0;
+  }
+
+  .tableBadges {
+    margin-right: var(--leaderboard-header-end-inset);
+  }
+
+  @supports (font: -apple-system-body) {
+    .tableHeaderMeta {
+      --leaderboard-header-end-inset: var(--ui-space-2xs);
+    }
   }
 }
 
@@ -358,15 +366,66 @@
 }
 
 @media (min-width: 75rem) and (max-width: 89.9375rem) {
+  .page:not(.displayPage) .railSlot > aside {
+    top: 3rem;
+    margin-top: calc(-1 * var(--ui-space-lg));
+  }
+
   .tableSurface {
-    --leaderboard-row-height: 4rem;
-    --leaderboard-row-gap: 0.5rem;
+    --leaderboard-grid-template: clamp(3.25rem, 5vw, 4rem) minmax(clamp(8rem, 20vw, 12rem), 0.5fr)
+      minmax(0, 1.5fr);
+    --leaderboard-row-height: 2.75rem;
+    --leaderboard-row-gap: 0.125rem;
+  }
+
+  .tableHeaderMeta h2 {
+    font-size: clamp(1.75rem, 2.65vw, 2.25rem);
+    line-height: 1.05;
+  }
+
+  .skeletonRank {
+    width: 2.125rem;
+    height: 2.125rem;
+  }
+
+  .skeletonName {
+    height: 1rem;
+  }
+
+  .skeletonValue {
+    height: 0.625rem;
   }
 }
 
 .displayPage .layout {
-  min-height: calc(100dvh - (var(--ui-space-md) * 2));
+  height: 100%;
+  min-height: 0;
   gap: var(--ui-space-lg);
+  align-items: stretch;
+}
+
+.displayPage .railSlot > aside {
+  top: 0;
+}
+
+.displayPage .railSlot > aside > div {
+  position: relative;
+  height: calc(100dvh - (var(--ui-space-md) * 2));
+  max-height: none;
+}
+
+.displayPage .content,
+.displayPage .content > section,
+.displayPage .tableCard,
+.displayPage .tableSurface,
+.displayPage .scrollRegion {
+  min-height: 0;
+}
+
+.displayPage .content > section,
+.displayPage .tableCard,
+.displayPage .tableSurface {
+  flex: 1 1 auto;
 }
 
 .displayPage .tableCard {
@@ -376,14 +435,20 @@
 }
 
 .displayPage .tableSurface {
-  --leaderboard-grid-template: 4.5rem minmax(0, 1fr) 8rem;
+  --leaderboard-grid-template: clamp(3.75rem, 4vw, 4.5rem) minmax(clamp(10rem, 16vw, 15rem), 0.58fr)
+    minmax(18rem, 1.42fr);
   --leaderboard-row-height: 3rem;
   --leaderboard-row-gap: 0.3125rem;
 }
 
+.displayPage .skeletonValue {
+  height: 0.625rem;
+}
+
 .displayPage .scrollRegion {
-  height: min(54rem, calc(100dvh - 13rem));
-  max-height: calc(100dvh - 10rem);
+  flex: 1 1 auto;
+  height: auto;
+  max-height: none;
   background: transparent;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -400,6 +465,10 @@
   z-index: 1;
   padding-bottom: var(--leaderboard-row-gap, 0.3125rem);
   background: var(--ui-color-surface-muted);
+}
+
+.displayPage .fullList {
+  will-change: transform;
 }
 
 .displayPage .introSection {
@@ -421,11 +490,6 @@
 
 .displayPage .tableCount {
   font-size: 1rem;
-}
-
-.displayPage .totalBadge {
-  gap: var(--ui-space-sm);
-  padding: 0.5rem 0.875rem;
 }
 
 @media (max-width: 48rem) {
@@ -473,15 +537,33 @@
     gap: var(--ui-space-xs);
   }
 
-  .totalBadge {
-    width: auto;
-    min-width: 0;
-  }
-
   .tableSurface {
-    --leaderboard-grid-template: 2.75rem minmax(0, 1fr) minmax(4.25rem, 4.75rem);
+    --leaderboard-grid-template: 2.5rem minmax(0, 1fr) auto;
+    --leaderboard-column-gap: var(--ui-space-sm);
     --leaderboard-row-height: 4rem;
     --leaderboard-row-gap: 0.4375rem;
+  }
+
+  .headerRow {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-rows: min-content;
+    align-content: center;
+    padding-left: var(--ui-space-sm);
+    padding-right: var(--ui-space-sm);
+  }
+
+  .headerCell:first-child {
+    grid-row: 1 / -1;
+    justify-content: center;
+  }
+
+  .headerCell:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .headerCell:last-child {
+    display: none;
   }
 
   .heroStatCard {
@@ -498,6 +580,6 @@
 
 @media (min-width: 90rem) {
   .displayPage .layout {
-    grid-template-columns: minmax(0, 13.75rem) minmax(0, 1fr) minmax(0, 13.75rem);
+    grid-template-columns: clamp(11rem, 14vw, 13.75rem) minmax(0, 1fr) clamp(11rem, 14vw, 13.75rem);
   }
 }

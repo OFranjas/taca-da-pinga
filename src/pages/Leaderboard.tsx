@@ -10,7 +10,7 @@ import styles from './Leaderboard.module.css';
 import { LeaderboardRow } from '../components/LeaderboardRow';
 
 const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
-const LAPTOP_ROW_METRICS = { height: 64, gap: 8 };
+const LAPTOP_ROW_METRICS = { height: 44, gap: 2 };
 const VIRTUALIZE_THRESHOLD = 50;
 const VISIBLE_WINDOW = 18;
 const BUFFER = 6;
@@ -18,8 +18,6 @@ const MAX_RENDERED_ROWS = VISIBLE_WINDOW + BUFFER * 2;
 const DISPLAY_PINNED_ROWS = 5;
 const DISPLAY_SCROLL_PX_PER_SECOND = 30;
 const DISPLAY_SCROLL_PAUSE_MS = 2200;
-
-const numberFormatter = new Intl.NumberFormat('pt-PT');
 
 const skeletonRows = Array.from({ length: 8 }, (_, index) => index);
 
@@ -108,6 +106,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const [isCompactViewport, setIsCompactViewport] = useState(false);
   const [isLaptopViewport, setIsLaptopViewport] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const displayScrollListRef = useRef<HTMLDivElement | null>(null);
   const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
@@ -217,47 +216,53 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     }
 
     const container = scrollRef.current;
-    if (!container) {
+    const list = displayScrollListRef.current;
+    if (!container || !list) {
       return;
     }
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-    if (reduceMotion) {
+    if (reduceMotion || typeof list.animate !== 'function') {
       return;
     }
 
-    let frameId = 0;
     let pauseTimeoutId = 0;
     let direction: 1 | -1 = 1;
+    let currentOffset = 0;
+    let activeAnimation: Animation | null = null;
 
     const getMaxScrollTop = () => Math.max(0, container.scrollHeight - container.clientHeight);
+    const applyOffset = (offset: number) => {
+      list.style.transform = `translate3d(0, -${offset}px, 0)`;
+    };
 
-    const animateTo = (targetScrollTop: number) => {
-      window.cancelAnimationFrame(frameId);
-      const startScrollTop = container.scrollTop;
-      const distance = Math.abs(targetScrollTop - startScrollTop);
+    const animateTo = (targetOffset: number) => {
+      activeAnimation?.cancel();
+      const startOffset = currentOffset;
+      const distance = Math.abs(targetOffset - startOffset);
       const duration = Math.max(2600, (distance / DISPLAY_SCROLL_PX_PER_SECOND) * 1000);
-      let startTime = 0;
 
-      const step = (timestamp: number) => {
-        if (!startTime) {
-          startTime = timestamp;
-        }
+      const animation = list.animate(
+        [
+          { transform: `translate3d(0, -${startOffset}px, 0)` },
+          { transform: `translate3d(0, -${targetOffset}px, 0)` },
+        ],
+        { duration, easing: 'linear', fill: 'forwards' }
+      );
+      activeAnimation = animation;
 
-        const progress = Math.min(1, (timestamp - startTime) / duration);
-        container.scrollTop = startScrollTop + (targetScrollTop - startScrollTop) * progress;
-
-        if (progress < 1) {
-          frameId = window.requestAnimationFrame(step);
+      animation.onfinish = () => {
+        if (activeAnimation !== animation) {
           return;
         }
 
-        container.scrollTop = targetScrollTop;
+        currentOffset = targetOffset;
+        applyOffset(currentOffset);
+        animation.cancel();
+        activeAnimation = null;
         direction = direction === 1 ? -1 : 1;
         pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
       };
-
-      frameId = window.requestAnimationFrame(step);
     };
 
     const scheduleNextScroll = () => {
@@ -270,14 +275,13 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
       animateTo(direction === 1 ? maxScrollTop : 0);
     };
 
-    container.scrollTop = 0;
-    frameId = window.requestAnimationFrame(() => {
-      pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
-    });
+    applyOffset(0);
+    pauseTimeoutId = window.setTimeout(scheduleNextScroll, DISPLAY_SCROLL_PAUSE_MS);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      activeAnimation?.cancel();
       window.clearTimeout(pauseTimeoutId);
+      list.style.transform = '';
     };
   }, [displayMode, teams.length]);
 
@@ -310,7 +314,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     [teams]
   );
 
-  const totalPingas = useMemo(() => teams.reduce((total, team) => total + team.pingas, 0), [teams]);
   const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
   const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
 
@@ -329,7 +332,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
   const sponsorLoopItemTarget =
     canAnimateSponsorRails && largestSponsorRail === 3 ? 4 : largestSponsorRail || undefined;
 
-  const tableAriaLabel = 'Classificação geral das equipas por pingas acumuladas';
+  const tableAriaLabel = 'Classificação geral das equipas por pingas em escala relativa';
 
   return (
     <>
@@ -390,14 +393,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                         ? '1 equipa em prova'
                         : `${teams.length} equipas em prova`}
                     </Text>
-                    <div className={styles.totalBadge} aria-label="Total de pingas registadas">
-                      <Text as="span" variant="label" tone="muted">
-                        Total de Pingas
-                      </Text>
-                      <Text as="span" variant="heading" weight="bold" className={styles.totalValue}>
-                        {numberFormatter.format(totalPingas)}
-                      </Text>
-                    </div>
                   </div>
                 </Stack>
 
@@ -444,10 +439,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                           <span role="columnheader" className={styles.headerCell}>
                             Equipa
                           </span>
-                          <span
-                            role="columnheader"
-                            className={`${styles.headerCell} ${styles.headerCellEnd}`}
-                          >
+                          <span role="columnheader" className={styles.headerCell}>
                             Pingas
                           </span>
                         </div>
@@ -465,12 +457,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
                                   ariaRowIndex={index + 2}
-                                  numberFormatter={numberFormatter}
                                 />
                               ))}
                             </div>
                             {displayScrollableTeams.length > 0 ? (
-                              <div className={styles.fullList} role="presentation">
+                              <div
+                                ref={displayScrollListRef}
+                                className={styles.fullList}
+                                role="presentation"
+                              >
                                 {displayScrollableTeams.map((team, index) => (
                                   <LeaderboardRow
                                     key={team.id}
@@ -479,7 +474,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                     pingas={team.pingas}
                                     maxPingas={maxPingas}
                                     ariaRowIndex={index + DISPLAY_PINNED_ROWS + 2}
-                                    numberFormatter={numberFormatter}
                                   />
                                 ))}
                               </div>
@@ -504,7 +498,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
                                   ariaRowIndex={virtualState.startIndex + index + 2}
-                                  numberFormatter={numberFormatter}
                                 />
                               ))}
                             </div>
@@ -519,7 +512,6 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                 pingas={team.pingas}
                                 maxPingas={maxPingas}
                                 ariaRowIndex={index + 2}
-                                numberFormatter={numberFormatter}
                               />
                             ))}
                           </div>
