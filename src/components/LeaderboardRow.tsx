@@ -81,7 +81,8 @@ export function LeaderboardRow({
   const safePingas = Number.isFinite(pingas) ? Math.max(0, Math.floor(pingas)) : 0;
   const safeMax = Number.isFinite(maxPingas) ? Math.max(0, Math.floor(maxPingas)) : 0;
   const fillPercent = safeMax > 0 ? clampPercentage((safePingas / safeMax) * 100) : 0;
-  const roundedFillPercent = Math.round(fillPercent);
+  const isReferenceValue = safeMax > 0 && safePingas === safeMax;
+  const roundedFillPercent = isReferenceValue ? 100 : Math.min(99, Math.round(fillPercent));
   const tone = getTone(rank);
 
   const style = {

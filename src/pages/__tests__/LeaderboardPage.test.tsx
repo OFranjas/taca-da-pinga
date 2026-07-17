@@ -154,6 +154,26 @@ describe('Leaderboard page', () => {
     expect(screen.queryByText('Total de Pingas')).not.toBeInTheDocument();
   });
 
+  it('does not announce a near-tied trailing team as the reference value', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([
+        { id: 'leader', name: 'Leader Squad', pingas: 201 },
+        { id: 'trailing', name: 'Trailing Squad', pingas: 200 },
+      ]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    const meters = await screen.findAllByRole('meter');
+
+    expect(meters.map((meter) => meter.getAttribute('aria-valuenow'))).toEqual(['100', '99']);
+    expect(meters.map((meter) => meter.getAttribute('aria-valuetext'))).toEqual([
+      'Leader Squad está no valor de referência',
+      'Trailing Squad está a 99% do valor da equipa líder',
+    ]);
+  });
+
   it('shows the empty state when there are no teams', async () => {
     observeLeaderboardMock.mockImplementation((callback) => {
       callback([]);
