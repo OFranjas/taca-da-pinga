@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 import SponsorsRail from '../SponsorsRail';
 
@@ -89,5 +89,41 @@ describe('SponsorsRail', () => {
     render(<SponsorsRail sponsors={sponsors} loopItemTarget={3} />);
 
     expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  test('resets the rail to its scroll origin when reduced motion is enabled', () => {
+    let mediaQueryListener;
+    const mediaQuery = {
+      matches: false,
+      addEventListener: vi.fn((_event, listener) => {
+        mediaQueryListener = listener;
+      }),
+      removeEventListener: vi.fn(),
+    };
+    const frames = new Map();
+    let frameId = 0;
+    const requestAnimationFrame = vi.fn((callback) => {
+      frameId += 1;
+      frames.set(frameId, callback);
+      return frameId;
+    });
+
+    vi.stubGlobal('requestAnimationFrame', requestAnimationFrame);
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
+    vi.stubGlobal('matchMedia', () => mediaQuery);
+
+    const { container } = render(<SponsorsRail sponsors={sponsors} loopItemTarget={3} />);
+    const track = container.querySelector('[class*="stack"]');
+
+    frames.get(1)(0);
+    frames.get(2)(100);
+    expect(track).toHaveStyle('transform: translate3d(0, -1.1px, 0)');
+
+    mediaQuery.matches = true;
+    act(() => mediaQueryListener());
+
+    expect(window.cancelAnimationFrame).toHaveBeenCalledWith(3);
+    expect(track).toHaveStyle('transform:');
+    expect(window.requestAnimationFrame).toHaveBeenCalledTimes(3);
   });
 });

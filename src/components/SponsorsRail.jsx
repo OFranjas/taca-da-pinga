@@ -90,6 +90,12 @@ export default function SponsorsRail({
       return undefined;
     }
 
+    if (prefersReducedMotion) {
+      loopProgressRef.current = 0;
+      track.style.transform = '';
+      return undefined;
+    }
+
     let frameId = 0;
     let previousTime;
     let offset = loopProgressRef.current * cycleExtent;
@@ -115,7 +121,7 @@ export default function SponsorsRail({
 
     applyOffset();
 
-    if (isPaused || prefersReducedMotion) {
+    if (isPaused) {
       return () => {
         loopProgressRef.current = offset / cycleExtent;
       };
