@@ -17,8 +17,13 @@ export default function SponsorsRail({
   const viewportRef = React.useRef(null);
   const cycleRef = React.useRef(null);
   const trackRef = React.useRef(null);
-  const isPausedRef = React.useRef(false);
   const loopProgressRef = React.useRef(0);
+  const [isPaused, setIsPaused] = React.useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(() =>
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false
+  );
   const items = React.useMemo(
     () =>
       sponsors.length
@@ -60,17 +65,31 @@ export default function SponsorsRail({
     pixelsPerSecond: AUTO_SCROLL_SPEED,
     viewportRef,
   });
+
   React.useEffect(() => {
-    if (!shouldLoop || !cycleExtent) {
+    const mediaQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!mediaQuery) {
       return undefined;
     }
 
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener?.('change', updatePreference);
+
+    return () => mediaQuery.removeEventListener?.('change', updatePreference);
+  }, []);
+
+  React.useEffect(() => {
     const track = trackRef.current;
     if (!track) {
       return undefined;
     }
 
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!shouldLoop || !cycleExtent) {
+      track.style.transform = '';
+      return undefined;
+    }
+
     let frameId = 0;
     let previousTime;
     let offset = loopProgressRef.current * cycleExtent;
@@ -87,37 +106,48 @@ export default function SponsorsRail({
       const elapsedSeconds = Math.min((time - previousTime) / 1000, 0.05);
       previousTime = time;
 
-      if (!isPausedRef.current && !reducedMotion?.matches) {
-        offset = (offset + elapsedSeconds * AUTO_SCROLL_SPEED) % cycleExtent;
-        loopProgressRef.current = offset / cycleExtent;
-        applyOffset();
-      }
+      offset = (offset + elapsedSeconds * AUTO_SCROLL_SPEED) % cycleExtent;
+      loopProgressRef.current = offset / cycleExtent;
+      applyOffset();
 
       frameId = window.requestAnimationFrame(tick);
     };
 
     applyOffset();
+
+    if (isPaused || prefersReducedMotion) {
+      return () => {
+        loopProgressRef.current = offset / cycleExtent;
+      };
+    }
+
     frameId = window.requestAnimationFrame(tick);
 
     return () => {
       loopProgressRef.current = offset / cycleExtent;
       window.cancelAnimationFrame(frameId);
-      track.style.transform = '';
     };
-  }, [cycleExtent, shouldLoop]);
+  }, [cycleExtent, isPaused, prefersReducedMotion, shouldLoop]);
+
+  React.useEffect(
+    () => () => {
+      trackRef.current?.style.removeProperty('transform');
+    },
+    []
+  );
 
   if (!items.length) return null;
 
   const pauseLoop = () => {
-    isPausedRef.current = true;
+    setIsPaused(true);
   };
 
   const resumeLoop = (event) => {
-    if (event.currentTarget.contains(event.relatedTarget)) {
+    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
       return;
     }
 
-    isPausedRef.current = false;
+    setIsPaused(false);
   };
 
   const renderItem = (item, index, isDuplicate) => {

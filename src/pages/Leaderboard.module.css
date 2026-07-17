@@ -545,12 +545,33 @@
   }
 
   .headerRow {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-rows: min-content min-content;
+    align-content: center;
+    row-gap: 0.4rem;
     padding-left: var(--ui-space-sm);
     padding-right: var(--ui-space-sm);
   }
 
+  .headerCell:first-child {
+    grid-row: 1 / -1;
+    justify-content: center;
+  }
+
+  .headerCell:nth-child(2),
   .headerCell:last-child {
-    justify-content: flex-end;
+    grid-column: 2;
+  }
+
+  .headerCell:nth-child(2) {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .headerCell:last-child {
+    grid-row: 2;
+    align-self: start;
+    justify-content: flex-start;
   }
 
   .heroStatCard {
