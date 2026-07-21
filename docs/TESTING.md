@@ -68,6 +68,7 @@ git grep "from 'firebase/firestore'" src/components src/pages
 
 Rules tests live under `rules-tests/` and run via `yarn test:rules`.
 
-The service validates dynamic drink receipt consistency. The current client-write
-rules intentionally cannot prove an arbitrary receipt item sum, but continue to
-enforce admin-only writes and the authoritative 1–50 positive team increment.
+The service validates the immutable drink receipt. Firestore rules mirror the
+fixed Phase 1 catalogue and enforce that each `drinkTotals` quantity/pinga delta
+uses the configured value and that the combined projection delta matches the
+authoritative 1–50 team-score increment.

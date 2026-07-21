@@ -100,6 +100,18 @@ describe('Firestore security rules', () => {
     // Metadata-only updates are allowed.
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
 
+    // Teams start with no score and no attributed drinks.
+    await assertFails(
+      setDoc(doc(adminDb, 'teams/non-zero'), { name: 'Non-zero', pingas: 1 })
+    );
+    await assertFails(
+      setDoc(doc(adminDb, 'teams/unknown-drink'), {
+        name: 'Unknown drink',
+        pingas: 0,
+        drinkTotals: { cocktail: { quantity: 0, pingas: 0 } },
+      })
+    );
+
     // Allowed increments 1..50
     await assertSucceeds(
       updateDoc(doc(adminDb, 'teams/a1'), {
@@ -111,9 +123,42 @@ describe('Firestore security rules', () => {
 
     // A direct projection edit cannot bypass the bounded score increment.
     await assertFails(updateDoc(doc(adminDb, 'teams/a1'), { 'drinkTotals.light.quantity': 2 }));
+    // A score update must have a matching drink projection delta.
+    await assertFails(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 2 }));
 
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 3 })); // 1 -> 3 (+2)
-    await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
+    await assertSucceeds(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        pingas: 3,
+        'drinkTotals.light.quantity': 3,
+        'drinkTotals.light.pingas': 3,
+      })
+    ); // 1 -> 3 (+2)
+    await assertSucceeds(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        pingas: 53,
+        'drinkTotals.light.quantity': 4,
+        'drinkTotals.light.pingas': 4,
+        'drinkTotals.white-spirit.quantity': 1,
+        'drinkTotals.white-spirit.pingas': 5,
+        'drinkTotals.metro.quantity': 4,
+        'drinkTotals.metro.pingas': 44,
+      })
+    ); // 3 -> 53 (+50)
+
+    await assertFails(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        pingas: 54,
+        'drinkTotals.light.quantity': 5,
+        'drinkTotals.light.pingas': 10,
+      })
+    ); // score and projection deltas must agree
+    await assertFails(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        pingas: 54,
+        'drinkTotals.cocktail.quantity': 1,
+        'drinkTotals.cocktail.pingas': 1,
+      })
+    ); // only configured drink IDs may be projected
 
     // Out-of-range increments denied (>50)
     const { db: seedDb } = makeAdminDb('increment-seed');
@@ -121,7 +166,14 @@ describe('Firestore security rules', () => {
     await assertFails(updateDoc(doc(adminDb, 'teams/b1'), { pingas: 51 })); // 0 -> 51 (+51)
 
     // Negative increments denied; totals never negative
-    await setDoc(doc(seedDb, 'teams/c1'), { name: 'C', pingas: 2 });
+    await setDoc(doc(seedDb, 'teams/c1'), { name: 'C', pingas: 0 });
+    await assertSucceeds(
+      updateDoc(doc(seedDb, 'teams/c1'), {
+        pingas: 2,
+        'drinkTotals.light.quantity': 2,
+        'drinkTotals.light.pingas': 2,
+      })
+    );
     await assertFails(updateDoc(doc(adminDb, 'teams/c1'), { pingas: 1 })); // 2 -> 1 (-1)
     await assertFails(updateDoc(doc(adminDb, 'teams/c1'), { pingas: -1 })); // negative total
 
