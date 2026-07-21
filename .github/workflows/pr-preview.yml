@@ -7,15 +7,17 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  preview:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+  build:
+    # The PR head is intentionally built without deploy credentials.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     env:
@@ -93,6 +95,57 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         run: yarn build
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: build
+    # Only trusted base-branch tooling receives the Firebase service account.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+
+    env:
+      PREVIEW_CHANNEL: preview
+      PREVIEW_SOURCE_SITE: taca-da-pinga
+      PREVIEW_STATIC_SITE: preview-taca-da-pinga
+      PREVIEW_CUSTOM_DOMAIN: preview-taca-da-pinga.web.app
+      FIREBASE_DEFAULT_PROJECT: taca-da-pinga
+
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Install trusted deploy tooling
+        run: yarn install --immutable --mode=skip-build
+
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-dist
+          path: dist
 
       - name: Configure Firebase credentials
         env:
