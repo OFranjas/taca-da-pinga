@@ -21,7 +21,8 @@
 
 The `Deploy Production` workflow runs automatically after a merge to
 `production`. It validates, builds, deploys Firestore rules and indexes, then
-deploys Firebase Hosting.
+deploys the `taca-da-pinga` Firebase Hosting site. Manual workflow runs are
+allowed only when the selected ref is `production`.
 
 Configure the GitHub **production** environment with the `PRODUCTION_*` secrets
 listed in [CONFIG.md](CONFIG.md#github-secrets). The service account needs

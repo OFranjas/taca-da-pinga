@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     environment: production
 
@@ -115,4 +116,4 @@ jobs:
       - name: Deploy hosting (production)
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.PRODUCTION_FIREBASE_PROJECT_ID }}
-        run: ./node_modules/.bin/firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID"
+        run: ./node_modules/.bin/firebase deploy --only hosting:taca-da-pinga --project "$FIREBASE_PROJECT_ID"
