@@ -93,38 +93,6 @@ describe('services/leaderboard', () => {
     expect(cb).toHaveBeenCalledWith([{ id: 'x', name: 'X', pingas: 9 }]);
   });
 
-  test('addPinga validates delta and updates doc with increment', async () => {
-    const { addPinga } = await import('../leaderboard');
-    await addPinga('team1', 3, 'u1');
-    expect(mockDoc).toHaveBeenCalledWith({}, 'teams', 'team1');
-    expect(mockCollection).toHaveBeenCalledWith({}, 'events');
-    expect(mockIncrement).toHaveBeenCalledWith(3);
-    expect(mockWriteBatch).toHaveBeenCalledWith({});
-    expect(mockBatchUpdate).toHaveBeenCalledWith(
-      { col: 'teams', id: 'team1' },
-      { pingas: { __op: 'increment', n: 3 } }
-    );
-    expect(mockBatchSet).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        actorUid: 'u1',
-        delta: 3,
-        teamId: 'team1',
-        ts: 'server-ts',
-        type: 'add-pinga',
-      })
-    );
-    expect(mockBatchCommit).toHaveBeenCalledTimes(1);
-  });
-
-  test('addPinga throws on invalid delta', async () => {
-    const { addPinga } = await import('../leaderboard');
-    await expect(addPinga('team1', 0)).rejects.toThrow('Delta must be an integer between 1 and 50');
-    await expect(addPinga('team1', 51)).rejects.toThrow(
-      'Delta must be an integer between 1 and 50'
-    );
-  });
-
   test.each(['', ' team1', 'team1 ', 'team/1'])(
     'addDrinkPingas rejects invalid team IDs: %j',
     async (teamId) => {

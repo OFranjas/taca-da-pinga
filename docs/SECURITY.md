@@ -55,9 +55,9 @@ service cloud.firestore {
   ordering is bounded from 0 to 999.
 - Drink scoring is service-owned: the service validates active catalogue IDs,
   quantities, derived line deltas, duplicate consolidation, and receipt/projection
-  consistency before committing one batch. Rules do not attempt to validate
-  arbitrary dynamic receipt sums, but still enforce authorization and the score
-  increment bound.
+  consistency before committing one batch. Firestore rules mirror the fixed
+  Phase 1 drink catalogue and enforce the quantity/pinga arithmetic and total
+  score delta for its `drinkTotals` projection.
 
 ## Logging & Audit
 

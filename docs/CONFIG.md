@@ -75,6 +75,9 @@ lowercase kebab-case `id`, Portuguese `name`, positive integer `pingaValue`,
 `active` flag, `order`, a typed fallback `icon`, and optional local `imageSrc`.
 The catalogue is bundled with the application; it is not read from `app_config`
 or Firestore. IDs must not be renamed or recycled after scoring data uses them.
+The Firestore rules mirror the active Phase 1 IDs and pinga values so they can
+authoritatively validate the stored `drinkTotals` projection; update the rules
+and their emulator tests whenever this catalogue changes.
 
 Each submission uses the derived catalogue total and must be between 1 and 50
 pingas. The UI, service, and Firestore Rules enforce this bound.

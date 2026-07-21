@@ -22,22 +22,81 @@ service cloud.firestore {
       return isDataUrl(dataUrl) && dataUrl.size() <= maxImgLen();
     }
 
+    // The Phase 1 drinks catalogue is deliberately mirrored here so that the
+    // client-maintained team projection remains verifiable at the trust boundary.
+    function drinkTotals(data) {
+      return data.get('drinkTotals', {});
+    }
+
+    function drinkQuantity(totals, drinkId) {
+      return totals.get(drinkId, {}).get('quantity', 0);
+    }
+
+    function drinkPingas(totals, drinkId) {
+      return totals.get(drinkId, {}).get('pingas', 0);
+    }
+
+    function isValidDrinkTotal(totals, drinkId, pingaValue) {
+      let total = totals.get(drinkId, {});
+      return total is map &&
+        total.keys().hasOnly(['quantity', 'pingas']) &&
+        drinkQuantity(totals, drinkId) is int && drinkQuantity(totals, drinkId) >= 0 &&
+        drinkPingas(totals, drinkId) is int && drinkPingas(totals, drinkId) >= 0 &&
+        drinkPingas(totals, drinkId) == drinkQuantity(totals, drinkId) * pingaValue;
+    }
+
+    function hasValidDrinkTotals(totals) {
+      return totals is map &&
+        totals.keys().hasOnly(['light', 'white-spirit', 'metro']) &&
+        isValidDrinkTotal(totals, 'light', 1) &&
+        isValidDrinkTotal(totals, 'white-spirit', 5) &&
+        isValidDrinkTotal(totals, 'metro', 11);
+    }
+
+    function hasEmptyDrinkTotals(totals) {
+      return totals is map && totals.keys().size() == 0;
+    }
+
+    function drinkDeltaMatchesValue(before, after, drinkId, pingaValue) {
+      return drinkQuantity(after, drinkId) >= drinkQuantity(before, drinkId) &&
+        drinkPingas(after, drinkId) >= drinkPingas(before, drinkId) &&
+        drinkPingas(after, drinkId) - drinkPingas(before, drinkId) ==
+          (drinkQuantity(after, drinkId) - drinkQuantity(before, drinkId)) * pingaValue;
+    }
+
+    function drinkPingasDelta(before, after) {
+      return (drinkPingas(after, 'light') - drinkPingas(before, 'light')) +
+        (drinkPingas(after, 'white-spirit') - drinkPingas(before, 'white-spirit')) +
+        (drinkPingas(after, 'metro') - drinkPingas(before, 'metro'));
+    }
+
+    function hasValidDrinkProjectionUpdate() {
+      let before = drinkTotals(resource.data);
+      let after = drinkTotals(request.resource.data);
+      return hasValidDrinkTotals(after) &&
+        drinkDeltaMatchesValue(before, after, 'light', 1) &&
+        drinkDeltaMatchesValue(before, after, 'white-spirit', 5) &&
+        drinkDeltaMatchesValue(before, after, 'metro', 11) &&
+        drinkPingasDelta(before, after) ==
+          request.resource.data.pingas - resource.data.pingas;
+    }
+
     // Leaderboard (teams) — public READ, admin WRITE with invariants
     match /teams/{teamId} {
       allow read: if true;
 
       // Create/update/delete only by admins
       allow create: if isAdmin() &&
-        // New documents must start with non-negative total
-        (!('pingas' in request.resource.data) ||
-          (request.resource.data.pingas is int && request.resource.data.pingas >= 0));
+        // New teams begin with no score and an empty (or absent) projection.
+        request.resource.data.pingas is int && request.resource.data.pingas == 0 &&
+        hasEmptyDrinkTotals(drinkTotals(request.resource.data));
 
       allow update: if isAdmin() && (
         // Metadata-only edits are allowed, but the service-owned drink projection
         // cannot change without a score increment.
         (
-          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['pingas'])) &&
-          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['drinkTotals']))
+          !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['pingas'])) &&
+          !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['drinkTotals']))
         ) ||
         // If pingas changes, enforce bounds and positivity, and types
         (
@@ -46,13 +105,10 @@ service cloud.firestore {
           request.resource.data.pingas >= 0 &&
           request.resource.data.pingas > resource.data.pingas &&
           (request.resource.data.pingas - resource.data.pingas) >= 1 &&
-          (request.resource.data.pingas - resource.data.pingas) <= 50
+          (request.resource.data.pingas - resource.data.pingas) <= 50 &&
+          hasValidDrinkProjectionUpdate()
         )
       );
-
-      // The service validates drinkTotals arithmetic and receipt consistency.
-      // Rules preserve authorization and the total increment bound, but cannot
-      // prove that arbitrary dynamic receipt items sum to this projection.
 
       allow delete: if isAdmin();
     }
