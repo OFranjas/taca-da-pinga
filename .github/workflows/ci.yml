@@ -47,7 +47,7 @@ jobs:
         run: yarn lint
 
       - name: Typecheck
-        run: yarn typecheck || true
+        run: yarn typecheck
 
       - name: Unit tests
         run: yarn test:ci
