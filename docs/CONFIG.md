@@ -30,9 +30,11 @@ The CI/CD workflows rely on the same Firebase configuration. Add these repositor
 
 > The service account must be able to create Hosting channels/sites and deploy Firestore rules (e.g. roles: `Firebase Hosting Admin` + `Firebase Rules Admin`).
 
-## Runtime Config
+## Runtime Data
 
-- Admin allowlist: `app_config/admins` document in Firestore (or custom claim `admin`).
+- Admin authorization is exclusively controlled by the Firebase Auth custom
+  claim `admin: true`. The app and Firestore rules do not consult an
+  `app_config/admins` allowlist.
 - Collections:
   - `teams`: { id, name, pingas, drinkTotals }
     - `pingas` remains the public leaderboard total.
@@ -68,6 +70,12 @@ reset plan. Do not run destructive deletion commands by default.
 
 - Separate Firebase projects for `develop` and `production`.
 - Never reuse prod keys locally.
+
+## PWA cache behaviour
+
+Production builds register a service worker that caches the application shell
+and runtime static assets. Firestore data remains live and network-backed, so
+the leaderboard and admin tools are not supported as offline data-entry tools.
 
 ## Admin claims configuration
 

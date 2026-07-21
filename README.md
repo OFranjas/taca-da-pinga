@@ -1,6 +1,6 @@
 # 🏆 Taça da Pinga
 
-> Real-time leaderboard app for a friendly football tournament — with beer points instead of goals 🍺
+> A real-time tournament leaderboard for tracking drinks as **pingas** 🍺
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)[![Firebase](https://img.shields.io/badge/Firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)[![Recharts](https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)](https://recharts.org/)[![CSS Modules](https://img.shields.io/badge/CSS%20Modules-000000?style=for-the-badge&logo=css3&logoColor=white)](https://github.com/css-modules/css-modules)
 ![Firebase Hosting](https://img.shields.io/badge/Hosted%20on-Firebase%20Hosting-orange?style=for-the-badge&logo=firebase)
@@ -10,22 +10,34 @@
 ![CI](https://github.com/OFranjas/taca-da-pinga/actions/workflows/ci.yml/badge.svg)
 [![License: MIT](https://cdn.prod.website-files.com/5e0f1144930a8bc8aace526c/65dd9eb5aaca434fac4f1c34_License-MIT-blue.svg)](/LICENSE)
 
-A small web application built with **React** and **Firebase** to manage a fun "beer points" leaderboard for a local football tournament.  
-Participants can see the leaderboard in real-time, and admins can add points (_pingas_) from a protected admin panel.
+A React and Firebase app for live tournament scoring. Visitors can follow the leaderboard without signing in; authorised administrators manage teams, score configured drinks, update tournament branding and manage sponsor placements.
 
-Originally developed in a couple of days as a request for a friend, this project also served as a hands-on opportunity to practice **React** development, **Firebase** integration, and responsive UI design.
-
-🚀 <a href="https://taca-da-pinga.web.app/" target="_blank"><strong>Click here to view the live demo</strong></a> 🚀
+**Live site:** [taca-da-pinga.web.app](https://taca-da-pinga.web.app/)
 
 ---
 
 ## ✨ Features
 
-- **Real-time Leaderboard** – Updates instantly as scores change.
-- **Admin Panel** – Secure login for managing teams and recording configured drinks with their pinga values.
-- **Responsive Design** – Optimized for desktop, TV display, and mobile.
-- **Firebase Integration** – Authentication & Firestore database.
-- **Sponsor Rail** – Displays tournament sponsors.
+- **Live leaderboard** – Teams update immediately as scores are recorded, with responsive comparison bars.
+- **Drink scoring** – Admins record configured drinks; the app derives the pinga total and preserves a per-drink breakdown.
+- **Admin tools** – Create and manage teams, edit sponsors, and update the tournament logo and icon.
+- **Display mode** – A presentation-focused `/display` route for a TV or shared screen.
+- **Sponsor rails** – Accessible, motion-aware sponsor presentation across desktop, display and mobile layouts.
+- **PWA support** – Installable app shell and service worker for a more app-like tournament experience.
+
+See [the admin guide](docs/ADMIN.md) for the operational workflow and [the drinks catalogue](docs/CONFIG.md#developer-owned-drinks-catalogue) for the currently configured scores.
+
+## Routes
+
+| Route                 | Purpose                                                  | Access     |
+| --------------------- | -------------------------------------------------------- | ---------- |
+| `/`                   | Tournament home and sponsor presentation                 | Public     |
+| `/leaderboard`        | Interactive live leaderboard                             | Public     |
+| `/display` (or `/tv`) | Presentation-first leaderboard for a TV or shared screen | Public     |
+| `/admin`              | Scoring, teams and sponsor management                    | Admin only |
+| `/admin/branding`     | Logo and icon management                                 | Admin only |
+
+The service worker is registered only in production builds. It caches the app shell for installation and faster repeat visits, but live Firebase data still requires a network connection.
 
 ---
 
@@ -92,7 +104,10 @@ Builds the app for production to the `dist` folder (Vite). Use `yarn preview` to
 ```
 yarn test        # unit + component (Vitest)
 yarn test:ci     # CI mode with coverage
-npm run test:rules  # Firestore security rules (emulator)
+yarn test:rules  # Firestore security rules (emulator)
+yarn lint        # lint source files
+yarn typecheck   # TypeScript checks
+yarn build       # production build
 ```
 
 ## 🔀 Branching Model
@@ -138,13 +153,14 @@ yarn --cwd rules-tests test
 Admin-only Firestore writes are gated by a custom claim: `admin: true`.  
 Grant/revoke admin locally (no Cloud Functions required). See [docs/DEV.md](docs/DEV.md#admin-custom-claims).
 
-## Runbook
+## Documentation
 
-- Local dev: [docs/DEV.md](docs/DEV.md)
-- Config/env: [docs/CONFIG.md](docs/CONFIG.md)
-- Testing: [docs/TESTING.md](docs/TESTING.md)
-- Release: [docs/RELEASE.md](docs/RELEASE.md)
-- Security: [docs/SECURITY.md](docs/SECURITY.md)
+- [Admin guide](docs/ADMIN.md) – daily tournament operations and access.
+- [Developer guide](docs/DEV.md) – local setup, emulators and admin-claim tooling.
+- [Configuration](docs/CONFIG.md) – Firebase environments, secrets and data model.
+- [Testing](docs/TESTING.md) – test commands and Firestore invariants.
+- [Release](docs/RELEASE.md) – production checklist and rollback.
+- [Security](docs/SECURITY.md) – security model and operational boundaries.
 
 ## 📄 License
 
