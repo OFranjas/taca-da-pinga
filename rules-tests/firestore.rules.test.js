@@ -111,6 +111,13 @@ describe('Firestore security rules', () => {
         drinkTotals: { cocktail: { quantity: 0, pingas: 0 } },
       })
     );
+    await assertFails(
+      setDoc(doc(adminDb, 'teams/prepopulated-total'), {
+        name: 'Pre-populated total',
+        pingas: 0,
+        drinkTotals: { light: { quantity: 1, pingas: 1 } },
+      })
+    );
 
     // Allowed increments 1..50
     await assertSucceeds(

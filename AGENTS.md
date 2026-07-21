@@ -12,7 +12,7 @@ Purpose: This file briefs AI coding agents (e.g., Codex) on how to work in this 
   - `taca-da-pinga` (main)
   - `preview-taca-da-pinga` (PR previews)
   - `develop-taca-da-pinga` (auto-deploy for develop)
-- Services: `src/services/leaderboard.js` (getLeaderboard, observeLeaderboard, addPinga, listEvents), `src/services/teams.js` (observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam).
+- Services: `src/services/leaderboard.js` (getLeaderboard, observeLeaderboard, addDrinkPingas, listEvents), `src/services/teams.js` (observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam).
 
 ## Branching & PR Rules
 

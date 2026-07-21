@@ -29,26 +29,6 @@ export function observeLeaderboard(callback) {
   });
 }
 
-export async function addPinga(teamId, delta, _actorUid) {
-  // Enforce service-level guardrails; rules will enforce too.
-  const n = Number(delta);
-  if (!Number.isInteger(n) || n < 1 || n > 50) {
-    throw new Error('Delta must be an integer between 1 and 50');
-  }
-  const ref = doc(db, 'teams', teamId);
-  const eventRef = doc(collection(db, 'events'));
-  const batch = writeBatch(db);
-  batch.update(ref, { pingas: increment(n) });
-  batch.set(eventRef, {
-    ts: serverTimestamp(),
-    actorUid: _actorUid ?? null,
-    type: 'add-pinga',
-    delta: n,
-    teamId,
-  });
-  await batch.commit();
-}
-
 const SAFE_DRINK_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function validateTeamId(teamId) {

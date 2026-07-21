@@ -53,6 +53,10 @@ service cloud.firestore {
         isValidDrinkTotal(totals, 'metro', 11);
     }
 
+    function hasEmptyDrinkTotals(totals) {
+      return totals is map && totals.keys().size() == 0;
+    }
+
     function drinkDeltaMatchesValue(before, after, drinkId, pingaValue) {
       return drinkQuantity(after, drinkId) >= drinkQuantity(before, drinkId) &&
         drinkPingas(after, drinkId) >= drinkPingas(before, drinkId) &&
@@ -85,7 +89,7 @@ service cloud.firestore {
       allow create: if isAdmin() &&
         // New teams begin with no score and an empty (or absent) projection.
         request.resource.data.pingas is int && request.resource.data.pingas == 0 &&
-        hasValidDrinkTotals(drinkTotals(request.resource.data));
+        hasEmptyDrinkTotals(drinkTotals(request.resource.data));
 
       allow update: if isAdmin() && (
         // Metadata-only edits are allowed, but the service-owned drink projection
