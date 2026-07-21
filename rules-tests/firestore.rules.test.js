@@ -99,6 +99,13 @@ describe('Firestore security rules', () => {
 
     // Metadata-only updates are allowed.
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { name: 'Alpha' }));
+    // Legacy teams without a projection cannot add one outside a score update.
+    await assertFails(
+      updateDoc(doc(adminDb, 'teams/a1'), {
+        'drinkTotals.light.quantity': 1,
+        'drinkTotals.light.pingas': 1,
+      })
+    );
 
     // Teams start with no score and no attributed drinks.
     await assertFails(

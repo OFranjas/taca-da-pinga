@@ -95,8 +95,8 @@ service cloud.firestore {
         // Metadata-only edits are allowed, but the service-owned drink projection
         // cannot change without a score increment.
         (
-          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['pingas'])) &&
-          !(request.resource.data.diff(resource.data).changedKeys().hasAny(['drinkTotals']))
+          !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['pingas'])) &&
+          !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['drinkTotals']))
         ) ||
         // If pingas changes, enforce bounds and positivity, and types
         (
