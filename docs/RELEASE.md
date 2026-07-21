@@ -26,9 +26,9 @@ allowed only when the selected ref is `production`.
 
 Configure the GitHub **production** environment with the `PRODUCTION_*` secrets
 listed in [CONFIG.md](CONFIG.md#github-secrets). The service account needs
-Firebase Hosting Admin and Firebase Rules Admin permissions for that production
-project. Required reviewers are optional if a post-merge approval gate is
-desired.
+Firebase Hosting Admin, Firebase Rules Admin, and Cloud Datastore Index Admin
+(`roles/datastore.indexAdmin`) permissions for that production project. Required
+reviewers are optional if a post-merge approval gate is desired.
 
 ## Post-deploy verification
 

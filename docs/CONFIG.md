@@ -31,7 +31,9 @@ workflow.
 | `FIREBASE_SERVICE_ACCOUNT`          | ✅       | JSON service account with Hosting + Firestore Rules deploy permissions           |
 | `FIREBASE_PROJECT_ID`               | ⬜       | Override when the repo default project differs from the service account defaults |
 
-> The service account must be able to create Hosting channels/sites and deploy Firestore rules (e.g. roles: `Firebase Hosting Admin` + `Firebase Rules Admin`).
+> The service account must be able to create Hosting channels/sites and deploy
+> Firestore rules and indexes (e.g. roles: `Firebase Hosting Admin` + `Firebase
+Rules Admin` + `Cloud Datastore Index Admin` (`roles/datastore.indexAdmin`)).
 
 The `Deploy Production` workflow is bound to the GitHub `production`
 environment. Add these secrets there (do not reuse the repository-secret
