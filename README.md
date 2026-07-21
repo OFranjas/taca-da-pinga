@@ -45,7 +45,7 @@ yarn build
 
 ## Delivery
 
-Feature branches merge into `develop`; production releases are promoted from `develop` to `production`. Pull requests publish a preview, and merges to `develop` deploy to [develop-taca-da-pinga.web.app](https://develop-taca-da-pinga.web.app/). Production deployment is manual.
+Feature branches merge into `develop`; production releases are promoted from `develop` to `production`. Pull requests publish a preview, merges to `develop` deploy to [develop-taca-da-pinga.web.app](https://develop-taca-da-pinga.web.app/), and merges to `production` deploy the production Firebase project.
 
 ## Documentation
 

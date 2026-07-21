@@ -4,7 +4,8 @@
 
 - Pull requests automatically publish previews at `https://preview-taca-da-pinga.web.app`.
 - Merges to `develop` auto-deploy to `https://develop-taca-da-pinga.web.app` after re-running lint/tests/build.
-- Production deploys remain manual (below).
+- Merges to `production` run the production deployment workflow after its
+  validation steps pass.
 
 ## Pre-merge to `production`
 
@@ -16,15 +17,17 @@
 - [ ] Firebase production configuration and the admin access plan have been confirmed.
 - [ ] Release notes or a changelog entry have been added when user-visible behaviour changed.
 
-## Deploy (human owner)
+## Production deployment
 
-```bash
-firebase use <prod-project-id>
-yarn build
-firebase deploy --only hosting,firestore:rules,firestore:indexes
-```
+The `Deploy Production` workflow runs automatically after a merge to
+`production`. It validates, builds, deploys Firestore rules and indexes, then
+deploys Firebase Hosting.
 
-> The service account used by the automation must have permission to deploy Hosting **and** Firestore rules (e.g. Firebase Hosting Admin + Firebase Rules Admin). Grant the same roles locally (or run deploys with an owner account) to avoid 403 errors.
+Configure the GitHub **production** environment with the `PRODUCTION_*` secrets
+listed in [CONFIG.md](CONFIG.md#github-secrets). The service account needs
+Firebase Hosting Admin and Firebase Rules Admin permissions for that production
+project. Required reviewers are optional if a post-merge approval gate is
+desired.
 
 ## Post-deploy verification
 

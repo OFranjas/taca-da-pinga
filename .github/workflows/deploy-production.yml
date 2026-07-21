@@ -1,0 +1,118 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      VITE_FIREBASE_API_KEY: ${{ secrets.PRODUCTION_VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.PRODUCTION_VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.PRODUCTION_VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.PRODUCTION_VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.PRODUCTION_VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.PRODUCTION_VITE_FIREBASE_APP_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Validate Firebase web config
+        run: |
+          missing=0
+          for key in \
+            VITE_FIREBASE_API_KEY \
+            VITE_FIREBASE_AUTH_DOMAIN \
+            VITE_FIREBASE_PROJECT_ID \
+            VITE_FIREBASE_STORAGE_BUCKET \
+            VITE_FIREBASE_MESSAGING_SENDER_ID \
+            VITE_FIREBASE_APP_ID
+          do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing production secret: $key" >&2
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
+
+      - name: Install dependencies
+        run: yarn install --immutable --mode=skip-build
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Unit tests
+        run: yarn test:ci
+
+      - name: Rules tests (Firestore emulator)
+        run: yarn test:rules
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure Firebase credentials
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.PRODUCTION_FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT}" ]; then
+            echo "::error::Missing production secret: FIREBASE_SERVICE_ACCOUNT" >&2
+            exit 1
+          fi
+
+          credentials_file="$RUNNER_TEMP/firebase-service-account.json"
+          echo "${FIREBASE_SERVICE_ACCOUNT}" > "$credentials_file"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$credentials_file" >> "$GITHUB_ENV"
+
+      - name: Deploy Firestore rules and indexes
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.PRODUCTION_FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -z "${FIREBASE_PROJECT_ID}" ]; then
+            echo "::error::Missing production secret: FIREBASE_PROJECT_ID" >&2
+            exit 1
+          fi
+
+          ./node_modules/.bin/firebase deploy --only firestore --project "$FIREBASE_PROJECT_ID"
+
+      - name: Deploy hosting (production)
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.PRODUCTION_FIREBASE_PROJECT_ID }}
+        run: ./node_modules/.bin/firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID"

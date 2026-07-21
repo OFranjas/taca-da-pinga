@@ -15,7 +15,10 @@ VITE_FIREBASE_APP_ID=
 
 ## GitHub Secrets
 
-The CI/CD workflows rely on the same Firebase configuration. Add these repository secrets:
+The CI/CD workflows need Firebase configuration. Use repository secrets for
+preview and `develop`. Configure a GitHub environment named `production` with
+the distinct production-only secrets below for the production deployment
+workflow.
 
 | Secret                              | Required | Description                                                                      |
 | ----------------------------------- | -------- | -------------------------------------------------------------------------------- |
@@ -25,10 +28,28 @@ The CI/CD workflows rely on the same Firebase configuration. Add these repositor
 | `VITE_FIREBASE_STORAGE_BUCKET`      | ✅       | Firebase client config                                                           |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | ✅       | Firebase client config                                                           |
 | `VITE_FIREBASE_APP_ID`              | ✅       | Firebase client config                                                           |
-| `FIREBASE_SERVICE_ACCOUNT`          | ✅       | Base64/JSON service account with Hosting + Firestore Rules deploy permissions    |
+| `FIREBASE_SERVICE_ACCOUNT`          | ✅       | JSON service account with Hosting + Firestore Rules deploy permissions           |
 | `FIREBASE_PROJECT_ID`               | ⬜       | Override when the repo default project differs from the service account defaults |
 
 > The service account must be able to create Hosting channels/sites and deploy Firestore rules (e.g. roles: `Firebase Hosting Admin` + `Firebase Rules Admin`).
+
+The `Deploy Production` workflow is bound to the GitHub `production`
+environment. Add these secrets there (do not reuse the repository-secret
+names):
+
+- `PRODUCTION_VITE_FIREBASE_API_KEY`
+- `PRODUCTION_VITE_FIREBASE_AUTH_DOMAIN`
+- `PRODUCTION_VITE_FIREBASE_PROJECT_ID`
+- `PRODUCTION_VITE_FIREBASE_STORAGE_BUCKET`
+- `PRODUCTION_VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `PRODUCTION_VITE_FIREBASE_APP_ID`
+- `PRODUCTION_FIREBASE_PROJECT_ID`
+- `PRODUCTION_FIREBASE_SERVICE_ACCOUNT`
+
+This makes a merge to `production` fail safely until its production-only
+configuration exists, rather than falling back to `develop` credentials. Add
+required reviewers to the GitHub environment only if a post-merge approval gate
+is desired before production deployment.
 
 ## Runtime Data
 
