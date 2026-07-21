@@ -101,13 +101,13 @@
   bottom: 0;
   width: var(--row-fill-width, 0%);
   border-radius: inherit;
-  background: var(--row-meter-start, var(--ui-color-accent-strong));
+  background: linear-gradient(
+    90deg,
+    var(--row-meter-start, var(--ui-color-accent-strong)) 0%,
+    var(--row-meter-end, var(--ui-color-accent)) 100%
+  );
   box-shadow: 0 2px 4px var(--row-meter-shadow, rgba(4, 120, 87, 0.28));
   transition: width 240ms ease-out;
-}
-
-.meterFillComplete {
-  background: var(--row-meter-end, var(--ui-color-accent));
 }
 
 @media (prefers-reduced-motion: reduce) {

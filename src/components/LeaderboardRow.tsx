@@ -23,13 +23,13 @@ const getTone = (rank: number): LeaderboardRowTone => {
   switch (rank) {
     case 1:
       return {
-        accent: 'rgba(250, 204, 21, 0.32)',
-        badgeBg: 'rgba(250, 204, 21, 0.38)',
+        accent: 'rgba(224, 167, 47, 0.32)',
+        badgeBg: 'rgba(234, 204, 137, 0.48)',
         badgeColor: '#854d0e',
-        meterStart: '#d97706',
-        meterEnd: '#facc15',
-        meterRail: 'rgba(250, 204, 21, 0.16)',
-        meterShadow: 'rgba(180, 83, 9, 0.28)',
+        meterStart: '#b7791f',
+        meterEnd: '#e0a72f',
+        meterRail: 'rgba(224, 167, 47, 0.16)',
+        meterShadow: 'rgba(180, 121, 31, 0.28)',
       };
     case 2:
       return {
@@ -43,13 +43,13 @@ const getTone = (rank: number): LeaderboardRowTone => {
       };
     case 3:
       return {
-        accent: 'rgba(249, 115, 22, 0.25)',
-        badgeBg: 'rgba(253, 186, 116, 0.5)',
-        badgeColor: '#7c2d12',
-        meterStart: '#c2410c',
-        meterEnd: '#fb923c',
-        meterRail: 'rgba(249, 115, 22, 0.14)',
-        meterShadow: 'rgba(154, 52, 18, 0.26)',
+        accent: 'rgba(196, 122, 69, 0.28)',
+        badgeBg: 'rgba(235, 193, 157, 0.55)',
+        badgeColor: '#7c3f20',
+        meterStart: '#8f4e2c',
+        meterEnd: '#c47a45',
+        meterRail: 'rgba(196, 122, 69, 0.14)',
+        meterShadow: 'rgba(143, 78, 44, 0.26)',
       };
     default:
       return {
@@ -135,10 +135,7 @@ export function LeaderboardRow({
           aria-valuemax={100}
           aria-valuetext={ariaValueText}
         >
-          <div
-            className={`${styles.meterFill} ${isReferenceValue ? styles.meterFillComplete : ''}`}
-            aria-hidden="true"
-          />
+          <div className={styles.meterFill} aria-hidden="true" />
         </div>
       </div>
     </div>
