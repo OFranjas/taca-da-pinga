@@ -7,6 +7,7 @@ type LeaderboardRowTone = {
   badgeColor: string;
   meterStart: string;
   meterEnd: string;
+  meterRail: string;
   meterShadow: string;
 };
 
@@ -22,12 +23,13 @@ const getTone = (rank: number): LeaderboardRowTone => {
   switch (rank) {
     case 1:
       return {
-        accent: 'rgba(250, 204, 21, 0.32)',
-        badgeBg: 'rgba(250, 204, 21, 0.38)',
+        accent: 'rgba(224, 167, 47, 0.32)',
+        badgeBg: 'rgba(234, 204, 137, 0.48)',
         badgeColor: '#854d0e',
-        meterStart: '#d97706',
-        meterEnd: '#facc15',
-        meterShadow: 'rgba(180, 83, 9, 0.28)',
+        meterStart: '#b7791f',
+        meterEnd: '#e0a72f',
+        meterRail: 'rgba(224, 167, 47, 0.16)',
+        meterShadow: 'rgba(180, 121, 31, 0.28)',
       };
     case 2:
       return {
@@ -36,16 +38,18 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#1f2937',
         meterStart: '#64748b',
         meterEnd: '#cbd5e1',
+        meterRail: 'rgba(100, 116, 139, 0.12)',
         meterShadow: 'rgba(71, 85, 105, 0.24)',
       };
     case 3:
       return {
-        accent: 'rgba(249, 115, 22, 0.25)',
-        badgeBg: 'rgba(253, 186, 116, 0.5)',
-        badgeColor: '#7c2d12',
-        meterStart: '#c2410c',
-        meterEnd: '#fb923c',
-        meterShadow: 'rgba(154, 52, 18, 0.26)',
+        accent: 'rgba(196, 122, 69, 0.28)',
+        badgeBg: 'rgba(235, 193, 157, 0.55)',
+        badgeColor: '#7c3f20',
+        meterStart: '#8f4e2c',
+        meterEnd: '#c47a45',
+        meterRail: 'rgba(196, 122, 69, 0.14)',
+        meterShadow: 'rgba(143, 78, 44, 0.26)',
       };
     default:
       return {
@@ -54,6 +58,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#065f46',
         meterStart: '#047857',
         meterEnd: '#22c55e',
+        meterRail: 'rgba(34, 197, 94, 0.12)',
         meterShadow: 'rgba(4, 120, 87, 0.28)',
       };
   }
@@ -92,6 +97,7 @@ export function LeaderboardRow({
     '--row-rank-color': tone.badgeColor,
     '--row-meter-start': tone.meterStart,
     '--row-meter-end': tone.meterEnd,
+    '--row-meter-rail': tone.meterRail,
     '--row-meter-shadow': tone.meterShadow,
   } as CSSProperties;
 
