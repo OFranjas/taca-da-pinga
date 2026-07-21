@@ -3,7 +3,8 @@
 ## AuthN / AuthZ
 
 - Public can read leaderboard & events without auth.
-- Admins authenticated via Firebase Auth; authorized via custom claim `admin` or email in `app_config/admins`.
+- Admins authenticate with Firebase Auth and are authorized exclusively by the
+  custom claim `admin: true`.
 
 ## Firestore Rules (sketch)
 
@@ -29,16 +30,29 @@ service cloud.firestore {
       allow write: if isAdmin();
       allow read: if false;                     // not publicly readable
     }
+    // Branding and sponsors
+    match /branding/current {
+      allow read: if true;
+      allow write: if isAdmin();                // image data is separately validated
+    }
+    match /sponsors/{sponsorId} {
+      allow read: if true;
+      allow write: if isAdmin();                // fields and HTTPS links are validated
+    }
   }
 }
 ```
 
 ## Invariants
 
-- Only admins can mutate (`teams`, `events`, `app_config`).
-- Public can read `teams` and `events`; `app_config` is not publicly readable.
+- Only admins can mutate `teams`, `events`, `app_config`, branding and sponsors.
+- Public can read `teams`, `events`, `branding/current` and sponsors;
+  `app_config` is not publicly readable.
 - “Add pinga” increments are positive and bounded (delta ∈ [1..50]).
 - Totals never negative.
+- Branding and sponsor images must be image data URLs at most 180 KB. Sponsor
+  names are limited to 80 characters, links must be HTTPS (or empty), and
+  ordering is bounded from 0 to 999.
 - Drink scoring is service-owned: the service validates active catalogue IDs,
   quantities, derived line deltas, duplicate consolidation, and receipt/projection
   consistency before committing one batch. Rules do not attempt to validate

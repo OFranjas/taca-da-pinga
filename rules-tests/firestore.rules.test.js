@@ -55,11 +55,15 @@ function makeDb(mockUserToken) {
   return { app, db };
 }
 
+function makeAdminDb(uid = 'rules-admin') {
+  return makeDb({ sub: uid, user_id: uid, admin: true });
+}
+
 describe('Firestore security rules', () => {
   test('public reads allowed for teams and events', async () => {
-    const { db: ownerDb } = makeDb('owner');
-    await setDoc(doc(ownerDb, 'teams/t1'), { name: 'Team 1', pingas: 0 });
-    await setDoc(doc(ownerDb, 'events/e1'), { type: 'bootstrap' });
+    const { db: adminDb } = makeAdminDb('public-read-seed');
+    await setDoc(doc(adminDb, 'teams/t1'), { name: 'Team 1', pingas: 0 });
+    await setDoc(doc(adminDb, 'events/e1'), { type: 'bootstrap' });
 
     const { db: anonDb } = makeDb(undefined);
     await assertSucceeds(getDoc(doc(anonDb, 'teams/t1')));
@@ -67,8 +71,8 @@ describe('Firestore security rules', () => {
   });
 
   test('non-admin writes denied everywhere (teams, events, app_config)', async () => {
-    const { db: ownerDb } = makeDb('owner');
-    await setDoc(doc(ownerDb, 'teams/t1'), { name: 'Team 1', pingas: 0 });
+    const { db: adminDb } = makeAdminDb('non-admin-write-seed');
+    await setDoc(doc(adminDb, 'teams/t1'), { name: 'Team 1', pingas: 0 });
 
     const { db: anonDb } = makeDb(undefined);
     await assertFails(setDoc(doc(anonDb, 'teams/x'), { name: 'X', pingas: 0 }));
@@ -112,12 +116,12 @@ describe('Firestore security rules', () => {
     await assertSucceeds(updateDoc(doc(adminDb, 'teams/a1'), { pingas: 53 })); // 3 -> 53 (+50)
 
     // Out-of-range increments denied (>50)
-    const { db: ownerDb } = makeDb('owner');
-    await setDoc(doc(ownerDb, 'teams/b1'), { name: 'B', pingas: 0 });
+    const { db: seedDb } = makeAdminDb('increment-seed');
+    await setDoc(doc(seedDb, 'teams/b1'), { name: 'B', pingas: 0 });
     await assertFails(updateDoc(doc(adminDb, 'teams/b1'), { pingas: 51 })); // 0 -> 51 (+51)
 
     // Negative increments denied; totals never negative
-    await setDoc(doc(ownerDb, 'teams/c1'), { name: 'C', pingas: 2 });
+    await setDoc(doc(seedDb, 'teams/c1'), { name: 'C', pingas: 2 });
     await assertFails(updateDoc(doc(adminDb, 'teams/c1'), { pingas: 1 })); // 2 -> 1 (-1)
     await assertFails(updateDoc(doc(adminDb, 'teams/c1'), { pingas: -1 })); // negative total
 
@@ -131,8 +135,8 @@ describe('Firestore security rules', () => {
 
   test('app_config reads are not public', async () => {
     {
-      const { db: ownerDb2 } = makeDb('owner');
-      await setDoc(doc(ownerDb2, 'app_config/main'), { feature: 'x' });
+      const { db: adminDb } = makeAdminDb('app-config-seed');
+      await setDoc(doc(adminDb, 'app_config/main'), { feature: 'x' });
     }
 
     const { db: anonDb2 } = makeDb(undefined);
