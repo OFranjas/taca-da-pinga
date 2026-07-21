@@ -7,6 +7,7 @@ type LeaderboardRowTone = {
   badgeColor: string;
   meterStart: string;
   meterEnd: string;
+  meterRail: string;
   meterShadow: string;
 };
 
@@ -27,6 +28,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#854d0e',
         meterStart: '#d97706',
         meterEnd: '#facc15',
+        meterRail: 'rgba(250, 204, 21, 0.16)',
         meterShadow: 'rgba(180, 83, 9, 0.28)',
       };
     case 2:
@@ -36,6 +38,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#1f2937',
         meterStart: '#64748b',
         meterEnd: '#cbd5e1',
+        meterRail: 'rgba(100, 116, 139, 0.12)',
         meterShadow: 'rgba(71, 85, 105, 0.24)',
       };
     case 3:
@@ -45,6 +48,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#7c2d12',
         meterStart: '#c2410c',
         meterEnd: '#fb923c',
+        meterRail: 'rgba(249, 115, 22, 0.14)',
         meterShadow: 'rgba(154, 52, 18, 0.26)',
       };
     default:
@@ -54,6 +58,7 @@ const getTone = (rank: number): LeaderboardRowTone => {
         badgeColor: '#065f46',
         meterStart: '#047857',
         meterEnd: '#22c55e',
+        meterRail: 'rgba(34, 197, 94, 0.12)',
         meterShadow: 'rgba(4, 120, 87, 0.28)',
       };
   }
@@ -92,6 +97,7 @@ export function LeaderboardRow({
     '--row-rank-color': tone.badgeColor,
     '--row-meter-start': tone.meterStart,
     '--row-meter-end': tone.meterEnd,
+    '--row-meter-rail': tone.meterRail,
     '--row-meter-shadow': tone.meterShadow,
   } as CSSProperties;
 
@@ -129,7 +135,10 @@ export function LeaderboardRow({
           aria-valuemax={100}
           aria-valuetext={ariaValueText}
         >
-          <div className={styles.meterFill} aria-hidden="true" />
+          <div
+            className={`${styles.meterFill} ${isReferenceValue ? styles.meterFillComplete : ''}`}
+            aria-hidden="true"
+          />
         </div>
       </div>
     </div>

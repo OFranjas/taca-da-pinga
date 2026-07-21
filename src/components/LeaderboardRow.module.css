@@ -82,11 +82,12 @@
 .meter {
   position: relative;
   width: 100%;
-  height: 0.75rem;
+  height: 0.875rem;
   overflow: hidden;
   border-radius: var(--ui-radius-full);
-  background: rgba(148, 163, 184, 0.2);
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+  background: var(--row-meter-rail, rgba(148, 163, 184, 0.2));
+  border: 1px solid color-mix(in srgb, var(--row-meter-start) 16%, transparent);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .meterCell {
@@ -100,22 +101,13 @@
   bottom: 0;
   width: var(--row-fill-width, 0%);
   border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--row-meter-start, var(--ui-color-accent-strong)) 0%,
-    var(--row-meter-end, var(--ui-color-accent)) 100%
-  );
-  box-shadow:
-    0 1px 2px var(--row-meter-shadow, rgba(4, 120, 87, 0.28)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  background: var(--row-meter-start, var(--ui-color-accent-strong));
+  box-shadow: 0 2px 4px var(--row-meter-shadow, rgba(4, 120, 87, 0.28));
   transition: width 240ms ease-out;
 }
 
-.meterFill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 65%);
+.meterFillComplete {
+  background: var(--row-meter-end, var(--ui-color-accent));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -137,7 +129,7 @@
   }
 
   .meter {
-    height: 0.625rem;
+    height: 0.75rem;
   }
 }
 
@@ -186,6 +178,6 @@
   }
 
   .meter {
-    height: 0.625rem;
+    height: 0.75rem;
   }
 }

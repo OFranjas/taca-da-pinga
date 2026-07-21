@@ -107,6 +107,10 @@ describe('Leaderboard page', () => {
     expect(rows[1]).toHaveStyle('--row-meter-start: #64748b');
     expect(rows[2]).toHaveStyle('--row-meter-start: #c2410c');
     expect(rows[3]).toHaveStyle('--row-meter-start: #047857');
+    expect(rows[0]).toHaveStyle('--row-meter-rail: rgba(250, 204, 21, 0.16)');
+    expect(rows[1]).toHaveStyle('--row-meter-rail: rgba(100, 116, 139, 0.12)');
+    expect(rows[2]).toHaveStyle('--row-meter-rail: rgba(249, 115, 22, 0.14)');
+    expect(rows[3]).toHaveStyle('--row-meter-rail: rgba(34, 197, 94, 0.12)');
     const meters = screen.getAllByRole('meter');
     expect(meters).toHaveLength(4);
     expect(meters.map((meter) => meter.getAttribute('aria-valuenow'))).toEqual([
