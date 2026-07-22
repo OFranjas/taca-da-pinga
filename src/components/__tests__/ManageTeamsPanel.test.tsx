@@ -119,4 +119,20 @@ describe('ManageTeamsPanel editing', () => {
     expect(screen.getByRole('button', { name: 'Criar' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Editar' })).toBeEnabled();
   });
+
+  test('clears the edit lock when filtering hides the edited team', async () => {
+    render(<ManageTeamsPanel />);
+    fireEvent.click(
+      await screen.findAllByRole('button', { name: 'Editar' }).then((buttons) => buttons[0])
+    );
+    expect(screen.getByRole('textbox', { name: 'Nome da equipa' })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Filtrar equipas' }), {
+      target: { value: 'Beta' },
+    });
+
+    expect(screen.queryByRole('textbox', { name: 'Nome da equipa' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Criar' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Editar' })).toBeEnabled();
+  });
 });

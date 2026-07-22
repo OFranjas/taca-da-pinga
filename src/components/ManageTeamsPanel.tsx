@@ -38,13 +38,6 @@ export default function ManageTeamsPanel() {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (editingTeamId && !teams.some((team) => team.id === editingTeamId)) {
-      setEditingTeamId(null);
-      setEditName('');
-    }
-  }, [editingTeamId, teams]);
-
   const createTeam = async () => {
     const nameTrim = newName.trim();
     if (!nameTrim) {
@@ -138,6 +131,13 @@ export default function ManageTeamsPanel() {
     () => teams.filter((team) => team.name.toLowerCase().includes(filter.toLowerCase())),
     [filter, teams]
   );
+
+  useEffect(() => {
+    if (editingTeamId && !visible.some((team) => team.id === editingTeamId)) {
+      setEditingTeamId(null);
+      setEditName('');
+    }
+  }, [editingTeamId, visible]);
 
   return (
     <div className={styles.panel}>
