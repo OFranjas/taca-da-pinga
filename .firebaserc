@@ -1,5 +1,12 @@
 {
   "projects": {
     "default": "taca-da-pinga"
+  },
+  "targets": {
+    "taca-da-pinga": {
+      "hosting": {
+        "develop": ["develop-taca-da-pinga"]
+      }
+    }
   }
 }

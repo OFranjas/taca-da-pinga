@@ -28,3 +28,38 @@ Thumbs.db
 npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# ESLint
+.eslintcache
+
+# Yarn Berry (v2+)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/install-state.gz
+!.yarn/sdks
+!.yarn/versions
+
+# Firebase Admin service account keys
+serviceAccountKey.json
+**/serviceAccountKey.json
+*.serviceAccountKey.json
+*serviceAccountKey*.json
+
+# Local tooling output / logs
+tools/*.log
+tools/.env.local
+
+# Lockfiles
+package-lock.json
+**/package-lock.json
+!yarn.lock
+**/yarn.lock
+
+# non-root yarn.lock
+tools/yarn.lock
+test-rules/yarn.lock
+
+# Cursor
+*.cursor

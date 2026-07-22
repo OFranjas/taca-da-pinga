@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@tabler/icons-react": "^3.44.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -10,26 +14,32 @@
     "firebase": "^11.10.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-is": "^18.3.1",
     "react-router-dom": "^7.7.0",
-    "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
     "recharts": "^3.1.0",
     "tailwindcss": "^4.1.11",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start || vite",
-    "build": "react-scripts build || vite build",
-    "test": "echo \"(todo) tests\" && exit 0",
-    "lint": "echo \"(todo) eslint\" && exit 0",
-    "typecheck": "echo \"(todo) tsc\" && exit 0"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage",
+    "test:rules": "./scripts/test-rules.sh",
+    "lint": "eslint --cache --max-warnings=0 \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint --cache --fix \"src/**/*.{js,jsx,ts,tsx}\"",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky",
+    "set:admin": "node tools/set-admin-claim.mjs",
+    "unset:admin": "node tools/set-admin-claim.mjs --unset"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "engines": {
+    "node": ">=22.19.0 <23"
   },
+  "packageManager": "yarn@4.3.1",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -41,5 +51,36 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "jsdom": "^24.1.0",
+    "glob": "^9.3.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.4",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@eslint/js": "^9.14.0",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^4.0.6",
+    "eslint": "^9.14.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "firebase-admin": "^13.5.0",
+    "firebase-tools": "^14.17.0",
+    "globals": "^15.13.0",
+    "husky": "^9.1.7",
+    "jsdom": "^24.1.0",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.6.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.3.5",
+    "vitest": "^4.0.6"
   }
 }

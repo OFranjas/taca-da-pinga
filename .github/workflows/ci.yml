@@ -1,11 +1,12 @@
 name: CI
 
 on:
-  push:
-    branches: [production, develop]
   pull_request:
-    branches: [production, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   quality:
@@ -13,26 +14,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: '22.19.0'
+          # Don't use setup-node's Yarn cache because it invokes Yarn 1
+          # which conflicts with Corepack-managed Yarn 4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare Yarn 4
+        run: corepack prepare yarn@4.3.1 --activate
+
+      - name: Cache Yarn global cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.yarn/berry/cache
+          key: ${{ runner.os }}-yarn-berry-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-berry-cache-
 
       - name: Install
-        run: npm ci
+        run: yarn install --immutable --mode=skip-build
 
       - name: Lint
-        run: npm run lint --if-present
+        run: yarn lint
 
       - name: Typecheck
-        run: npm run typecheck --if-present
+        run: yarn typecheck
 
       - name: Unit tests
-        run: npm test --if-present -- --ci --reporter=default --coverage
+        run: yarn test:ci
+
+      - name: Cache Firebase emulators
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators
+
+      - name: Rules tests (Firestore emulator)
+        run: yarn test:rules
 
       - name: Build
-        run: npm run build --if-present
+        run: yarn build

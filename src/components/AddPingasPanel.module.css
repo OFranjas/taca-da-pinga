@@ -1,112 +1,408 @@
-:root {
-  --card-border: #e5e7eb;
-  --shadow: 0 2px 10px rgba(17, 24, 39, 0.08);
-}
-
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--ui-space-md);
   width: 100%;
-  padding: 0.25rem 0;
 }
 
-.searchRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.75rem;
-  align-items: start;
+.label,
+.sectionLegend,
+.summaryLabel {
+  color: var(--ui-color-text-secondary);
+  font-size: var(--ui-text-size-sm);
+  font-weight: var(--ui-font-weight-semibold);
 }
 
-/* Search */
 .searchWrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
 }
+
 .searchInput {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
+  min-height: 2.75rem;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-sm);
   font-size: 1rem;
-  outline: none;
-  background: var(--bg-card);
+  background: var(--ui-color-surface-muted);
+  transition:
+    border-color var(--ui-transition-base),
+    box-shadow var(--ui-transition-base),
+    background var(--ui-transition-base);
 }
+
 .searchInput:focus {
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  outline: none;
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+  background: var(--ui-color-surface);
 }
+
+.searchInput:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.searchSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  padding-top: var(--ui-space-2xs);
+}
+
+.searchSkeleton span:not(.visuallyHidden) {
+  display: block;
+  height: 0.8rem;
+  border-radius: var(--ui-radius-full);
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.18) 0%,
+    rgba(148, 163, 184, 0.34) 50%,
+    rgba(148, 163, 184, 0.18) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.45s ease-in-out infinite;
+}
+
+.searchSkeleton span:nth-child(2) {
+  width: 72%;
+}
+
+.searchSkeleton span:nth-child(3) {
+  width: 56%;
+}
+
+.searchSkeleton span:nth-child(4) {
+  width: 64%;
+}
+
 .suggestions {
   position: absolute;
   top: calc(100% - 2px);
   left: 0;
   right: 0;
-  background: var(--bg-card);
-  border: 1px solid #d1d5db;
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  max-height: 10rem;
-  overflow-y: auto;
-  box-shadow: var(--shadow);
   z-index: 10;
-}
-.suggestion {
-  padding: 0.6rem 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.suggestion:hover {
-  background: var(--accent-hover);
+  max-height: 14rem;
+  padding: var(--ui-space-2xs);
+  overflow-y: auto;
+  background: var(--ui-color-surface);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
 }
 
-/* Amount picker */
-.amountPicker {
+.suggestion {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.82rem var(--ui-space-md);
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-xs);
+  background: transparent;
+  color: var(--ui-color-text-primary);
+  font-size: 1rem;
+  font-weight: var(--ui-font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--ui-transition-base),
+    border-color var(--ui-transition-base);
+}
+
+.suggestion:hover,
+.suggestion:focus-visible {
+  background: var(--ui-color-surface-muted);
+  border-color: var(--ui-color-border-subtle);
+  outline: none;
+}
+
+.drinksFieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sectionLegend {
+  margin-bottom: var(--ui-space-xs);
+  padding: 0;
+}
+
+.drinkList {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-lg);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), var(--ui-color-surface));
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.drinkRow {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(7rem, 1fr) auto minmax(5.25rem, auto);
+  gap: var(--ui-space-sm);
+  align-items: center;
+  min-height: 4.75rem;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.drinkRow:last-child {
+  border-bottom: 0;
+}
+
+.drinkImage,
+.drinkFallback {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--ui-radius-sm);
+}
+
+.drinkImage {
+  display: block;
+  object-fit: cover;
+  background: var(--ui-color-surface-muted);
+}
+
+.drinkFallback {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  overflow: hidden;
-  width: max-content;
-  background: var(--bg-card);
-}
-.minusBtn,
-.plusBtn {
-  background: var(--accent-green);
-  color: #fff;
-  border: none;
-  padding: 0.5rem 0.85rem;
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.minusBtn:hover,
-.plusBtn:hover {
-  background: #0e9e63;
-}
-.amountInput {
-  width: 3.25rem;
-  padding: 0.55rem;
-  border: none;
-  text-align: center;
-  font-size: 1rem;
-  outline: none;
-  background: transparent;
+  justify-content: center;
+  background: var(--ui-color-accent-soft);
+  color: var(--ui-color-accent-strong);
+  font-size: var(--ui-text-size-xs);
+  font-weight: var(--ui-font-weight-extrabold);
+  letter-spacing: 0.04em;
 }
 
-/* Add button */
-.addButton {
-  padding: 0.9rem;
-  background: var(--accent-green);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+.drinkInfo {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--ui-space-3xs);
 }
-.addButton:hover {
-  background: #0e9e63;
+
+.drinkName {
+  overflow: hidden;
+  color: var(--ui-color-text-primary);
+  font-weight: var(--ui-font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drinkUnit,
+.lineSubtotal {
+  color: var(--ui-color-text-muted);
+  font-size: var(--ui-text-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.quantityPicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2xs);
+  padding: var(--ui-space-3xs);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-color-surface-muted);
+}
+
+.stepperButton {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: var(--ui-radius-xs);
+  background: var(--ui-color-surface);
+  color: var(--ui-color-accent-strong);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--ui-transition-base),
+    transform var(--ui-transition-fast);
+}
+
+.stepperButton:hover:not(:disabled) {
+  background: var(--ui-color-accent-soft);
+}
+
+.stepperButton:active:not(:disabled) {
+  background: var(--ui-color-accent-strong);
+  color: var(--ui-color-text-inverted);
   transform: translateY(-1px);
+}
+
+.stepperButton:focus-visible,
+.quantityInput:focus-visible,
+.clearButton:focus-visible,
+.addButton:focus-visible {
+  outline: 2px solid rgba(34, 197, 94, 0.6);
+  outline-offset: 2px;
+}
+
+.stepperButton:disabled,
+.clearButton:disabled,
+.addButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.quantityInput {
+  width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-xs);
+  background: var(--ui-color-surface);
+  color: var(--ui-color-text-primary);
+  font-size: 1.2rem;
+  font-weight: var(--ui-font-weight-extrabold);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+}
+
+.quantityInput::-webkit-inner-spin-button,
+.quantityInput::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.lineSubtotal {
+  min-width: 5.25rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-md);
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border: 1px solid var(--ui-color-border-subtle);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-color-accent-soft);
+}
+
+.summaryRow > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--ui-space-3xs);
+}
+
+.summaryRow strong {
+  color: var(--ui-color-accent-strong);
+  font-size: var(--ui-text-size-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.clearButton {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0 var(--ui-space-xs);
+  border: 0;
+  background: transparent;
+  color: var(--ui-color-accent-strong);
+  font-size: var(--ui-text-size-sm);
+  font-weight: var(--ui-font-weight-bold);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.limitMessage,
+.errorMessage {
+  margin: 0;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-radius: var(--ui-radius-sm);
+  font-size: var(--ui-text-size-sm);
+  line-height: var(--ui-line-height-snug);
+}
+
+.limitMessage {
+  border: 1px solid rgba(234, 179, 8, 0.42);
+  background: rgba(250, 204, 21, 0.14);
+  color: rgba(113, 63, 18, 0.95);
+}
+
+.errorMessage {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: var(--ui-color-danger-soft);
+  color: var(--ui-color-danger);
+}
+
+.addButton {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: var(--ui-space-sm);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  border-radius: var(--ui-radius-full);
+  background: linear-gradient(120deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.9));
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.22);
+  color: var(--ui-color-text-inverted);
+  font-size: 1rem;
+  font-weight: var(--ui-font-weight-extrabold);
+  cursor: pointer;
+  transition:
+    transform var(--ui-transition-fast),
+    box-shadow var(--ui-transition-base),
+    background var(--ui-transition-base);
+}
+
+.addButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px rgba(34, 197, 94, 0.28);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes skeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  50% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .drinkRow {
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    gap: var(--ui-space-xs);
+    padding: var(--ui-space-sm);
+  }
+
+  .drinkName {
+    line-height: var(--ui-line-height-snug);
+    white-space: normal;
+  }
+
+  .lineSubtotal {
+    grid-column: 2 / -1;
+    min-width: 0;
+    margin-top: -0.35rem;
+    text-align: left;
+  }
 }

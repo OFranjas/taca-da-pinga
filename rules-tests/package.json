@@ -1,0 +1,13 @@
+{
+  "name": "taca-da-pinga-rules-tests",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "NODE_NO_WARNINGS=1 vitest --run"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^11.10.0",
+    "vitest": "^3.0.4"
+  }
+}
