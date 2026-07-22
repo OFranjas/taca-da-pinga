@@ -4,22 +4,22 @@ const mockCollection = vi.fn();
 const mockQuery = vi.fn();
 const mockOrderBy = vi.fn((field, dir) => ({ field, dir }));
 const mockOnSnapshot = vi.fn();
-const mockWhere = vi.fn();
 const mockGetDocs = vi.fn();
 const mockAddDoc = vi.fn();
 const mockDoc = vi.fn((db, col, id) => ({ col, id }));
 const mockDeleteDoc = vi.fn();
+const mockUpdateDoc = vi.fn();
 
 vi.mock('firebase/firestore', () => ({
   collection: (...args) => mockCollection(...args),
   query: (...args) => mockQuery(...args),
   orderBy: (...args) => mockOrderBy(...args),
   onSnapshot: (...args) => mockOnSnapshot(...args),
-  where: (...args) => mockWhere(...args),
   getDocs: (...args) => mockGetDocs(...args),
   addDoc: (...args) => mockAddDoc(...args),
   doc: (...args) => mockDoc(...args),
   deleteDoc: (...args) => mockDeleteDoc(...args),
+  updateDoc: (...args) => mockUpdateDoc(...args),
 }));
 
 describe('services/teams', () => {
@@ -43,7 +43,7 @@ describe('services/teams', () => {
 
   test('createTeamIfNotExists adds when not present', async () => {
     const { createTeamIfNotExists } = await import('../teams');
-    mockGetDocs.mockResolvedValue({ empty: true, docs: [] });
+    mockGetDocs.mockResolvedValue({ docs: [] });
     await createTeamIfNotExists('New Team');
     expect(mockAddDoc).toHaveBeenCalledWith(undefined, {
       name: 'New Team',
@@ -52,10 +52,36 @@ describe('services/teams', () => {
     });
   });
 
-  test('createTeamIfNotExists throws when already exists', async () => {
+  test('createTeamIfNotExists rejects names that differ only by letter case', async () => {
     const { createTeamIfNotExists } = await import('../teams');
-    mockGetDocs.mockResolvedValue({ empty: false, docs: [{}] });
-    await expect(createTeamIfNotExists('Existing')).rejects.toThrow('Team already exists');
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'existing', data: () => ({ name: 'Equipa Pinga' }) }],
+    });
+    await expect(createTeamIfNotExists(' equipa pinga ')).rejects.toThrow('Team already exists');
+  });
+
+  test('updateTeamName validates, excludes the current team, and updates only the name', async () => {
+    const { updateTeamName } = await import('../teams');
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'tid', data: () => ({ name: 'Equipa Antiga' }) }],
+    });
+
+    await updateTeamName('tid', ' Equipa Nova ');
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+      { col: 'teams', id: 'tid' },
+      { name: 'Equipa Nova' }
+    );
+  });
+
+  test('updateTeamName rejects an empty or duplicate name', async () => {
+    const { updateTeamName } = await import('../teams');
+    await expect(updateTeamName('tid', '   ')).rejects.toThrow('Name is required');
+
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'other', data: () => ({ name: 'Equipa Pinga' }) }],
+    });
+    await expect(updateTeamName('tid', 'equipa pinga')).rejects.toThrow('Team already exists');
   });
 
   test('deleteTeam deletes by id', async () => {

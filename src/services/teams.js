@@ -4,12 +4,38 @@ import {
   query,
   orderBy,
   onSnapshot,
-  where,
   getDocs,
   addDoc,
   doc,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore';
+
+function normalizeTeamName(name) {
+  return String(name || '').trim();
+}
+
+function getTeamNameKey(name) {
+  return normalizeTeamName(name).toLocaleLowerCase('pt-PT');
+}
+
+async function assertTeamNameAvailable(name, excludedTeamId) {
+  const teamsSnapshot = await getDocs(collection(db, 'teams'));
+  const nameKey = getTeamNameKey(name);
+  const hasDuplicate = teamsSnapshot.docs.some((team) => {
+    if (team.id === excludedTeamId) {
+      return false;
+    }
+
+    return getTeamNameKey(team.data().name) === nameKey;
+  });
+
+  if (hasDuplicate) {
+    const err = new Error('Team already exists');
+    err.code = 'already-exists';
+    throw err;
+  }
+}
 
 export function observeTeamsOrderedByName(callback) {
   const q = query(collection(db, 'teams'), orderBy('name'));
@@ -20,16 +46,19 @@ export function observeTeamsOrderedByName(callback) {
 }
 
 export async function createTeamIfNotExists(name) {
-  const nameTrim = String(name || '').trim();
+  const nameTrim = normalizeTeamName(name);
   if (!nameTrim) throw new Error('Name is required');
-  const q = query(collection(db, 'teams'), where('name', '==', nameTrim));
-  const snap = await getDocs(q);
-  if (!snap.empty) {
-    const err = new Error('Team already exists');
-    err.code = 'already-exists';
-    throw err;
-  }
+
+  await assertTeamNameAvailable(nameTrim);
   await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0, drinkTotals: {} });
+}
+
+export async function updateTeamName(teamId, name) {
+  const nameTrim = normalizeTeamName(name);
+  if (!nameTrim) throw new Error('Name is required');
+
+  await assertTeamNameAvailable(nameTrim, teamId);
+  await updateDoc(doc(db, 'teams', teamId), { name: nameTrim });
 }
 
 export async function deleteTeam(teamId) {
