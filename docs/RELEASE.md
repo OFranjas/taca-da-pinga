@@ -24,6 +24,11 @@ The `Deploy Production` workflow runs automatically after a merge to
 deploys the `taca-da-pinga` Firebase Hosting site. Manual workflow runs are
 allowed only when the selected ref is `production`.
 
+For a manual local production deployment, `./deploy.sh` builds the app and
+deploys only `hosting:taca-da-pinga`; it does not deploy the `develop` Hosting
+target. Confirm that the active Firebase credentials and project are the
+intended production ones before running it.
+
 Configure the GitHub **production** environment with the `PRODUCTION_*` secrets
 listed in [CONFIG.md](CONFIG.md#github-secrets). The service account needs
 Firebase Hosting Admin, Firebase Rules Admin, and Cloud Datastore Index Admin
