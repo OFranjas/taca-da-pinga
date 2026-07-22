@@ -305,14 +305,15 @@
   }
 
   .item {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: var(--ui-space-xs);
+    min-height: 4rem;
   }
 
   .right {
-    justify-content: space-between;
-    width: 100%;
+    justify-content: flex-end;
+    width: auto;
   }
 
   .editForm {
@@ -322,13 +323,40 @@
   .editActions,
   .actionGroup {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .editActions {
+    grid-column: 1 / -1;
     width: 100%;
   }
 
-  .editActions > button,
-  .actionGroup > button {
+  .editActions > button {
     width: 100%;
     min-height: 3.25rem;
+  }
+
+  .actionGroup {
+    display: flex;
+    gap: var(--ui-space-2xs);
+  }
+
+  .actionGroup > button {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+  }
+
+  .actionLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .countPill {

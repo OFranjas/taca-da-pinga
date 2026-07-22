@@ -219,7 +219,7 @@ export default function ManageTeamsPanel() {
                       onClick={() => startEditingTeam(team)}
                       disabled={Boolean(editingTeamId) || busyTeamId === team.id}
                     >
-                      Editar
+                      <span className={styles.actionLabel}>Editar</span>
                     </AdminActionButton>
                     <AdminActionButton
                       icon={IconTrash}
@@ -227,7 +227,7 @@ export default function ManageTeamsPanel() {
                       onClick={() => setToDelete(team)}
                       disabled={Boolean(editingTeamId) || busyTeamId === team.id}
                     >
-                      Eliminar
+                      <span className={styles.actionLabel}>Eliminar</span>
                     </AdminActionButton>
                   </div>
                 )}
