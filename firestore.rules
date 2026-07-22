@@ -10,6 +10,13 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.admin == true;
     }
 
+    function hasValidTeamName(data) {
+      return data.name is string &&
+        data.name.size() >= 1 &&
+        data.name.size() <= 80 &&
+        data.name.matches('.*\\S.*');
+    }
+
     function isDataUrl(s) {
       return s is string && s.matches('^data:image/.*');
     }
@@ -86,7 +93,7 @@ service cloud.firestore {
       allow read: if true;
 
       // Create/update/delete only by admins
-      allow create: if isAdmin() &&
+      allow create: if isAdmin() && hasValidTeamName(request.resource.data) &&
         // New teams begin with no score and an empty (or absent) projection.
         request.resource.data.pingas is int && request.resource.data.pingas == 0 &&
         hasEmptyDrinkTotals(drinkTotals(request.resource.data));
@@ -95,11 +102,13 @@ service cloud.firestore {
         // Metadata-only edits are allowed, but the service-owned drink projection
         // cannot change without a score increment.
         (
+          hasValidTeamName(request.resource.data) &&
           !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['pingas'])) &&
           !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['drinkTotals']))
         ) ||
         // If pingas changes, enforce bounds and positivity, and types
         (
+          hasValidTeamName(request.resource.data) &&
           (request.resource.data.pingas is int) &&
           (resource.data.pingas is int) &&
           request.resource.data.pingas >= 0 &&

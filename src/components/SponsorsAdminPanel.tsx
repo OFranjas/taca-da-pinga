@@ -41,6 +41,7 @@ import {
 } from '../services/sponsors.service';
 import ConfirmModal from './ConfirmModal';
 import { toast } from 'react-toastify';
+import { AdminActionButton } from '../ui/components/AdminActionButton';
 import styles from './SponsorsAdminPanel.module.css';
 
 type SponsorFormState = {
@@ -532,15 +533,14 @@ export default function SponsorsAdminPanel() {
                             </>
                           ) : (
                             <>
-                              <button
-                                type="button"
-                                className={`${styles.neutralButton} ${styles.actionButton}`}
+                              <AdminActionButton
+                                className={styles.adminActionButton}
                                 onClick={() => startEditingSponsor(sponsor)}
                                 disabled={isBusy}
+                                icon={IconPencil}
                               >
-                                <IconPencil aria-hidden="true" />
                                 Editar
-                              </button>
+                              </AdminActionButton>
                               <div className={styles.siteActionGroup}>
                                 <button
                                   type="button"
@@ -557,17 +557,17 @@ export default function SponsorsAdminPanel() {
                                   )}
                                   {sponsor.active ? 'Ocultar' : 'Mostrar'}
                                 </button>
-                                <button
-                                  type="button"
-                                  className={`${styles.dangerButton} ${styles.actionButton}`}
+                                <AdminActionButton
+                                  className={styles.adminActionButton}
                                   onClick={() => {
                                     setSponsorToDelete(sponsor);
                                   }}
                                   disabled={isBusy}
+                                  icon={IconTrash}
+                                  tone="danger"
                                 >
-                                  <IconTrash aria-hidden="true" />
                                   Eliminar
-                                </button>
+                                </AdminActionButton>
                               </div>
                             </>
                           )}

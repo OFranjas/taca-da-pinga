@@ -450,7 +450,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .actionButton {
+  .adminActionButton,
+  .siteActionGroup > button {
     width: 100%;
   }
 }
@@ -494,7 +495,8 @@
     min-height: 3.25rem;
   }
 
-  .actionButton {
+  .adminActionButton,
+  .siteActionGroup > button {
     min-height: 3.25rem;
     padding: 0 var(--ui-space-xs);
   }

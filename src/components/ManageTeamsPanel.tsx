@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { observeTeamsOrderedByName, createTeamIfNotExists, deleteTeam } from '../services/teams';
+import {
+  observeTeamsOrderedByName,
+  createTeamIfNotExists,
+  deleteTeam,
+  TEAM_NAME_MAX_LENGTH,
+  updateTeamName,
+} from '../services/teams';
 import { toast } from 'react-toastify';
+import { IconPencil, IconTrash } from '@tabler/icons-react';
+import { AdminActionButton } from '../ui/components/AdminActionButton';
 import styles from './ManageTeamsPanel.module.css';
 import ConfirmModal from './ConfirmModal';
 
@@ -15,6 +23,9 @@ export default function ManageTeamsPanel() {
   const [newName, setNewName] = useState('');
   const [filter, setFilter] = useState('');
   const [toDelete, setToDelete] = useState<Team | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [busyTeamId, setBusyTeamId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -33,6 +44,10 @@ export default function ManageTeamsPanel() {
       toast.error('Nome não pode estar vazio');
       return;
     }
+    if (nameTrim.length > TEAM_NAME_MAX_LENGTH) {
+      toast.error(`O nome não pode ter mais de ${TEAM_NAME_MAX_LENGTH} caracteres`);
+      return;
+    }
     try {
       await createTeamIfNotExists(nameTrim);
     } catch (error) {
@@ -43,7 +58,10 @@ export default function ManageTeamsPanel() {
           return;
         }
       }
-      throw error;
+
+      const message = error instanceof Error ? error.message : 'Não foi possível criar a equipa';
+      toast.error(message);
+      return;
     }
     toast.success('Equipa criada');
     setNewName('');
@@ -66,10 +84,60 @@ export default function ManageTeamsPanel() {
     }
   };
 
+  const startEditingTeam = (team: Team) => {
+    setEditingTeamId(team.id);
+    setEditName(team.name);
+  };
+
+  const cancelEditingTeam = () => {
+    setEditingTeamId(null);
+    setEditName('');
+  };
+
+  const saveTeamName = async (team: Team) => {
+    const name = editName.trim();
+    if (!name) {
+      toast.error('Nome não pode estar vazio');
+      return;
+    }
+    if (name.length > TEAM_NAME_MAX_LENGTH) {
+      toast.error(`O nome não pode ter mais de ${TEAM_NAME_MAX_LENGTH} caracteres`);
+      return;
+    }
+
+    setBusyTeamId(team.id);
+    try {
+      await updateTeamName(team.id, name);
+      toast.success('Equipa atualizada');
+      cancelEditingTeam();
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        const { code } = error as { code?: string };
+        if (code === 'already-exists') {
+          toast.error('Equipa já existe');
+          return;
+        }
+      }
+
+      const message =
+        error instanceof Error ? error.message : 'Não foi possível atualizar a equipa';
+      toast.error(message);
+    } finally {
+      setBusyTeamId(null);
+    }
+  };
+
   const visible = useMemo(
     () => teams.filter((team) => team.name.toLowerCase().includes(filter.toLowerCase())),
     [filter, teams]
   );
+
+  useEffect(() => {
+    if (editingTeamId && !visible.some((team) => team.id === editingTeamId)) {
+      setEditingTeamId(null);
+      setEditName('');
+    }
+  }, [editingTeamId, visible]);
 
   return (
     <div className={styles.panel}>
@@ -83,7 +151,12 @@ export default function ManageTeamsPanel() {
           onChange={(e) => setNewName(e.target.value)}
           className={styles.input}
         />
-        <button type="button" onClick={createTeam} className={styles.createBtn}>
+        <button
+          type="button"
+          onClick={createTeam}
+          className={styles.createBtn}
+          disabled={Boolean(editingTeamId) || Boolean(busyTeamId)}
+        >
           Criar
         </button>
       </div>
@@ -116,18 +189,67 @@ export default function ManageTeamsPanel() {
             <li key={team.id} className={styles.item}>
               <div className={styles.left}>
                 <span className={styles.dot} aria-hidden />
-                <span className={styles.teamName}>{team.name}</span>
+                {editingTeamId === team.id ? (
+                  <form
+                    className={styles.editForm}
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void saveTeamName(team);
+                    }}
+                  >
+                    <label className={styles.editField}>
+                      <span>Nome da equipa</span>
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(event) => setEditName(event.target.value)}
+                        disabled={busyTeamId === team.id}
+                        autoFocus
+                      />
+                    </label>
+                    <div className={styles.editActions}>
+                      <button
+                        type="submit"
+                        className={styles.saveBtn}
+                        disabled={busyTeamId === team.id}
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.cancelBtn}
+                        onClick={cancelEditingTeam}
+                        disabled={busyTeamId === team.id}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <span className={styles.teamName}>{team.name}</span>
+                )}
               </div>
               <div className={styles.right}>
                 <span className={styles.countPill}>{team.pingas}</span>
-                <button
-                  type="button"
-                  onClick={() => setToDelete(team)}
-                  className={styles.deleteBtn}
-                  aria-label={`Eliminar ${team.name}`}
-                >
-                  Eliminar
-                </button>
+                {editingTeamId === team.id ? null : (
+                  <div className={styles.actionGroup}>
+                    <AdminActionButton
+                      icon={IconPencil}
+                      onClick={() => startEditingTeam(team)}
+                      disabled={Boolean(editingTeamId) || busyTeamId === team.id}
+                    >
+                      <span className={styles.actionLabel}>Editar</span>
+                    </AdminActionButton>
+                    <AdminActionButton
+                      icon={IconTrash}
+                      tone="danger"
+                      onClick={() => setToDelete(team)}
+                      disabled={Boolean(editingTeamId) || busyTeamId === team.id}
+                    >
+                      <span className={styles.actionLabel}>Eliminar</span>
+                    </AdminActionButton>
+                  </div>
+                )}
               </div>
             </li>
           ))}
