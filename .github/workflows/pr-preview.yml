@@ -120,10 +120,10 @@ jobs:
       FIREBASE_DEFAULT_PROJECT: taca-da-pinga
 
     steps:
-      - name: Checkout trusted base revision
+      - name: Checkout trusted default-branch tooling
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.sha }}
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Setup Node
