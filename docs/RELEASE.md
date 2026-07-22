@@ -24,6 +24,15 @@ The `Deploy Production` workflow runs automatically after a merge to
 deploys the `taca-da-pinga` Firebase Hosting site. Manual workflow runs are
 allowed only when the selected ref is `production`.
 
+For a manual local production deployment, `./deploy.sh` builds the app and
+deploys only `hosting:taca-da-pinga`; it does not deploy the `develop` Hosting
+target. Before running it, load the production `VITE_FIREBASE_*` values (for
+example, from an uncommitted `.env.production.local`) and confirm that
+`VITE_FIREBASE_PROJECT_ID` is the production project. Vite embeds these values
+in the bundle during `yarn build`; Firebase CLI credentials alone do not change
+the project's client configuration. Also confirm that the active Firebase CLI
+credentials and project are the intended production ones.
+
 Configure the GitHub **production** environment with the `PRODUCTION_*` secrets
 listed in [CONFIG.md](CONFIG.md#github-secrets). The service account needs
 Firebase Hosting Admin, Firebase Rules Admin, and Cloud Datastore Index Admin
