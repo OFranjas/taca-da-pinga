@@ -38,6 +38,13 @@ export default function ManageTeamsPanel() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (editingTeamId && !teams.some((team) => team.id === editingTeamId)) {
+      setEditingTeamId(null);
+      setEditName('');
+    }
+  }, [editingTeamId, teams]);
+
   const createTeam = async () => {
     const nameTrim = newName.trim();
     if (!nameTrim) {

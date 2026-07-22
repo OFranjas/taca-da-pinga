@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import ManageTeamsPanel from '../ManageTeamsPanel';
 import { toast } from 'react-toastify';
@@ -24,11 +24,13 @@ const teams = [
 const observeTeamsMock = vi.mocked(observeTeamsOrderedByName);
 const updateTeamNameMock = vi.mocked(updateTeamName);
 const toastMock = vi.mocked(toast);
+let observedTeamsCallback: ((nextTeams: typeof teams) => void) | undefined;
 
 describe('ManageTeamsPanel editing', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     observeTeamsMock.mockImplementation((callback) => {
+      observedTeamsCallback = callback;
       callback(teams);
       return vi.fn();
     });
@@ -100,5 +102,21 @@ describe('ManageTeamsPanel editing', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Criar' }));
 
     expect(toastMock.error).toHaveBeenCalledWith('O nome não pode ter mais de 80 caracteres');
+  });
+
+  test('clears the edit lock when the edited team is removed remotely', async () => {
+    render(<ManageTeamsPanel />);
+    fireEvent.click(
+      await screen.findAllByRole('button', { name: 'Editar' }).then((buttons) => buttons[0])
+    );
+    expect(screen.getByRole('textbox', { name: 'Nome da equipa' })).toBeInTheDocument();
+
+    act(() => {
+      observedTeamsCallback?.([teams[1]]);
+    });
+
+    expect(screen.queryByRole('textbox', { name: 'Nome da equipa' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Criar' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Editar' })).toBeEnabled();
   });
 });
