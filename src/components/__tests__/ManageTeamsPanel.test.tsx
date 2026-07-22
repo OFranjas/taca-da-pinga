@@ -8,6 +8,7 @@ vi.mock('../../services/teams', () => ({
   createTeamIfNotExists: vi.fn(),
   deleteTeam: vi.fn(),
   observeTeamsOrderedByName: vi.fn(),
+  TEAM_NAME_MAX_LENGTH: 80,
   updateTeamName: vi.fn(),
 }));
 
@@ -89,5 +90,15 @@ describe('ManageTeamsPanel editing', () => {
       expect(toastMock.error).toHaveBeenCalledWith('Equipa já existe');
     });
     expect(screen.getByRole('textbox', { name: 'Nome da equipa' })).toBeInTheDocument();
+  });
+
+  test('rejects overly long names before calling the team service', async () => {
+    render(<ManageTeamsPanel />);
+
+    const newTeamInput = screen.getByRole('textbox', { name: 'Nova equipa' });
+    fireEvent.change(newTeamInput, { target: { value: 'A'.repeat(81) } });
+    fireEvent.click(screen.getByRole('button', { name: 'Criar' }));
+
+    expect(toastMock.error).toHaveBeenCalledWith('O nome não pode ter mais de 80 caracteres');
   });
 });

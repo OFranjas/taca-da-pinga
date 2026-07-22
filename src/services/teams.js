@@ -11,8 +11,27 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 
+export const TEAM_NAME_MAX_LENGTH = 80;
+
 function normalizeTeamName(name) {
   return String(name || '').trim();
+}
+
+function validateTeamName(name) {
+  const nameTrim = normalizeTeamName(name);
+  if (!nameTrim) {
+    const err = new Error('Name is required');
+    err.code = 'invalid-name';
+    throw err;
+  }
+
+  if (nameTrim.length > TEAM_NAME_MAX_LENGTH) {
+    const err = new Error(`Team name must be ${TEAM_NAME_MAX_LENGTH} characters or fewer`);
+    err.code = 'name-too-long';
+    throw err;
+  }
+
+  return nameTrim;
 }
 
 function getTeamNameKey(name) {
@@ -46,16 +65,14 @@ export function observeTeamsOrderedByName(callback) {
 }
 
 export async function createTeamIfNotExists(name) {
-  const nameTrim = normalizeTeamName(name);
-  if (!nameTrim) throw new Error('Name is required');
+  const nameTrim = validateTeamName(name);
 
   await assertTeamNameAvailable(nameTrim);
   await addDoc(collection(db, 'teams'), { name: nameTrim, pingas: 0, drinkTotals: {} });
 }
 
 export async function updateTeamName(teamId, name) {
-  const nameTrim = normalizeTeamName(name);
-  if (!nameTrim) throw new Error('Name is required');
+  const nameTrim = validateTeamName(name);
 
   await assertTeamNameAvailable(nameTrim, teamId);
   await updateDoc(doc(db, 'teams', teamId), { name: nameTrim });

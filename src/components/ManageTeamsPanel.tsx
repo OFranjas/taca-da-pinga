@@ -3,6 +3,7 @@ import {
   observeTeamsOrderedByName,
   createTeamIfNotExists,
   deleteTeam,
+  TEAM_NAME_MAX_LENGTH,
   updateTeamName,
 } from '../services/teams';
 import { toast } from 'react-toastify';
@@ -43,6 +44,10 @@ export default function ManageTeamsPanel() {
       toast.error('Nome não pode estar vazio');
       return;
     }
+    if (nameTrim.length > TEAM_NAME_MAX_LENGTH) {
+      toast.error(`O nome não pode ter mais de ${TEAM_NAME_MAX_LENGTH} caracteres`);
+      return;
+    }
     try {
       await createTeamIfNotExists(nameTrim);
     } catch (error) {
@@ -53,7 +58,10 @@ export default function ManageTeamsPanel() {
           return;
         }
       }
-      throw error;
+
+      const message = error instanceof Error ? error.message : 'Não foi possível criar a equipa';
+      toast.error(message);
+      return;
     }
     toast.success('Equipa criada');
     setNewName('');
@@ -90,6 +98,10 @@ export default function ManageTeamsPanel() {
     const name = editName.trim();
     if (!name) {
       toast.error('Nome não pode estar vazio');
+      return;
+    }
+    if (name.length > TEAM_NAME_MAX_LENGTH) {
+      toast.error(`O nome não pode ter mais de ${TEAM_NAME_MAX_LENGTH} caracteres`);
       return;
     }
 

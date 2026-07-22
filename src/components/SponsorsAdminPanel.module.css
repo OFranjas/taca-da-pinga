@@ -409,6 +409,18 @@
   gap: var(--ui-space-xs);
 }
 
+.actionButton {
+  gap: var(--ui-space-xs);
+  min-width: 0;
+  padding: 0 var(--ui-space-sm);
+}
+
+.actionButton svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  stroke-width: 2;
+}
+
 @media (max-width: 75rem) {
   .form {
     grid-template-columns: repeat(2, minmax(0, 1fr));

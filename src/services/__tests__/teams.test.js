@@ -60,6 +60,17 @@ describe('services/teams', () => {
     await expect(createTeamIfNotExists(' equipa pinga ')).rejects.toThrow('Team already exists');
   });
 
+  test('rejects team names longer than the Firestore rule allows', async () => {
+    const { createTeamIfNotExists, updateTeamName, TEAM_NAME_MAX_LENGTH } = await import(
+      '../teams'
+    );
+    const longName = 'A'.repeat(TEAM_NAME_MAX_LENGTH + 1);
+
+    await expect(createTeamIfNotExists(longName)).rejects.toMatchObject({ code: 'name-too-long' });
+    await expect(updateTeamName('tid', longName)).rejects.toMatchObject({ code: 'name-too-long' });
+    expect(mockGetDocs).not.toHaveBeenCalled();
+  });
+
   test('updateTeamName validates, excludes the current team, and updates only the name', async () => {
     const { updateTeamName } = await import('../teams');
     mockGetDocs.mockResolvedValue({
