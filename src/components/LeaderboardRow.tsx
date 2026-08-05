@@ -11,13 +11,22 @@ type LeaderboardRowTone = {
   meterShadow: string;
 };
 
+export type GapRailPosition = 'start' | 'middle' | 'end';
+
 type LeaderboardRowProps = {
   rank: number;
   teamName: string;
   pingas: number;
   maxPingas: number;
+  gapToPrevious?: number;
+  gapRailPosition?: GapRailPosition;
   ariaRowIndex: number;
 };
+
+const gapFormatter = new Intl.NumberFormat('pt-PT', {
+  maximumFractionDigits: 0,
+  useGrouping: true,
+});
 
 const getTone = (rank: number): LeaderboardRowTone => {
   switch (rank) {
@@ -81,6 +90,8 @@ export function LeaderboardRow({
   teamName,
   pingas,
   maxPingas,
+  gapToPrevious,
+  gapRailPosition,
   ariaRowIndex,
 }: LeaderboardRowProps) {
   const safePingas = Number.isFinite(pingas) ? Math.max(0, Math.floor(pingas)) : 0;
@@ -89,6 +100,16 @@ export function LeaderboardRow({
   const isReferenceValue = safeMax > 0 && safePingas === safeMax;
   const roundedFillPercent = isReferenceValue ? 100 : Math.min(99, Math.round(fillPercent));
   const tone = getTone(rank);
+  const safeGap =
+    gapToPrevious === undefined || !Number.isFinite(gapToPrevious)
+      ? undefined
+      : Math.max(0, Math.floor(gapToPrevious));
+  const visibleGap =
+    safeGap === undefined ? undefined : safeGap === 0 ? '0' : `−${gapFormatter.format(safeGap)}`;
+  const accessibleGap =
+    safeGap === undefined
+      ? undefined
+      : `Diferença para a equipa imediatamente acima: ${safeGap} ${safeGap === 1 ? 'pinga' : 'pingas'}`;
 
   const style = {
     '--row-fill-width': `${fillPercent}%`,
@@ -114,6 +135,7 @@ export function LeaderboardRow({
       aria-rowindex={ariaRowIndex}
       className={styles.root}
       data-testid="leaderboard-row"
+      data-gap-rail={gapRailPosition}
       style={style}
     >
       <div role="cell" className={styles.rankCell}>
@@ -125,6 +147,7 @@ export function LeaderboardRow({
         <span className={styles.teamName} title={teamName}>
           {teamName}
         </span>
+        {accessibleGap ? <span className={styles.gapAccessibleText}>{accessibleGap}</span> : null}
       </div>
       <div role="cell" className={styles.meterCell}>
         <div
@@ -138,6 +161,11 @@ export function LeaderboardRow({
           <div className={styles.meterFill} aria-hidden="true" />
         </div>
       </div>
+      {visibleGap !== undefined ? (
+        <span className={styles.gapMarker} data-testid="leaderboard-gap" aria-hidden="true">
+          {visibleGap}
+        </span>
+      ) : null}
     </div>
   );
 }
