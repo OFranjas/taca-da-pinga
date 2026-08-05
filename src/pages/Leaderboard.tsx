@@ -7,7 +7,7 @@ import { observeSponsors, type Sponsor } from '../services/sponsors.service';
 import { Card, Page, Section, Stack, Text } from '../ui';
 import styles from './Leaderboard.module.css';
 
-import { LeaderboardRow } from '../components/LeaderboardRow';
+import { LeaderboardRow, type GapRailPosition } from '../components/LeaderboardRow';
 
 const DEFAULT_ROW_METRICS = { height: 80, gap: 12 };
 const LAPTOP_ROW_METRICS = { height: 44, gap: 2 };
@@ -31,6 +31,11 @@ type LeaderboardTeam = {
   id: string;
   name: string;
   pingas: number;
+};
+
+type LeaderboardTeamWithGap = LeaderboardTeam & {
+  gapToPrevious?: number;
+  gapRailPosition?: GapRailPosition;
 };
 
 type ObserveLeaderboard = (callback: (teams: ServiceTeam[]) => void) => () => void;
@@ -285,37 +290,59 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
     };
   }, [displayMode, teams.length]);
 
+  const teamsWithGaps = useMemo<LeaderboardTeamWithGap[]>(() => {
+    const railTeamCount = Math.min(teams.length, DISPLAY_PINNED_ROWS);
+
+    return teams.map((team, index) => {
+      const isGapVisible = index > 0 && index < DISPLAY_PINNED_ROWS;
+      const gapToPrevious = isGapVisible
+        ? Math.max(0, teams[index - 1].pingas - team.pingas)
+        : undefined;
+
+      let gapRailPosition: GapRailPosition | undefined;
+      if (index < railTeamCount) {
+        gapRailPosition = index === 0 ? 'start' : index === railTeamCount - 1 ? 'end' : 'middle';
+      }
+
+      return {
+        ...team,
+        gapToPrevious,
+        gapRailPosition,
+      };
+    });
+  }, [teams]);
+
   const virtualState = useMemo(() => {
     if (!shouldVirtualize) {
       return {
         startIndex: 0,
-        items: teams,
+        items: teamsWithGaps,
         offset: 0,
-        totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
+        totalHeight: getRowsetHeight(teamsWithGaps.length, rowMetrics.height, rowMetrics.gap),
       };
     }
 
     const safeScrollTop = Math.max(0, scrollTop);
     const estimateIndex = Math.floor(safeScrollTop / rowStride);
     const startIndex = Math.max(0, estimateIndex - BUFFER);
-    const endIndex = Math.min(teams.length, startIndex + MAX_RENDERED_ROWS);
+    const endIndex = Math.min(teamsWithGaps.length, startIndex + MAX_RENDERED_ROWS);
     const offset = startIndex * rowStride;
 
     return {
       startIndex,
-      items: teams.slice(startIndex, endIndex),
+      items: teamsWithGaps.slice(startIndex, endIndex),
       offset,
-      totalHeight: getRowsetHeight(teams.length, rowMetrics.height, rowMetrics.gap),
+      totalHeight: getRowsetHeight(teamsWithGaps.length, rowMetrics.height, rowMetrics.gap),
     };
-  }, [rowMetrics.gap, rowMetrics.height, rowStride, scrollTop, shouldVirtualize, teams]);
+  }, [rowMetrics.gap, rowMetrics.height, rowStride, scrollTop, shouldVirtualize, teamsWithGaps]);
 
   const maxPingas = useMemo(
-    () => teams.reduce((max, team) => (team.pingas > max ? team.pingas : max), 0),
-    [teams]
+    () => teamsWithGaps.reduce((max, team) => (team.pingas > max ? team.pingas : max), 0),
+    [teamsWithGaps]
   );
 
-  const displayPinnedTeams = displayMode ? teams.slice(0, DISPLAY_PINNED_ROWS) : [];
-  const displayScrollableTeams = displayMode ? teams.slice(DISPLAY_PINNED_ROWS) : [];
+  const displayPinnedTeams = displayMode ? teamsWithGaps.slice(0, DISPLAY_PINNED_ROWS) : [];
+  const displayScrollableTeams = displayMode ? teamsWithGaps.slice(DISPLAY_PINNED_ROWS) : [];
 
   const leaderboardSponsors = useMemo(
     () => (sponsorStatus === 'loaded' ? sponsors : []),
@@ -420,7 +447,7 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                     className={styles.tableSurface}
                     role="table"
                     aria-label={tableAriaLabel}
-                    aria-rowcount={teams.length + 1}
+                    aria-rowcount={teamsWithGaps.length + 1}
                     aria-colcount={3}
                     aria-busy={!isLoaded}
                   >
@@ -456,6 +483,8 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   teamName={team.name}
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
+                                  gapToPrevious={team.gapToPrevious}
+                                  gapRailPosition={team.gapRailPosition}
                                   ariaRowIndex={index + 2}
                                 />
                               ))}
@@ -473,6 +502,8 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                     teamName={team.name}
                                     pingas={team.pingas}
                                     maxPingas={maxPingas}
+                                    gapToPrevious={team.gapToPrevious}
+                                    gapRailPosition={team.gapRailPosition}
                                     ariaRowIndex={index + DISPLAY_PINNED_ROWS + 2}
                                   />
                                 ))}
@@ -497,6 +528,8 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                                   teamName={team.name}
                                   pingas={team.pingas}
                                   maxPingas={maxPingas}
+                                  gapToPrevious={team.gapToPrevious}
+                                  gapRailPosition={team.gapRailPosition}
                                   ariaRowIndex={virtualState.startIndex + index + 2}
                                 />
                               ))}
@@ -504,13 +537,15 @@ export default function Leaderboard({ displayMode = false }: LeaderboardProps = 
                           </div>
                         ) : (
                           <div className={styles.fullList} role="presentation">
-                            {teams.map((team, index) => (
+                            {teamsWithGaps.map((team, index) => (
                               <LeaderboardRow
                                 key={team.id}
                                 rank={index + 1}
                                 teamName={team.name}
                                 pingas={team.pingas}
                                 maxPingas={maxPingas}
+                                gapToPrevious={team.gapToPrevious}
+                                gapRailPosition={team.gapRailPosition}
                                 ariaRowIndex={index + 2}
                               />
                             ))}

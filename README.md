@@ -7,6 +7,7 @@ A real-time tournament leaderboard for tracking drinks as pingas.
 ## What it does
 
 - Shows a live public leaderboard.
+- Shows the top-five gap to the team immediately above in leaderboard and TV modes.
 - Lets authorised administrators score drinks, manage teams, sponsors and branding.
 - Provides a dedicated display mode for a TV or shared screen.
 - Runs on React, Firebase and Vite, with an installable PWA shell.

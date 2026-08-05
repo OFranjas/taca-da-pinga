@@ -141,6 +141,62 @@ describe('Leaderboard page', () => {
     expect(screen.queryByText('56')).not.toBeInTheDocument();
   });
 
+  it('shows top-five gaps to the immediately preceding team', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([
+        { id: 'leader', name: 'Leader Squad', pingas: 120 },
+        { id: 'second', name: 'Second Squad', pingas: 119 },
+        { id: 'third', name: 'Third Squad', pingas: 119 },
+        { id: 'fourth', name: 'Fourth Squad', pingas: 100 },
+        { id: 'fifth', name: 'Fifth Squad', pingas: 40 },
+        { id: 'sixth', name: 'Sixth Squad', pingas: 0 },
+      ]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    const rows = await screen.findAllByTestId('leaderboard-row');
+    const gaps = screen.getAllByTestId('leaderboard-gap');
+
+    expect(gaps.map((gap) => gap.textContent)).toEqual(['−1', '0', '−19', '−60']);
+    expect(rows[0]).not.toHaveTextContent('Diferença para a equipa');
+    expect(rows[1]).toHaveTextContent('Diferença para a equipa imediatamente acima: 1 pinga');
+    expect(rows[2]).toHaveTextContent('Diferença para a equipa imediatamente acima: 0 pingas');
+    expect(rows[4]).toHaveTextContent('Diferença para a equipa imediatamente acima: 60 pingas');
+    expect(rows[5]).not.toHaveTextContent('Diferença para a equipa');
+    expect(rows.map((row) => row.getAttribute('data-gap-rail'))).toEqual([
+      'start',
+      'middle',
+      'middle',
+      'middle',
+      'end',
+      null,
+    ]);
+  });
+
+  it('ends the gap rail at the last available team', async () => {
+    observeLeaderboardMock.mockImplementation((callback) => {
+      callback([
+        { id: 'leader', name: 'Leader Squad', pingas: 10 },
+        { id: 'second', name: 'Second Squad', pingas: 5 },
+        { id: 'third', name: 'Third Squad', pingas: 1 },
+      ]);
+      return vi.fn();
+    });
+
+    renderLeaderboard();
+
+    const rows = await screen.findAllByTestId('leaderboard-row');
+
+    expect(screen.getAllByTestId('leaderboard-gap')).toHaveLength(2);
+    expect(rows.map((row) => row.getAttribute('data-gap-rail'))).toEqual([
+      'start',
+      'middle',
+      'end',
+    ]);
+  });
+
   it('renders empty comparison meters without exposing a score', async () => {
     observeLeaderboardMock.mockImplementation((callback) => {
       callback([
