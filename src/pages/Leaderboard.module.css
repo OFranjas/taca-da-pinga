@@ -103,6 +103,7 @@
 }
 
 .tableCard {
+  --leaderboard-gap-gutter: 5rem;
   gap: var(--ui-space-md);
   min-width: 0;
   border-radius: var(--ui-radius-lg);
@@ -149,6 +150,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-sm);
+  width: calc(100% - var(--leaderboard-gap-gutter));
 }
 
 .skeletonRow {
@@ -201,6 +203,7 @@
   --leaderboard-column-gap: var(--ui-space-md);
   --leaderboard-row-height: 5rem;
   --leaderboard-row-gap: 0.75rem;
+  --leaderboard-gap-gutter: 5rem;
   display: flex;
   flex-direction: column;
   gap: var(--ui-space-sm);
@@ -244,6 +247,7 @@
   box-shadow: none;
   border: 1px solid rgba(148, 163, 184, 0.22);
   min-width: 0;
+  width: calc(100% - var(--leaderboard-gap-gutter));
 }
 
 .headerCell {
@@ -275,6 +279,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--leaderboard-row-gap, 0.75rem);
+  width: calc(100% - var(--leaderboard-gap-gutter));
   transform: translateY(0);
   will-change: transform;
 }
@@ -283,12 +288,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--leaderboard-row-gap, 0.75rem);
+  width: calc(100% - var(--leaderboard-gap-gutter));
 }
 
 .displayPinnedList {
   display: flex;
   flex-direction: column;
   gap: var(--leaderboard-row-gap, 0.75rem);
+  width: calc(100% - var(--leaderboard-gap-gutter));
 }
 
 .visuallyHidden {
@@ -376,6 +383,7 @@
       minmax(0, 1.5fr);
     --leaderboard-row-height: 2.75rem;
     --leaderboard-row-gap: 0.125rem;
+    --leaderboard-gap-gutter: 4.5rem;
   }
 
   .tableHeaderMeta h2 {
@@ -429,6 +437,7 @@
 }
 
 .displayPage .tableCard {
+  --leaderboard-gap-gutter: 5rem;
   padding: var(--ui-space-lg);
   gap: var(--ui-space-sm);
   border-radius: var(--ui-radius-md);
@@ -439,6 +448,7 @@
     minmax(18rem, 1.42fr);
   --leaderboard-row-height: 3rem;
   --leaderboard-row-gap: 0.3125rem;
+  --leaderboard-gap-gutter: 5rem;
 }
 
 .displayPage .skeletonValue {
@@ -513,6 +523,7 @@
   }
 
   .tableCard {
+    --leaderboard-gap-gutter: 3.75rem;
     padding: var(--ui-space-md);
     border-radius: var(--ui-radius-md);
   }
@@ -542,6 +553,7 @@
     --leaderboard-column-gap: var(--ui-space-sm);
     --leaderboard-row-height: 4rem;
     --leaderboard-row-gap: 0.4375rem;
+    --leaderboard-gap-gutter: 3.75rem;
   }
 
   .headerRow {
