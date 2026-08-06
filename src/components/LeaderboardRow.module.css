@@ -151,9 +151,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 3.25rem;
-  height: 2.25rem;
-  padding: 0 var(--ui-space-xs);
+  min-width: 3.75rem;
+  min-height: 2.75rem;
+  height: auto;
+  padding: var(--ui-space-xs) var(--ui-space-sm);
   border: 1px solid rgba(248, 113, 113, 0.22);
   border-radius: var(--ui-radius-md);
   background: rgba(255, 247, 247, 0.96);
@@ -202,8 +203,9 @@
   }
 
   .gapMarker {
-    min-width: 2.875rem;
-    height: 2rem;
+    min-width: 3.25rem;
+    min-height: 2.25rem;
+    padding: var(--ui-space-2xs) var(--ui-space-xs);
     font-size: 1.05rem;
   }
 }
@@ -257,9 +259,9 @@
   }
 
   .gapMarker {
-    min-width: 2.5rem;
-    height: 1.75rem;
-    padding: 0 var(--ui-space-2xs);
+    min-width: 3rem;
+    min-height: 2.25rem;
+    padding: var(--ui-space-xs) var(--ui-space-sm);
     border-radius: var(--ui-radius-sm);
     font-size: 1rem;
   }
